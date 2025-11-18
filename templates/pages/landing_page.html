@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -33,6 +34,7 @@
         .nav-scrolled .logo-text {
             color: #4f46e5 !important; /* text-indigo-600 */
         }
+        /* Logo tetap sama saat navbar di-scroll - tidak ada perubahan warna */
         .nav-scrolled .btn-login {
             color: #4f46e5 !important; /* text-indigo-600 */
         }
@@ -55,8 +57,8 @@
             <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="{% url 'landing' %}" class="text-3xl font-bold logo-text text-white">
-                        Motrac
+                    <a href="{% url 'landing' %}" class="flex items-center">
+                        <img src="{% static 'images/logo.png' %}" alt="Motrac" class="h-10 w-auto">
                     </a>
                 </div>
                 
@@ -506,8 +508,8 @@
                 
                 <!-- Kolom Logo/Deskripsi -->
                 <div class="md:col-span-2">
-                    <a href="{% url 'landing' %}" class="text-3xl font-bold text-white">
-                        Motrac
+                    <a href="{% url 'landing' %}" class="flex items-center">
+                        <img src="{% static 'images/logo.png' %}" alt="Motrac" class="h-10 w-auto">
                     </a>
                     <p class="mt-4 text-gray-400 max-w-sm">
                         Aplikasi cashflow management lengkap untuk mengelola keuangan pribadi dan bisnis Anda dengan mudah dan efisien.
