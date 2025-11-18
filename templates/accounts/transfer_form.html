@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Antar Dompet - Motrac</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'core:dashboard' %}" class="text-indigo-600 hover:text-indigo-700">Dashboard</a>
+                    <a href="{% url 'core:account_list' %}" class="text-indigo-600 hover:text-indigo-700">Kelola Dompet</a>
+                    <span class="text-gray-700">Halo, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Transfer Antar Dompet</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.from_account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Dari Dompet <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.from_account }}
+                        {% if form.from_account.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.from_account.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.to_account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Ke Dompet <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.to_account }}
+                        {% if form.to_account.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.to_account.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Jumlah Transfer <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.amount }}
+                        {% if form.amount.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.amount.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Masukkan jumlah yang ingin ditransfer (minimal Rp 0.01)</p>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Deskripsi (Opsional)
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 border border-red-200 rounded-md p-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="flex space-x-4 pt-4">
+                        <button type="submit" class="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            Transfer
+                        </button>
+                        <a href="{% url 'core:dashboard' %}" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                            Batal
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Box -->
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
+            <h3 class="font-semibold text-blue-800 mb-2">ℹ️ Informasi Transfer</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• Transfer akan membuat 2 transaksi: pengeluaran dari dompet asal dan pemasukan ke dompet tujuan</li>
+                <li>• Pastikan saldo dompet asal cukup untuk melakukan transfer</li>
+                <li>• Dompet asal dan tujuan tidak boleh sama</li>
+                <li>• Transfer akan otomatis menggunakan kategori "Transfer"</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+
