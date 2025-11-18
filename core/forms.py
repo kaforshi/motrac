@@ -127,14 +127,14 @@ class TransferForm(forms.Form):
         queryset=Account.objects.none(),
         label='Dari Dompet',
         widget=forms.Select(attrs={
-            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            'class': 'block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border shadow-sm'
         })
     )
     to_account = forms.ModelChoiceField(
         queryset=Account.objects.none(),
         label='Ke Dompet',
         widget=forms.Select(attrs={
-            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            'class': 'block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border shadow-sm'
         })
     )
     amount = forms.DecimalField(
@@ -143,17 +143,18 @@ class TransferForm(forms.Form):
         min_value=Decimal('0.01'),
         label='Jumlah Transfer',
         widget=forms.NumberInput(attrs={
-            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+            'class': 'focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-12 sm:text-sm border-gray-300 rounded-md border py-2',
             'step': '0.01',
             'min': '0.01',
-            'placeholder': '0.00'
+            'placeholder': '0.00',
+            'style': 'padding-left: 2.5rem; padding-right: 3rem;'
         })
     )
     description = forms.CharField(
         required=False,
         label='Deskripsi (Opsional)',
         widget=forms.Textarea(attrs={
-            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+            'class': 'shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md px-3 py-2',
             'rows': 3,
             'placeholder': 'Catatan transfer (opsional)'
         })

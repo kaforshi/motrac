@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Transaksi - Motrac</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter sebagai font default */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Navigasi Utama -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Dompet
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Kategori
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transfer
+                        </a>
+                        <!-- Link Aktif -->
+                        <a href="#" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            History
+                        </a>
+                    </div>
+                </div>
+                <!-- Navigasi User -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-sm text-gray-700 mr-4">Halo, aryantm</span>
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Konten Utama Halaman -->
+    <main class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Header Halaman -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">History Transaksi</h2>
+                <p class="mt-1 text-sm text-gray-600">Lihat dan filter riwayat transaksi Anda secara detail.</p>
+            </div>
+
+            <!-- Kartu Filter -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 border-b border-gray-100 pb-2">Filter Transaksi</h3>
+                <form action="#" method="GET">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                        <!-- Filter Dompet -->
+                        <div>
+                            <label for="filter_dompet" class="block text-sm font-medium text-gray-700 mb-1">Dompet</label>
+                            <select id="filter_dompet" name="dompet" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2 border">
+                                <option value="">Semua Dompet</option>
+                                <option value="rest23">rest23</option>
+                                <option value="test">test</option>
+                            </select>
+                        </div>
+                        <!-- Filter Kategori -->
+                        <div>
+                            <label for="filter_kategori" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                            <select id="filter_kategori" name="kategori" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2 border">
+                                <option value="">Semua Kategori</option>
+                                <option value="gaji">Gaji</option>
+                                <option value="makan">Makanan</option>
+                            </select>
+                        </div>
+                        <!-- Filter Bulan -->
+                        <div>
+                            <label for="filter_bulan" class="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                            <select id="filter_bulan" name="bulan" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2 border">
+                                <option value="">Semua Bulan</option>
+                                <option value="1">Januari</option>
+                                <option value="2">Februari</option>
+                                <!-- dst -->
+                            </select>
+                        </div>
+                        <!-- Filter Tahun -->
+                        <div>
+                            <label for="filter_tahun" class="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                            <select id="filter_tahun" name="tahun" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2 border">
+                                <option value="">Semua Tahun</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Tombol Filter -->
+                    <div class="flex justify-start space-x-3">
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Terapkan Filter
+                        </button>
+                        <button type="reset" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Ringkasan Singkat (Stats) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
+                    <p class="text-sm font-medium text-gray-500">Total Pemasukan</p>
+                    <p class="text-2xl font-bold text-green-600 mt-1">Rp 1.503.200,00</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-500">
+                    <p class="text-sm font-medium text-gray-500">Total Pengeluaran</p>
+                    <p class="text-2xl font-bold text-red-600 mt-1">Rp 3.000,00</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-indigo-500">
+                    <p class="text-sm font-medium text-gray-500">Saldo Bersih</p>
+                    <p class="text-2xl font-bold text-indigo-600 mt-1">Rp 1.500.200,00</p>
+                </div>
+            </div>
+
+            <!-- Tabel Daftar Transaksi -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h3 class="text-lg font-medium text-gray-900">Daftar Transaksi</h3>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">Total: 7 transaksi</span>
+                        <button class="flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm">
+                            <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            Download PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dompet</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Row 1: Pemasukan -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18 Nov 2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pemasukan
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">rest23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gaji</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">tea</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right">Rp 1.500.000,00</td>
+                            </tr>
+
+                            <!-- Row 2: Pengeluaran -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18 Nov 2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Pengeluaran
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">rest23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kesehatan</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">awd</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600 text-right">-Rp 1.000,00</td>
+                            </tr>
+
+                            <!-- Row 3: Pemasukan -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18 Nov 2025</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pemasukan
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">rest23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bonus</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1awd</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right">Rp 2.000,00</td>
+                            </tr>
+
+                             <!-- Row 4: Pemasukan -->
+                             <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">31 Dec 2001</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pemasukan
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">rest23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bonus</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right">Rp 1.000,00</td>
+                            </tr>
+
+                            <!-- Row 5: Pengeluaran -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20 Sep 2001</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Pengeluaran
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">rest23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Lainnya</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">adwawd</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600 text-right">-Rp 2.000,00</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination (Opsional, jika data banyak) -->
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Menampilkan <span class="font-medium">1</span> sampai <span class="font-medium">5</span> dari <span class="font-medium">7</span> hasil
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Sebelumnya</span>
+                                    <!-- Heroicon name: solid/chevron-left -->
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                                <a href="#" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</a>
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Selanjutnya</span>
+                                    <!-- Heroicon name: solid/chevron-right -->
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </main>
+
+</body>
+</html>

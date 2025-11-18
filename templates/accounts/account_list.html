@@ -4,76 +4,543 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Dompet - Motrac</title>
+    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter sebagai font default */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        /* Animasi untuk Toast Notification */
+        #toastNotification {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        #toastNotification:not(.hidden) {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        #toastNotification.hidden {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navbar -->
+<body>
+
+    <!-- Header / Navbar -->
     <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'core:dashboard' %}" class="text-indigo-600 hover:text-indigo-700">Dashboard</a>
-                    <span class="text-gray-700">Halo, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-700">Logout</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Navigasi Utama -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'core:dashboard' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <!-- Link Aktif -->
+                        <a href="{% url 'core:account_list' %}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            Kelola Dompet
+                        </a>
+                        <a href="{% url 'core:category-list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Kategori
+                        </a>
+                        <a href="{% url 'core:transfer' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transfer
+                        </a>
+                        <a href="{% url 'core:transaction-history' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            History
+                        </a>
+                    </div>
+                </div>
+                <!-- Navigasi User -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-sm text-gray-700 mr-4">Halo, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Logout
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Kelola Dompet</h2>
-            <a href="{% url 'core:account_create' %}" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                + Tambah Dompet
-            </a>
-        </div>
-
-        {% if accounts %}
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for account in accounts %}
-                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-200">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-xl font-semibold text-gray-800">{{ account.name }}</h3>
-                            <div class="flex space-x-2">
-                                <a href="{% url 'core:account_update' account.pk %}" class="text-indigo-600 hover:text-indigo-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                </a>
-                                <a href="{% url 'core:account_delete' account.pk %}" class="text-red-600 hover:text-red-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="border-t pt-4">
-                            <p class="text-sm text-gray-500 mb-1">Saldo Awal</p>
-                            <p class="text-2xl font-bold text-indigo-600">Rp {{ account.initial_balance|floatformat:2 }}</p>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-4">Dibuat: {{ account.created_at|date:"d M Y" }}</p>
+    <!-- Konten Utama Halaman -->
+    <main class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
                     </div>
                 {% endfor %}
+            {% endif %}
+
+            <!-- Notifikasi Toast -->
+            <div id="toastNotification" class="fixed top-4 right-4 z-50 hidden">
+                <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 flex items-center space-x-3 min-w-[300px] max-w-md">
+                    <div id="toastIcon" class="flex-shrink-0">
+                        <!-- Icon akan diisi oleh JavaScript -->
+                    </div>
+                    <div class="flex-1">
+                        <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                    </div>
+                    <button onclick="closeToast()" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-        {% else %}
-            <div class="bg-white p-12 rounded-lg shadow-md text-center">
-                <p class="text-gray-500 mb-4">Belum ada dompet. Tambahkan dompet pertama Anda!</p>
-                <a href="{% url 'core:account_create' %}" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
-                    + Tambah Dompet
-                </a>
+
+            <!-- Header Halaman (Judul & Tombol) -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    Kelola Dompet
+                </h2>
+                <button onclick="openCreateModal()" class="flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Tambah Dompet
+                </button>
             </div>
-        {% endif %}
+
+            <!-- Grid Kartu Dompet -->
+            {% if accounts %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for account in accounts %}
+                        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between" style="min-height: 200px;">
+                            <!-- Konten Atas (Nama, Saldo, Tombol) -->
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <h3 class="text-xl font-bold text-gray-900">{{ account.name }}</h3>
+                                    <div class="flex space-x-2 flex-shrink-0">
+                                        <button onclick="openEditModal({{ account.pk }})" class="text-gray-400 hover:text-indigo-600" title="Edit Dompet">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                            </svg>
+                                        </button>
+                                        <button onclick="openDeleteModal({{ account.pk }}, '{{ account.name }}')" class="text-gray-400 hover:text-red-600" title="Hapus Dompet">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165A48.11 48.11 0 0112 3c-2.292 0-4.545.209-6.75.62m13.5 0c-.34.058-.68.117-1.022.166m1.022-.166L18.37 19.563a2.25 2.25 0 01-2.244 2.077H7.875a2.25 2.25 0 01-2.244-2.077L4.35 6.21m13.5 0L12 3m0 0l-1.022.166" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="text-sm font-medium text-gray-500">Saldo Awal</p>
+                                    <p class="text-3xl font-bold text-indigo-600">Rp {{ account.initial_balance|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                            <!-- Konten Bawah (Tanggal) -->
+                            <div class="mt-auto pt-4">
+                                <p class="text-xs text-gray-400">Dibuat: {{ account.created_at|date:"d M Y" }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <p class="text-gray-500 mb-4">Belum ada dompet. Tambahkan dompet pertama Anda!</p>
+                    <button onclick="openCreateModal()" class="inline-flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Tambah Dompet
+                    </button>
+                </div>
+            {% endif %}
+            
+        </div>
+    </main>
+
+    <!-- Modal Tambah Dompet -->
+    <div id="createModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Tambah Dompet Baru</h3>
+                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Form Modal -->
+            <form id="createForm" onsubmit="submitCreateForm(event)" class="space-y-4">
+                <div>
+                    <label for="createNamaDompet" class="block text-sm font-medium text-gray-700">
+                        Nama Dompet
+                    </label>
+                    <input type="text" name="name" id="createNamaDompet" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="cth: Dompet Utama">
+                </div>
+                <div>
+                    <label for="createSaldoAwal" class="block text-sm font-medium text-gray-700">
+                        Saldo Awal
+                    </label>
+                    <input type="number" name="initial_balance" id="createSaldoAwal" required step="0.01" min="0" value="0.00"
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="0.00">
+                </div>
+                <div class="pt-2 flex space-x-4">
+                    <button type="submit" class="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Tambah Dompet
+                    </button>
+                    <button type="button" onclick="closeCreateModal()" class="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- Modal Edit Dompet -->
+    <div id="editModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Edit Dompet</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Form Modal -->
+            <form id="editForm" onsubmit="submitEditForm(event)" class="space-y-4">
+                <input type="hidden" id="editAccountId" name="account_id">
+                <div>
+                    <label for="editNamaDompet" class="block text-sm font-medium text-gray-700">
+                        Nama Dompet
+                    </label>
+                    <input type="text" name="name" id="editNamaDompet" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="cth: Dompet Utama">
+                </div>
+                <div>
+                    <label for="editSaldoAwal" class="block text-sm font-medium text-gray-700">
+                        Saldo Awal
+                    </label>
+                    <input type="number" name="initial_balance" id="editSaldoAwal" required step="0.01" min="0"
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="0.00">
+                </div>
+                <div class="pt-2 flex space-x-4">
+                    <button type="submit" class="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Simpan Perubahan
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Dompet -->
+    <div id="deleteModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Hapus Dompet</h3>
+                <button onclick="closeDeleteModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Konten Modal -->
+            <div class="mb-6">
+                <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <p class="text-red-800 font-semibold mb-2">Peringatan!</p>
+                    <p class="text-red-700 text-sm">
+                        Apakah Anda yakin ingin menghapus dompet <strong id="deleteAccountName"></strong>? 
+                        Tindakan ini tidak dapat dibatalkan. Semua transaksi yang terkait dengan dompet ini juga akan terpengaruh.
+                    </p>
+                </div>
+            </div>
+            <!-- Tombol Modal -->
+            <div class="flex space-x-4">
+                <button onclick="submitDeleteForm()" class="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                    Ya, Hapus
+                </button>
+                <button onclick="closeDeleteModal()" class="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Batal
+                </button>
+            </div>
+            <input type="hidden" id="deleteAccountId" name="account_id">
+        </div>
+    </div>
+
+    <!-- JavaScript untuk Modal dan AJAX -->
+    <script>
+        // Fungsi untuk mendapatkan CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Fungsi untuk menampilkan notifikasi toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set message
+            toastMessage.textContent = message;
+            
+            // Set icon berdasarkan type
+            if (type === 'success') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-green-200');
+            } else if (type === 'error') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-red-200');
+            } else if (type === 'warning') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-yellow-200');
+            }
+            
+            // Reset posisi awal untuk animasi
+            toast.style.transform = 'translateX(100%)';
+            toast.style.opacity = '0';
+            
+            // Trigger reflow untuk memastikan animasi berjalan
+            void toast.offsetWidth;
+            
+            // Tampilkan toast dengan animasi
+            toast.classList.remove('hidden');
+            
+            // Auto hide setelah 5 detik
+            setTimeout(() => {
+                closeToast();
+            }, 5000);
+        }
+
+        // Fungsi untuk menutup notifikasi toast
+        function closeToast() {
+            const toast = document.getElementById('toastNotification');
+            // Tambahkan class hidden untuk trigger animasi
+            toast.classList.add('hidden');
+            // Reset border class setelah animasi selesai
+            setTimeout(() => {
+                const bgDiv = toast.querySelector('.bg-white');
+                if (bgDiv) {
+                    bgDiv.classList.remove('border-green-200', 'border-red-200', 'border-yellow-200');
+                }
+            }, 300); // Wait for animation to complete
+        }
+
+        // Fungsi untuk membuka modal tambah
+        function openCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup modal tambah
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.getElementById('createForm').reset();
+            // Reset value saldo awal ke 0.00
+            document.getElementById('createSaldoAwal').value = '0.00';
+        }
+
+        // Fungsi untuk submit form tambah
+        async function submitCreateForm(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('createNamaDompet').value,
+                initial_balance: document.getElementById('createSaldoAwal').value
+            };
+            
+            try {
+                const response = await fetch('{% url "core:account_create_ajax" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeCreateModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat menambahkan dompet.', 'error');
+            }
+        }
+
+        // Fungsi untuk membuka modal edit
+        async function openEditModal(accountId) {
+            try {
+                const response = await fetch(`{% url 'core:account_data' 0 %}`.replace('0', accountId));
+                const data = await response.json();
+                
+                if (data.error) {
+                    showToast('Error: ' + data.error, 'error');
+                    return;
+                }
+                
+                document.getElementById('editAccountId').value = data.id;
+                document.getElementById('editNamaDompet').value = data.name;
+                document.getElementById('editSaldoAwal').value = data.initial_balance;
+                document.getElementById('editModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat memuat data dompet.');
+            }
+        }
+
+        // Fungsi untuk menutup modal edit
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+        }
+
+        // Fungsi untuk submit form edit
+        async function submitEditForm(event) {
+            event.preventDefault();
+            
+            const accountId = document.getElementById('editAccountId').value;
+            const formData = {
+                name: document.getElementById('editNamaDompet').value,
+                initial_balance: document.getElementById('editSaldoAwal').value
+            };
+            
+            try {
+                const response = await fetch(`{% url 'core:account_update_ajax' 0 %}`.replace('0', accountId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeEditModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat memperbarui dompet.', 'error');
+            }
+        }
+
+        // Fungsi untuk membuka modal hapus
+        function openDeleteModal(accountId, accountName) {
+            document.getElementById('deleteAccountId').value = accountId;
+            document.getElementById('deleteAccountName').textContent = accountName;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup modal hapus
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Fungsi untuk submit form hapus
+        async function submitDeleteForm() {
+            const accountId = document.getElementById('deleteAccountId').value;
+            
+            try {
+                const response = await fetch(`{% url 'core:account_delete_ajax' 0 %}`.replace('0', accountId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeDeleteModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat menghapus dompet.', 'error');
+            }
+        }
+
+        // Tutup modal jika klik di luar area modal
+        document.getElementById('createModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCreateModal();
+            }
+        });
+
+        document.getElementById('editModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
+
 </body>
 </html>
 

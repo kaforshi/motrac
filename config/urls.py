@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.views import LandingPageView
+from core.views import LandingPageView, custom_logout_view
 
 urlpatterns = [
     path('', LandingPageView.as_view(), name='landing'),
     path('admin/', admin.site.urls),
+    path('accounts/logout/', custom_logout_view, name='logout'),  # Custom logout yang redirect ke landing page
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('core.urls')),
 ]

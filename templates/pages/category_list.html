@@ -4,79 +4,568 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Kategori - Motrac</title>
+    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter sebagai font default */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        /* Animasi untuk Toast Notification */
+        #toastNotification {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        #toastNotification:not(.hidden) {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        #toastNotification.hidden {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navbar -->
+<body>
+
+    <!-- Header / Navbar -->
     <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'core:dashboard' %}" class="text-indigo-600 hover:text-indigo-700">Dashboard</a>
-                    <span class="text-gray-700">Halo, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-700">Logout</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Navigasi Utama -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'core:dashboard' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="{% url 'core:account_list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Dompet
+                        </a>
+                        <!-- Link Aktif -->
+                        <a href="{% url 'core:category-list' %}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            Kelola Kategori
+                        </a>
+                        <a href="{% url 'core:transfer' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transfer
+                        </a>
+                        <a href="{% url 'core:transaction-history' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            History
+                        </a>
+                    </div>
+                </div>
+                <!-- Navigasi User -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-sm text-gray-700 mr-4">Halo, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Logout
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
-                    {{ message }}
+    <!-- Konten Utama Halaman -->
+    <main class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Notifikasi Toast -->
+            <div id="toastNotification" class="fixed top-4 right-4 z-50 hidden">
+                <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 flex items-center space-x-3 min-w-[300px] max-w-md">
+                    <div id="toastIcon" class="flex-shrink-0">
+                        <!-- Icon akan diisi oleh JavaScript -->
+                    </div>
+                    <div class="flex-1">
+                        <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                    </div>
+                    <button onclick="closeToast()" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-            {% endfor %}
-        {% endif %}
+            </div>
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Daftar Kategori Saya</h2>
-            <a href="{% url 'core:category-create' %}" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                + Tambah Kategori Baru
-            </a>
+            <!-- Header Halaman (Judul & Tombol) -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    Daftar Kategori Saya
+                </h2>
+                <button onclick="openCreateModal()" class="flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Tambah Kategori
+                </button>
+            </div>
+
+            <!-- Tabel Kategori -->
+            {% if categories %}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nama Kategori
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tipe
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Aksi
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for category in categories %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="text-sm font-medium text-gray-900">{{ category.name }}</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if category.type == 'Pemasukan' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                                {{ category.get_type_display }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="btn-edit-category text-indigo-600 hover:text-indigo-900" data-category-id="{{ category.pk }}">Edit</button>
+                                            <button class="btn-delete-category ml-4 text-red-600 hover:text-red-900" data-category-id="{{ category.pk }}" data-category-name="{{ category.name }}">Hapus</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <p class="text-gray-500 mb-4">Belum ada kategori. Tambahkan kategori pertama Anda!</p>
+                    <button onclick="openCreateModal()" class="inline-flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Tambah Kategori Baru
+                    </button>
+                </div>
+            {% endif %}
+            
         </div>
+    </main>
 
-        {% if categories %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Kategori</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for category in categories %}
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ category.name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {% if category.type == 'Pemasukan' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                        {{ category.get_type_display }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{% url 'core:category-update' category.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                    <a href="{% url 'core:category-delete' category.pk %}" class="text-red-600 hover:text-red-900">Hapus</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Modal Tambah Kategori -->
+    <div id="createModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900">Tambah Kategori Baru</h3>
+                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-        {% else %}
-            <div class="bg-white p-12 rounded-lg shadow-md text-center">
-                <p class="text-gray-500 mb-4">Belum ada kategori. Tambahkan kategori pertama Anda!</p>
-                <a href="{% url 'core:category-create' %}" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
-                    + Tambah Kategori Baru
-                </a>
-            </div>
-        {% endif %}
+            <!-- Form Modal -->
+            <form id="createForm" onsubmit="submitCreateForm(event)" class="space-y-4 mt-4">
+                <div>
+                    <label for="createNamaKategori" class="block text-sm font-medium text-gray-700">
+                        Nama Kategori
+                    </label>
+                    <input type="text" name="name" id="createNamaKategori" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="cth: Makanan">
+                </div>
+                <div>
+                    <label for="createTipeKategori" class="block text-sm font-medium text-gray-700">
+                        Tipe Kategori
+                    </label>
+                    <select name="type" id="createTipeKategori" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">Pilih Tipe</option>
+                        <option value="Pemasukan">Pemasukan</option>
+                        <option value="Pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+                <div class="pt-2 text-right">
+                    <button type="submit" class="w-full sm:w-auto justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Simpan Kategori
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- Modal Edit Kategori -->
+    <div id="editModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Edit Kategori</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Form Modal -->
+            <form id="editForm" onsubmit="submitEditForm(event)" class="space-y-4">
+                <input type="hidden" id="editCategoryId" name="category_id">
+                <div>
+                    <label for="editNamaKategori" class="block text-sm font-medium text-gray-700">
+                        Nama Kategori
+                    </label>
+                    <input type="text" name="name" id="editNamaKategori" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="cth: Makanan & Minuman">
+                </div>
+                <div>
+                    <label for="editTipeKategori" class="block text-sm font-medium text-gray-700">
+                        Tipe
+                    </label>
+                    <select name="type" id="editTipeKategori" required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">Pilih Tipe</option>
+                        <option value="Pemasukan">Pemasukan</option>
+                        <option value="Pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex space-x-4">
+                    <button type="submit" class="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Simpan Perubahan
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Kategori -->
+    <div id="deleteModal" class="fixed inset-0 z-10 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Hapus Kategori</h3>
+                <button onclick="closeDeleteModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Konten Modal -->
+            <div class="mb-6">
+                <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <p class="text-red-800 font-semibold mb-2">Peringatan!</p>
+                    <p class="text-red-700 text-sm">
+                        Apakah Anda yakin ingin menghapus kategori <strong id="deleteCategoryName"></strong>? 
+                        Tindakan ini tidak dapat dibatalkan. Semua transaksi yang terkait dengan kategori ini juga akan terpengaruh.
+                    </p>
+                </div>
+            </div>
+            <!-- Tombol Modal -->
+            <div class="flex space-x-4">
+                <button onclick="submitDeleteForm()" class="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                    Ya, Hapus
+                </button>
+                <button onclick="closeDeleteModal()" class="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Batal
+                </button>
+            </div>
+            <input type="hidden" id="deleteCategoryId" name="category_id">
+        </div>
+    </div>
+
+    <!-- JavaScript untuk Modal dan AJAX -->
+    <script>
+        // Fungsi untuk mendapatkan CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Fungsi untuk menampilkan notifikasi toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set message
+            toastMessage.textContent = message;
+            
+            // Set icon berdasarkan type
+            if (type === 'success') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-green-200');
+            } else if (type === 'error') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-red-200');
+            } else if (type === 'warning') {
+                toastIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                `;
+                toast.querySelector('.bg-white').classList.add('border-yellow-200');
+            }
+            
+            // Reset posisi awal untuk animasi
+            toast.style.transform = 'translateX(100%)';
+            toast.style.opacity = '0';
+            
+            // Trigger reflow untuk memastikan animasi berjalan
+            void toast.offsetWidth;
+            
+            // Tampilkan toast dengan animasi
+            toast.classList.remove('hidden');
+            
+            // Auto hide setelah 5 detik
+            setTimeout(() => {
+                closeToast();
+            }, 5000);
+        }
+
+        // Fungsi untuk menutup notifikasi toast
+        function closeToast() {
+            const toast = document.getElementById('toastNotification');
+            // Tambahkan class hidden untuk trigger animasi
+            toast.classList.add('hidden');
+            // Reset border class setelah animasi selesai
+            setTimeout(() => {
+                const bgDiv = toast.querySelector('.bg-white');
+                if (bgDiv) {
+                    bgDiv.classList.remove('border-green-200', 'border-red-200', 'border-yellow-200');
+                }
+            }, 300); // Wait for animation to complete
+        }
+
+        // Fungsi untuk membuka modal tambah
+        function openCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup modal tambah
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.getElementById('createForm').reset();
+        }
+
+        // Fungsi untuk submit form tambah
+        async function submitCreateForm(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('createNamaKategori').value,
+                type: document.getElementById('createTipeKategori').value
+            };
+            
+            try {
+                const response = await fetch('{% url "core:category_create_ajax" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeCreateModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat menambahkan kategori.', 'error');
+            }
+        }
+
+        // Fungsi untuk membuka modal edit
+        async function openEditModal(categoryId) {
+            try {
+                const response = await fetch(`{% url 'core:category_data' 0 %}`.replace('0', String(categoryId)));
+                const data = await response.json();
+                
+                if (data.error) {
+                    showToast('Error: ' + data.error, 'error');
+                    return;
+                }
+                
+                document.getElementById('editCategoryId').value = data.id;
+                document.getElementById('editNamaKategori').value = data.name;
+                document.getElementById('editTipeKategori').value = data.type;
+                document.getElementById('editModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat memuat data kategori.', 'error');
+            }
+        }
+
+        // Fungsi untuk menutup modal edit
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+        }
+
+        // Fungsi untuk submit form edit
+        async function submitEditForm(event) {
+            event.preventDefault();
+            
+            const categoryId = document.getElementById('editCategoryId').value;
+            const formData = {
+                name: document.getElementById('editNamaKategori').value,
+                type: document.getElementById('editTipeKategori').value
+            };
+            
+            try {
+                const response = await fetch(`{% url 'core:category_update_ajax' 0 %}`.replace('0', String(categoryId)), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeEditModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat memperbarui kategori.', 'error');
+            }
+        }
+
+        // Fungsi untuk membuka modal hapus
+        function openDeleteModal(categoryId, categoryName) {
+            document.getElementById('deleteCategoryId').value = categoryId;
+            document.getElementById('deleteCategoryName').textContent = String(categoryName);
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup modal hapus
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Fungsi untuk submit form hapus
+        async function submitDeleteForm() {
+            const categoryId = document.getElementById('deleteCategoryId').value;
+            
+            try {
+                const response = await fetch(`{% url 'core:category_delete_ajax' 0 %}`.replace('0', String(categoryId)), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeDeleteModal();
+                    setTimeout(() => {
+                        location.reload(); // Reload halaman untuk update data
+                    }, 1000); // Delay 1 detik untuk menampilkan notifikasi
+                } else {
+                    showToast('Error: ' + (data.error || 'Terjadi kesalahan'), 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan saat menghapus kategori.', 'error');
+            }
+        }
+
+        // Event listener untuk tombol edit dan hapus kategori
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButtons = document.querySelectorAll('.btn-edit-category');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-category-id');
+                    openEditModal(categoryId);
+                });
+            });
+
+            const deleteButtons = document.querySelectorAll('.btn-delete-category');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-category-id');
+                    const categoryName = this.getAttribute('data-category-name');
+                    openDeleteModal(categoryId, categoryName);
+                });
+            });
+        });
+
+        // Tutup modal jika klik di luar area modal
+        document.getElementById('createModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCreateModal();
+            }
+        });
+
+        document.getElementById('editModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
+
 </body>
 </html>
-

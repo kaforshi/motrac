@@ -3,114 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer Antar Dompet - Motrac</title>
+    <title>Transfer - Motrac</title>
+    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter sebagai font default */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navbar -->
+<body>
+
+    <!-- Header / Navbar -->
     <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'core:dashboard' %}" class="text-indigo-600 hover:text-indigo-700">Dashboard</a>
-                    <a href="{% url 'core:account_list' %}" class="text-indigo-600 hover:text-indigo-700">Kelola Dompet</a>
-                    <span class="text-gray-700">Halo, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-700">Logout</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Navigasi Utama -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'core:dashboard' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="{% url 'core:account_list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Dompet
+                        </a>
+                        <a href="{% url 'core:category-list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Kategori
+                        </a>
+                        <!-- Link Aktif -->
+                        <a href="{% url 'core:transfer' %}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            Transfer
+                        </a>
+                        <a href="{% url 'core:transaction-history' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            History
+                        </a>
+                    </div>
+                </div>
+                <!-- Navigasi User -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-sm text-gray-700 mr-4">Halo, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Logout
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8 max-w-2xl">
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Transfer Antar Dompet</h2>
+    <!-- Konten Utama Halaman -->
+    <main class="py-10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="space-y-4">
-                    <div>
-                        <label for="{{ form.from_account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                            Dari Dompet <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.from_account }}
-                        {% if form.from_account.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.from_account.errors.0 }}</p>
-                        {% endif %}
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
                     </div>
+                {% endfor %}
+            {% endif %}
 
-                    <div>
-                        <label for="{{ form.to_account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                            Ke Dompet <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.to_account }}
-                        {% if form.to_account.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.to_account.errors.0 }}</p>
-                        {% endif %}
-                    </div>
+            <!-- Header Section -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Transfer Antar Dompet</h2>
+                <p class="mt-2 text-sm text-gray-600">Pindahkan saldo Anda dengan mudah antar dompet yang berbeda.</p>
+            </div>
 
-                    <div>
-                        <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                            Jumlah Transfer <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.amount }}
-                        {% if form.amount.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.amount.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">Masukkan jumlah yang ingin ditransfer (minimal Rp 0.01)</p>
-                    </div>
+            <!-- Kartu Formulir Transfer -->
+            <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Baris Dompet (Dari & Ke) -->
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                            <!-- Dari Dompet -->
+                            <div>
+                                <label for="{{ form.from_account.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Dari Dompet <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1">
+                                    {{ form.from_account }}
+                                </div>
+                                {% if form.from_account.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.from_account.errors.0 }}</p>
+                                {% endif %}
+                            </div>
 
-                    <div>
-                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                            Deskripsi (Opsional)
-                        </label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    {% if form.non_field_errors %}
-                        <div class="bg-red-50 border border-red-200 rounded-md p-3">
-                            {% for error in form.non_field_errors %}
-                                <p class="text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
+                            <!-- Ke Dompet -->
+                            <div>
+                                <label for="{{ form.to_account.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Ke Dompet <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1">
+                                    {{ form.to_account }}
+                                </div>
+                                {% if form.to_account.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.to_account.errors.0 }}</p>
+                                {% endif %}
+                            </div>
                         </div>
-                    {% endif %}
 
-                    <div class="flex space-x-4 pt-4">
-                        <button type="submit" class="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            Transfer
-                        </button>
-                        <a href="{% url 'core:dashboard' %}" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                            Batal
-                        </a>
+                        <!-- Jumlah Transfer -->
+                        <div>
+                            <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                Jumlah Transfer <span class="text-red-500">*</span>
+                            </label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">Rp</span>
+                                </div>
+                                {{ form.amount }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">IDR</span>
+                                </div>
+                            </div>
+                            {% if form.amount.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.amount.errors.0 }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500">Masukkan jumlah yang ingin ditransfer (minimal Rp 0.01)</p>
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                Deskripsi (Opsional)
+                            </label>
+                            <div class="mt-1">
+                                <textarea id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" rows="3" 
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md px-3 py-2" 
+                                    placeholder="Catatan transfer (opsional)">{{ form.description.value|default:'' }}</textarea>
+                            </div>
+                            {% if form.description.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Error Messages (Non-field errors) -->
+                        {% if form.non_field_errors %}
+                            <div class="bg-red-50 border border-red-200 rounded-md p-3">
+                                {% for error in form.non_field_errors %}
+                                    <p class="text-sm text-red-600">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Tombol Aksi -->
+                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100">
+                            <a href="{% url 'core:dashboard' %}" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                Batal
+                            </a>
+                            <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                Transfer Sekarang
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+                
+                <!-- Kotak Informasi -->
+                <div class="bg-blue-50 px-6 py-4 border-t border-blue-100">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">Informasi Transfer</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <ul role="list" class="list-disc pl-5 space-y-1">
+                                    <li>Transfer akan membuat 2 transaksi: pengeluaran dari dompet asal dan pemasukan ke dompet tujuan.</li>
+                                    <li>Pastikan saldo dompet asal cukup untuk melakukan transfer.</li>
+                                    <li>Dompet asal dan tujuan tidak boleh sama.</li>
+                                    <li>Transfer akan otomatis menggunakan kategori "Transfer".</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
 
-        <!-- Info Box -->
-        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
-            <h3 class="font-semibold text-blue-800 mb-2">ℹ️ Informasi Transfer</h3>
-            <ul class="text-sm text-blue-700 space-y-1">
-                <li>• Transfer akan membuat 2 transaksi: pengeluaran dari dompet asal dan pemasukan ke dompet tujuan</li>
-                <li>• Pastikan saldo dompet asal cukup untuk melakukan transfer</li>
-                <li>• Dompet asal dan tujuan tidak boleh sama</li>
-                <li>• Transfer akan otomatis menggunakan kategori "Transfer"</li>
-            </ul>
+            </div>
+
         </div>
-    </div>
+    </main>
+
 </body>
 </html>
-

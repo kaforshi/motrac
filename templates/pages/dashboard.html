@@ -4,375 +4,334 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Motrac</title>
+    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter sebagai font default */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navbar -->
+<body>
+
+    <!-- Header / Navbar -->
     <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'core:account_list' %}" class="text-indigo-600 hover:text-indigo-700">Kelola Dompet</a>
-                    <a href="{% url 'core:category-list' %}" class="text-indigo-600 hover:text-indigo-700">Kelola Kategori</a>
-                    <a href="{% url 'core:transfer' %}" class="text-indigo-600 hover:text-indigo-700">Transfer</a>
-                    <span class="text-gray-700">Halo, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-700">Logout</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Navigasi Utama -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Motrac</h1>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'core:dashboard' %}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            Dashboard
+                        </a>
+                        <a href="{% url 'core:account_list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Dompet
+                        </a>
+                        <a href="{% url 'core:category-list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Kelola Kategori
+                        </a>
+                        <a href="{% url 'core:transfer' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Transfer
+                        </a>
+                        <a href="{% url 'core:transaction-history' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            History
+                        </a>
+                    </div>
+                </div>
+                <!-- Navigasi User -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-sm text-gray-700 mr-4">Halo, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Logout
+                    </a>
+                </div>
+                <!-- Tombol Menu Mobile (opsional, untuk saat ini disembunyikan) -->
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Buka menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <!-- Statistik Cards -->
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Total Saldo</h3>
-                <p class="text-3xl font-bold text-indigo-600">Rp {{ total_balance|floatformat:2 }}</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Pemasukan Bulan Ini</h3>
-                <p class="text-3xl font-bold text-green-600">Rp {{ total_income_month|floatformat:2 }}</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Pengeluaran Bulan Ini</h3>
-                <p class="text-3xl font-bold text-red-600">Rp {{ total_expense_month|floatformat:2 }}</p>
-            </div>
-        </div>
-
-        <!-- Chart Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800">Pemasukan & Pengeluaran</h2>
-                <select id="chartPeriod" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="monthly">1 Bulan Terakhir</option>
-                    <option value="yearly">1 Tahun Terakhir</option>
-                </select>
-            </div>
-            <div class="h-96">
-                <canvas id="incomeExpenseChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Chart per Dompet dan Kategori -->
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-            <!-- Chart per Dompet -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-2xl font-bold text-gray-800">Pemasukan & Pengeluaran per Dompet</h2>
-                    </div>
-                    <div class="flex gap-2">
-                        <select id="accountChartPeriod" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="monthly">Bulan Ini</option>
-                            <option value="yearly">Tahun Ini</option>
-                        </select>
-                        <select id="accountChartCategory" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">Semua Kategori</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="h-96">
-                    <canvas id="accountChart"></canvas>
-                </div>
-            </div>
+    <!-- Konten Utama Dashboard -->
+    <main class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- Chart per Kategori -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-2xl font-bold text-gray-800">Transaksi per Kategori</h2>
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
                     </div>
-                    <div class="flex gap-2">
-                        <select id="categoryChartPeriod" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                {% endfor %}
+            {% endif %}
+
+            <!-- Kartu Statistik (Total Saldo, Pemasukan, Pengeluaran) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Total Saldo -->
+                <div class="bg-white rounded-xl shadow-lg p-6 flex items-center space-x-4">
+                    <div class="flex-shrink-0 p-3 bg-indigo-100 rounded-full">
+                        <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0A2.25 2.25 0 0018.75 9.75H5.25A2.25 2.25 0 003 12m18 0v-6A2.25 2.25 0 0018.75 3.75H5.25A2.25 2.25 0 003 6v6" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Total Saldo</p>
+                        <p class="text-2xl font-bold text-gray-900">Rp {{ total_balance|floatformat:2 }}</p>
+                    </div>
+                </div>
+                <!-- Pemasukan Bulan Ini -->
+                <div class="bg-white rounded-xl shadow-lg p-6 flex items-center space-x-4">
+                    <div class="flex-shrink-0 p-3 bg-green-100 rounded-full">
+                        <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.72-1.22m0 0l-5.56 5.56m5.56-5.56l-1.68-1.68m1.68 1.68L21.75 12.75" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pemasukan Bulan Ini</p>
+                        <p class="text-2xl font-bold text-green-600">Rp {{ total_income_month|floatformat:2 }}</p>
+                    </div>
+                </div>
+                <!-- Pengeluaran Bulan Ini -->
+                <div class="bg-white rounded-xl shadow-lg p-6 flex items-center space-x-4">
+                    <div class="flex-shrink-0 p-3 bg-red-100 rounded-full">
+                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814-5.519l2.72 1.22m0 0l-5.56-5.56m5.56 5.56l-1.68 1.68m1.68-1.68L21.75 11.25" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pengeluaran Bulan Ini</p>
+                        <p class="text-2xl font-bold text-red-600">Rp {{ total_expense_month|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik / Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Grafik Pemasukan & Pengeluaran -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Pemasukan & Pengeluaran per Dompet</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <select id="accountChartPeriod" class="w-full border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="monthly">Bulan Ini</option>
                             <option value="yearly">Tahun Ini</option>
                         </select>
-                        <select id="categoryChartAccount" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <select id="accountChartAccount" class="w-full border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="">Semua Dompet</option>
                         </select>
                     </div>
-                </div>
-                <div class="h-96">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- Form Tambah Transaksi -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Tambah Transaksi</h2>
-                    <a href="{% url 'core:category-list' %}" class="text-sm text-indigo-600 hover:text-indigo-700">Kelola Kategori</a>
-                </div>
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                Dompet
-                            </label>
-                            {{ form.account }}
-                            {% if form.account.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.account.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                                    Kategori
-                                </label>
-                                <a href="{% url 'core:category-create' %}" class="text-xs text-indigo-600 hover:text-indigo-700">+ Tambah Kategori</a>
-                            </div>
-                            {{ form.category }}
-                            {% if form.category.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                Jumlah
-                            </label>
-                            {{ form.amount }}
-                            {% if form.amount.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.amount.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                Tipe
-                            </label>
-                            {{ form.type }}
-                            {% if form.type.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.type.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                Tanggal
-                            </label>
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.date.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                Deskripsi (Opsional)
-                            </label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            Tambah Transaksi
-                        </button>
+                    <div class="h-64">
+                        <canvas id="accountChart"></canvas>
                     </div>
-                </form>
+                </div>
+                <!-- Grafik Transaksi per Kategori -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Transaksi per Kategori</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <select id="categoryChartPeriod" class="w-full border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="monthly">Bulan Ini</option>
+                            <option value="yearly">Tahun Ini</option>
+                        </select>
+                        <select id="categoryChartCategory" class="w-full border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <!-- Daftar Transaksi -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Daftar Transaksi</h2>
-                
-                {% if transactions %}
-                    <div class="space-y-4">
-                        {% for transaction in transactions %}
-                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-2 mb-2">
-                                            <span class="px-2 py-1 rounded text-xs font-semibold {% if transaction.type == 'Pemasukan' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                                {{ transaction.get_type_display }}
-                                            </span>
-                                            <span class="text-sm text-gray-500">{{ transaction.date }}</span>
-                                        </div>
-                                        <h3 class="font-semibold text-gray-800">{{ transaction.category.name }}</h3>
-                                        <p class="text-sm text-gray-600">{{ transaction.account.name }}</p>
-                                        {% if transaction.description %}
-                                            <p class="text-sm text-gray-500 mt-1">{{ transaction.description }}</p>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-lg font-bold {% if transaction.type == 'Pemasukan' %}text-green-600{% else %}text-red-600{% endif %}">
-                                            {% if transaction.type == 'Pengeluaran' %}-{% endif %}Rp {{ transaction.amount|floatformat:2 }}
-                                        </p>
+            <!-- Form & Daftar Transaksi -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Kolom Form Tambah Transaksi -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Tambah Transaksi</h3>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            
+                            <div>
+                                <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700">Dompet</label>
+                                <div class="mt-1">
+                                    {{ form.account }}
+                                </div>
+                                {% if form.account.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.account.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">Kategori</label>
+                                    <a href="{% url 'core:category-create' %}" class="text-xs text-indigo-600 hover:text-indigo-500">+ Tambah Kategori</a>
+                                </div>
+                                <div class="mt-1">
+                                    {{ form.category }}
+                                </div>
+                                {% if form.category.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700">Jumlah</label>
+                                <div class="mt-1">
+                                    {{ form.amount }}
+                                </div>
+                                {% if form.amount.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.amount.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-700">Tipe</label>
+                                <div class="mt-1">
+                                    {{ form.type }}
+                                </div>
+                                {% if form.type.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.type.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700">Tanggal</label>
+                                <div class="relative mt-1">
+                                    {{ form.date }}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                        </svg>
                                     </div>
                                 </div>
+                                {% if form.date.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.date.errors.0 }}</p>
+                                {% endif %}
                             </div>
-                        {% endfor %}
+                            
+                            <div>
+                                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Deskripsi (Opsional)</label>
+                                <div class="mt-1">
+                                    {{ form.description }}
+                                </div>
+                                {% if form.description.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    Tambah Transaksi
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                {% else %}
-                    <div class="text-center py-8 text-gray-500">
-                        <p>Belum ada transaksi. Tambahkan transaksi pertama Anda!</p>
+                </div>
+
+                <!-- Kolom Daftar Transaksi -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Daftar Transaksi</h3>
+                        {% if transactions %}
+                            <div class="space-y-4">
+                                {% for transaction in transactions %}
+                                    <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-1">
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium {% if transaction.type == 'Pemasukan' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                                    {{ transaction.get_type_display }}
+                                                </span>
+                                                <span class="text-sm font-medium text-gray-900">{{ transaction.category.name }}</span>
+                                            </div>
+                                            {% if transaction.description %}
+                                                <p class="text-sm text-gray-600">{{ transaction.description }}</p>
+                                            {% endif %}
+                                            <p class="text-xs text-gray-400 mt-1">{{ transaction.date|date:"M. d, Y" }} · {{ transaction.account.name }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-lg font-bold {% if transaction.type == 'Pemasukan' %}text-green-600{% else %}text-red-600{% endif %}">
+                                                {% if transaction.type == 'Pengeluaran' %}-{% endif %}Rp {{ transaction.amount|floatformat:2 }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-8 text-gray-500">
+                                <p>Belum ada transaksi. Tambahkan transaksi pertama Anda!</p>
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
             </div>
+
         </div>
-    </div>
+    </main>
 
     <!-- Chart.js Script -->
     <script>
-        // Data untuk chart
-        const monthlyData = {
-            labels: {{ monthly_labels|safe }},
-            income: {{ monthly_income|safe }},
-            expense: {{ monthly_expense|safe }}
-        };
-        
-        const yearlyData = {
-            labels: {{ yearly_labels|safe }},
-            income: {{ yearly_income|safe }},
-            expense: {{ yearly_expense|safe }}
-        };
-        
-        // Konfigurasi chart
-        const chartConfig = {
-            type: 'line',
-            data: {
-                labels: monthlyData.labels,
-                datasets: [{
-                    label: 'Pemasukan',
-                    data: monthlyData.income,
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Pengeluaran',
-                    data: monthlyData.expense,
-                    borderColor: 'rgba(239, 68, 68, 1)',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += 'Rp ' + context.parsed.y.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                return label;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'Rp ' + value.toLocaleString('id-ID');
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        
-        // Buat chart
-        const ctx = document.getElementById('incomeExpenseChart');
-        const incomeExpenseChart = new Chart(ctx, chartConfig);
-        
-        // Handle dropdown change
-        document.getElementById('chartPeriod').addEventListener('change', function() {
-            const selectedPeriod = this.value;
-            let newData;
-            
-            if (selectedPeriod === 'monthly') {
-                newData = monthlyData;
-            } else {
-                newData = yearlyData;
-            }
-            
-            // Update chart data
-            incomeExpenseChart.data.labels = newData.labels;
-            incomeExpenseChart.data.datasets[0].data = newData.income;
-            incomeExpenseChart.data.datasets[1].data = newData.expense;
-            incomeExpenseChart.update();
-        });
-        
-        // Populate dropdown kategori untuk chart per dompet
-        const categoriesList = {{ categories_list|safe }};
-        const accountChartCategorySelect = document.getElementById('accountChartCategory');
-        categoriesList.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.id;
-            option.textContent = cat.name;
-            accountChartCategorySelect.appendChild(option);
-        });
-        
-        // Populate dropdown dompet untuk chart per kategori
+        // Populate dropdown dompet untuk chart per dompet
         const accountsList = {{ accounts_list|safe }};
-        const categoryChartAccountSelect = document.getElementById('categoryChartAccount');
+        const accountChartAccountSelect = document.getElementById('accountChartAccount');
         accountsList.forEach(acc => {
             const option = document.createElement('option');
             option.value = acc.id;
             option.textContent = acc.name;
-            categoryChartAccountSelect.appendChild(option);
+            accountChartAccountSelect.appendChild(option);
+        });
+        
+        // Populate dropdown kategori untuk chart per kategori
+        const categoriesList = {{ categories_list|safe }};
+        const categoryChartCategorySelect = document.getElementById('categoryChartCategory');
+        categoriesList.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = cat.name;
+            categoryChartCategorySelect.appendChild(option);
         });
         
         // Chart per Dompet
         const accountDataMonthly = {{ account_chart_data_monthly|safe }};
         const accountDataYearly = {{ account_chart_data_yearly|safe }};
-        const accountCategoryDataMonthly = {{ account_category_data_monthly|safe }};
-        const accountCategoryDataYearly = {{ account_category_data_yearly|safe }};
         
-        function getAccountChartData(period, categoryId = '') {
-            if (categoryId === '') {
-                // Semua kategori
-                const data = period === 'monthly' ? accountDataMonthly : accountDataYearly;
+        function getAccountChartData(period, accountId = '') {
+            const data = period === 'monthly' ? accountDataMonthly : accountDataYearly;
+            
+            if (accountId === '') {
+                // Semua dompet
                 return {
                     labels: data.map(item => item.name),
                     income: data.map(item => item.income),
                     expense: data.map(item => item.expense)
                 };
             } else {
-                // Filter berdasarkan kategori
-                const detailData = period === 'monthly' ? accountCategoryDataMonthly : accountCategoryDataYearly;
-                const accountsList = {{ accounts_list|safe }};
-                const labels = [];
-                const income = [];
-                const expense = [];
-                
-                accountsList.forEach(acc => {
-                    if (detailData[acc.id] && detailData[acc.id][categoryId]) {
-                        labels.push(acc.name);
-                        income.push(detailData[acc.id][categoryId].income);
-                        expense.push(detailData[acc.id][categoryId].expense);
-                    }
-                });
-                
-                return { labels, income, expense };
+                // Filter berdasarkan dompet tertentu
+                const account = data.find(item => item.id == accountId);
+                if (account) {
+                    return {
+                        labels: [account.name],
+                        income: [account.income],
+                        expense: [account.expense]
+                    };
+                } else {
+                    return { labels: [], income: [], expense: [] };
+                }
             }
         }
         
@@ -433,8 +392,8 @@
         // Handle dropdown change untuk chart per dompet
         function updateAccountChart() {
             const selectedPeriod = document.getElementById('accountChartPeriod').value;
-            const selectedCategory = document.getElementById('accountChartCategory').value;
-            const newData = getAccountChartData(selectedPeriod, selectedCategory);
+            const selectedAccount = document.getElementById('accountChartAccount').value;
+            const newData = getAccountChartData(selectedPeriod, selectedAccount);
             
             accountChart.data.labels = newData.labels;
             accountChart.data.datasets[0].data = newData.income;
@@ -443,18 +402,17 @@
         }
         
         document.getElementById('accountChartPeriod').addEventListener('change', updateAccountChart);
-        document.getElementById('accountChartCategory').addEventListener('change', updateAccountChart);
+        document.getElementById('accountChartAccount').addEventListener('change', updateAccountChart);
         
         // Chart per Kategori
         const categoryDataMonthly = {{ category_chart_data_monthly|safe }};
         const categoryDataYearly = {{ category_chart_data_yearly|safe }};
-        const categoryAccountDataMonthly = {{ category_account_data_monthly|safe }};
-        const categoryAccountDataYearly = {{ category_account_data_yearly|safe }};
         
-        function getCategoryChartData(period, accountId = '') {
-            if (accountId === '') {
-                // Semua dompet
-                const data = period === 'monthly' ? categoryDataMonthly : categoryDataYearly;
+        function getCategoryChartData(period, categoryId = '') {
+            const data = period === 'monthly' ? categoryDataMonthly : categoryDataYearly;
+            
+            if (categoryId === '') {
+                // Semua kategori
                 return {
                     labels: data.map(item => item.name),
                     totals: data.map(item => item.total),
@@ -464,28 +422,20 @@
                     raw: data
                 };
             } else {
-                // Filter berdasarkan dompet
-                const detailData = period === 'monthly' ? categoryAccountDataMonthly : categoryAccountDataYearly;
-                const categoriesList = {{ categories_list|safe }};
-                const labels = [];
-                const totals = [];
-                const types = [];
-                const colors = [];
-                const borderColors = [];
-                const raw = [];
-                
-                categoriesList.forEach(cat => {
-                    if (detailData[cat.id] && detailData[cat.id][accountId]) {
-                        labels.push(cat.name);
-                        totals.push(detailData[cat.id][accountId].total);
-                        types.push(cat.type);
-                        colors.push(cat.type === 'Pemasukan' ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)');
-                        borderColors.push(cat.type === 'Pemasukan' ? 'rgba(34, 197, 94, 1)' : 'rgba(239, 68, 68, 1)');
-                        raw.push(cat);
-                    }
-                });
-                
-                return { labels, totals, types, colors, borderColors, raw };
+                // Filter berdasarkan kategori tertentu
+                const category = data.find(item => item.id == categoryId);
+                if (category) {
+                    return {
+                        labels: [category.name],
+                        totals: [category.total],
+                        types: [category.type],
+                        colors: [category.type === 'Pemasukan' ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)'],
+                        borderColors: [category.type === 'Pemasukan' ? 'rgba(34, 197, 94, 1)' : 'rgba(239, 68, 68, 1)'],
+                        raw: [category]
+                    };
+                } else {
+                    return { labels: [], totals: [], types: [], colors: [], borderColors: [], raw: [] };
+                }
             }
         }
         
@@ -539,8 +489,8 @@
         // Handle dropdown change untuk chart per kategori
         function updateCategoryChart() {
             const selectedPeriod = document.getElementById('categoryChartPeriod').value;
-            const selectedAccount = document.getElementById('categoryChartAccount').value;
-            const newData = getCategoryChartData(selectedPeriod, selectedAccount);
+            const selectedCategory = document.getElementById('categoryChartCategory').value;
+            const newData = getCategoryChartData(selectedPeriod, selectedCategory);
             
             categoryChart.data.labels = newData.labels;
             categoryChart.data.datasets[0].data = newData.totals;
@@ -559,8 +509,7 @@
         }
         
         document.getElementById('categoryChartPeriod').addEventListener('change', updateCategoryChart);
-        document.getElementById('categoryChartAccount').addEventListener('change', updateCategoryChart);
+        document.getElementById('categoryChartCategory').addEventListener('change', updateCategoryChart);
     </script>
 </body>
 </html>
-

@@ -1,15 +1,22 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView, FormView
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.db.models import Sum, Q
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from datetime import datetime, date, timedelta
+from django.http import HttpResponse
+from datetime import datetime, date
 from decimal import Decimal
 import json
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from .forms import CustomUserCreationForm, TransactionForm, TransferForm, CategoryForm
 from .models import Transaction, Account, Category
 
@@ -61,6 +68,13 @@ def ensure_default_categories(user):
 
 class LandingPageView(TemplateView):
     template_name = 'pages/landing_page.html'
+
+
+def custom_logout_view(request):
+    """Custom logout view yang redirect ke landing page"""
+    logout(request)
+    messages.success(request, 'Anda telah berhasil logout.')
+    return redirect('landing')
 
 
 def signup_view(request):
@@ -174,91 +188,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['total_income_month'] = total_income_month
         context['total_expense_month'] = total_expense_month
         
-        # Siapkan data untuk Chart 1 Bulan Terakhir (per hari)
-        monthly_labels = []
-        monthly_income = []
-        monthly_expense = []
-        
-        # Hitung 30 hari terakhir
-        today = now.date()
-        for i in range(29, -1, -1):  # 30 hari terakhir
-            target_date = today - timedelta(days=i)
-            date_start = target_date
-            date_end = target_date + timedelta(days=1)
-            
-            # Label: format tanggal
-            date_label = target_date.strftime('%d %b')
-            monthly_labels.append(date_label)
-            
-            # Hitung pemasukan hari ini
-            income = Transaction.objects.filter(
-                user=user,
-                type='Pemasukan',
-                date__gte=date_start,
-                date__lt=date_end
-            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-            monthly_income.append(float(income))
-            
-            # Hitung pengeluaran hari ini
-            expense = Transaction.objects.filter(
-                user=user,
-                type='Pengeluaran',
-                date__gte=date_start,
-                date__lt=date_end
-            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-            monthly_expense.append(float(expense))
-        
-        context['monthly_labels'] = mark_safe(json.dumps(monthly_labels))
-        context['monthly_income'] = mark_safe(json.dumps(monthly_income))
-        context['monthly_expense'] = mark_safe(json.dumps(monthly_expense))
-        
-        # Siapkan data untuk Chart 1 Tahun Terakhir (per bulan)
-        yearly_labels = []
-        yearly_income = []
-        yearly_expense = []
-        
-        # Hitung 12 bulan terakhir (1 tahun)
-        for i in range(11, -1, -1):  # 12 bulan terakhir
-            # Hitung bulan target (i bulan yang lalu dari bulan ini)
-            if now.month - i <= 0:
-                target_month = now.month - i + 12
-                target_year = now.year - 1
-            else:
-                target_month = now.month - i
-                target_year = now.year
-            
-            month_start = datetime(target_year, target_month, 1).date()
-            if target_month == 12:
-                month_end = datetime(target_year + 1, 1, 1).date()
-            else:
-                month_end = datetime(target_year, target_month + 1, 1).date()
-            
-            # Nama bulan
-            month_name = month_start.strftime('%b %Y')
-            yearly_labels.append(month_name)
-            
-            # Hitung pemasukan bulan ini
-            income = Transaction.objects.filter(
-                user=user,
-                type='Pemasukan',
-                date__gte=month_start,
-                date__lt=month_end
-            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-            yearly_income.append(float(income))
-            
-            # Hitung pengeluaran bulan ini
-            expense = Transaction.objects.filter(
-                user=user,
-                type='Pengeluaran',
-                date__gte=month_start,
-                date__lt=month_end
-            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-            yearly_expense.append(float(expense))
-        
-        context['yearly_labels'] = mark_safe(json.dumps(yearly_labels))
-        context['yearly_income'] = mark_safe(json.dumps(yearly_income))
-        context['yearly_expense'] = mark_safe(json.dumps(yearly_expense))
-        
         # Siapkan data untuk Chart per Dompet (Bulan Ini)
         accounts = Account.objects.filter(user=user)
         account_chart_data_monthly = []
@@ -282,6 +211,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
             
             account_chart_data_monthly.append({
+                'id': account.id,
                 'name': account.name,
                 'income': float(account_income),
                 'expense': float(account_expense)
@@ -311,6 +241,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
             
             account_chart_data_yearly.append({
+                'id': account.id,
                 'name': account.name,
                 'income': float(account_income),
                 'expense': float(account_expense)
@@ -333,6 +264,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
             
             category_chart_data_monthly.append({
+                'id': category.id,
                 'name': category.name,
                 'type': category.type,
                 'total': float(category_total)
@@ -350,6 +282,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
             
             category_chart_data_yearly.append({
+                'id': category.id,
                 'name': category.name,
                 'type': category.type,
                 'total': float(category_total)
@@ -366,104 +299,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Data semua kategori untuk dropdown
         categories_list = [{'id': cat.id, 'name': cat.name, 'type': cat.type} for cat in categories]
         context['categories_list'] = mark_safe(json.dumps(categories_list))
-        
-        # Siapkan data detail untuk chart per dompet (dengan filter kategori)
-        # Data per dompet per kategori untuk bulan ini
-        account_category_data_monthly = {}
-        for account in accounts:
-            account_category_data_monthly[account.id] = {}
-            for category in categories:
-                income = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    type='Pemasukan',
-                    date__gte=start_of_month,
-                    date__lt=end_of_month
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                expense = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    type='Pengeluaran',
-                    date__gte=start_of_month,
-                    date__lt=end_of_month
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                account_category_data_monthly[account.id][category.id] = {
-                    'income': float(income),
-                    'expense': float(expense)
-                }
-        
-        # Data per dompet per kategori untuk tahun ini
-        account_category_data_yearly = {}
-        for account in accounts:
-            account_category_data_yearly[account.id] = {}
-            for category in categories:
-                income = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    type='Pemasukan',
-                    date__gte=year_start,
-                    date__lt=year_end
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                expense = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    type='Pengeluaran',
-                    date__gte=year_start,
-                    date__lt=year_end
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                account_category_data_yearly[account.id][category.id] = {
-                    'income': float(income),
-                    'expense': float(expense)
-                }
-        
-        context['account_category_data_monthly'] = mark_safe(json.dumps(account_category_data_monthly))
-        context['account_category_data_yearly'] = mark_safe(json.dumps(account_category_data_yearly))
-        
-        # Siapkan data detail untuk chart per kategori (dengan filter dompet)
-        # Data per kategori per dompet untuk bulan ini
-        category_account_data_monthly = {}
-        for category in categories:
-            category_account_data_monthly[category.id] = {}
-            for account in accounts:
-                total = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    date__gte=start_of_month,
-                    date__lt=end_of_month
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                category_account_data_monthly[category.id][account.id] = {
-                    'total': float(total)
-                }
-        
-        # Data per kategori per dompet untuk tahun ini
-        category_account_data_yearly = {}
-        for category in categories:
-            category_account_data_yearly[category.id] = {}
-            for account in accounts:
-                total = Transaction.objects.filter(
-                    user=user,
-                    account=account,
-                    category=category,
-                    date__gte=year_start,
-                    date__lt=year_end
-                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                
-                category_account_data_yearly[category.id][account.id] = {
-                    'total': float(total)
-                }
-        
-        context['category_account_data_monthly'] = mark_safe(json.dumps(category_account_data_monthly))
-        context['category_account_data_yearly'] = mark_safe(json.dumps(category_account_data_yearly))
         
         return context
     
@@ -540,6 +375,194 @@ class AccountDeleteView(LoginRequiredMixin, DeleteView):
         """Tampilkan pesan sukses setelah delete"""
         messages.success(self.request, 'Dompet berhasil dihapus!')
         return super().delete(request, *args, **kwargs)
+
+
+# AJAX Views untuk Account
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+import json
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_account_ajax(request):
+    """AJAX view untuk create account"""
+    try:
+        data = json.loads(request.body)
+        
+        account = Account.objects.create(
+            user=request.user,
+            name=data.get('name'),
+            initial_balance=Decimal(data.get('initial_balance', '0.00'))
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Dompet berhasil ditambahkan!',
+            'account': {
+                'id': account.id,
+                'name': account.name,
+                'initial_balance': str(account.initial_balance)
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_account_data(request, pk):
+    """AJAX view untuk mendapatkan data account"""
+    
+    try:
+        account = Account.objects.get(pk=pk, user=request.user)
+        return JsonResponse({
+            'id': account.id,
+            'name': account.name,
+            'initial_balance': str(account.initial_balance)
+        })
+    except Account.DoesNotExist:
+        return JsonResponse({'error': 'Account not found'}, status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_account_ajax(request, pk):
+    """AJAX view untuk update account"""
+    
+    try:
+        account = Account.objects.get(pk=pk, user=request.user)
+        data = json.loads(request.body)
+        
+        account.name = data.get('name', account.name)
+        account.initial_balance = Decimal(data.get('initial_balance', account.initial_balance))
+        account.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Dompet berhasil diperbarui!',
+            'account': {
+                'id': account.id,
+                'name': account.name,
+                'initial_balance': str(account.initial_balance)
+            }
+        })
+    except Account.DoesNotExist:
+        return JsonResponse({'error': 'Account not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_account_ajax(request, pk):
+    """AJAX view untuk delete account"""
+    
+    try:
+        account = Account.objects.get(pk=pk, user=request.user)
+        account_name = account.name
+        account.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Dompet "{account_name}" berhasil dihapus!'
+        })
+    except Account.DoesNotExist:
+        return JsonResponse({'error': 'Account not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# AJAX Views untuk Category
+@login_required
+@require_http_methods(["POST"])
+def create_category_ajax(request):
+    """AJAX view untuk create category"""
+    try:
+        data = json.loads(request.body)
+        
+        category = Category.objects.create(
+            user=request.user,
+            name=data.get('name'),
+            type=data.get('type')
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Kategori berhasil ditambahkan!',
+            'category': {
+                'id': category.id,
+                'name': category.name,
+                'type': category.type
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_category_data(request, pk):
+    """AJAX view untuk mendapatkan data category"""
+    
+    try:
+        category = Category.objects.get(pk=pk, user=request.user)
+        return JsonResponse({
+            'id': category.id,
+            'name': category.name,
+            'type': category.type
+        })
+    except Category.DoesNotExist:
+        return JsonResponse({'error': 'Category not found'}, status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_category_ajax(request, pk):
+    """AJAX view untuk update category"""
+    
+    try:
+        category = Category.objects.get(pk=pk, user=request.user)
+        data = json.loads(request.body)
+        
+        category.name = data.get('name', category.name)
+        category.type = data.get('type', category.type)
+        category.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Kategori berhasil diperbarui!',
+            'category': {
+                'id': category.id,
+                'name': category.name,
+                'type': category.type
+            }
+        })
+    except Category.DoesNotExist:
+        return JsonResponse({'error': 'Category not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_category_ajax(request, pk):
+    """AJAX view untuk delete category"""
+    
+    try:
+        category = Category.objects.get(pk=pk, user=request.user)
+        category_name = category.name
+        category.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Kategori "{category_name}" berhasil dihapus!'
+        })
+    except Category.DoesNotExist:
+        return JsonResponse({'error': 'Category not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 class TransferView(LoginRequiredMixin, FormView):
@@ -668,3 +691,330 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
         """Tampilkan pesan sukses setelah delete"""
         messages.success(self.request, 'Kategori berhasil dihapus!')
         return super().delete(request, *args, **kwargs)
+
+
+class TransactionHistoryView(LoginRequiredMixin, ListView):
+    """View untuk menampilkan history transaksi dengan filter"""
+    model = Transaction
+    template_name = 'pages/transaction_history.html'
+    context_object_name = 'transactions'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        """Filter transaksi berdasarkan user dan parameter filter"""
+        queryset = Transaction.objects.filter(
+            user=self.request.user
+        ).select_related('account', 'category')
+        
+        # Filter berdasarkan dompet
+        account_id = self.request.GET.get('account')
+        if account_id:
+            try:
+                account = Account.objects.get(id=account_id, user=self.request.user)
+                queryset = queryset.filter(account=account)
+            except Account.DoesNotExist:
+                pass
+        
+        # Filter berdasarkan kategori
+        category_id = self.request.GET.get('category')
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id, user=self.request.user)
+                queryset = queryset.filter(category=category)
+            except Category.DoesNotExist:
+                pass
+        
+        # Filter berdasarkan bulan dan tahun
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+        
+        if month and year:
+            try:
+                month = int(month)
+                year = int(year)
+                # Filter berdasarkan bulan dan tahun
+                queryset = queryset.filter(date__year=year, date__month=month)
+            except (ValueError, TypeError):
+                pass
+        elif year:
+            try:
+                year = int(year)
+                queryset = queryset.filter(date__year=year)
+            except (ValueError, TypeError):
+                pass
+        
+        return queryset.order_by('-date', '-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Siapkan data untuk dropdown filter
+        context['accounts'] = Account.objects.filter(user=user).order_by('name')
+        context['categories'] = Category.objects.filter(user=user).order_by('type', 'name')
+        
+        # Ambil nilai filter saat ini dari query parameters
+        context['selected_account'] = self.request.GET.get('account', '')
+        context['selected_category'] = self.request.GET.get('category', '')
+        context['selected_month'] = self.request.GET.get('month', '')
+        context['selected_year'] = self.request.GET.get('year', '')
+        
+        # Generate list tahun (dari tahun transaksi pertama sampai tahun sekarang)
+        now = timezone.now()
+        first_transaction = Transaction.objects.filter(user=user).order_by('date').first()
+        if first_transaction:
+            start_year = first_transaction.date.year
+        else:
+            start_year = now.year
+        
+        context['years'] = list(range(start_year, now.year + 1))
+        context['months'] = [
+            (1, 'Januari'), (2, 'Februari'), (3, 'Maret'), (4, 'April'),
+            (5, 'Mei'), (6, 'Juni'), (7, 'Juli'), (8, 'Agustus'),
+            (9, 'September'), (10, 'Oktober'), (11, 'November'), (12, 'Desember')
+        ]
+        
+        # Hitung total pemasukan dan pengeluaran dari hasil filter
+        queryset = self.get_queryset()
+        total_income = queryset.filter(type='Pemasukan').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        total_expense = queryset.filter(type='Pengeluaran').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        context['total_income'] = total_income
+        context['total_expense'] = total_expense
+        context['net_balance'] = total_income - total_expense
+        
+        return context
+
+
+class TransactionHistoryPDFView(LoginRequiredMixin, ListView):
+    """View untuk generate PDF history transaksi"""
+    model = Transaction
+    
+    def get_queryset(self):
+        """Filter transaksi berdasarkan user dan parameter filter (sama seperti TransactionHistoryView)"""
+        queryset = Transaction.objects.filter(
+            user=self.request.user
+        ).select_related('account', 'category')
+        
+        # Filter berdasarkan dompet
+        account_id = self.request.GET.get('account')
+        if account_id:
+            try:
+                account = Account.objects.get(id=account_id, user=self.request.user)
+                queryset = queryset.filter(account=account)
+            except Account.DoesNotExist:
+                pass
+        
+        # Filter berdasarkan kategori
+        category_id = self.request.GET.get('category')
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id, user=self.request.user)
+                queryset = queryset.filter(category=category)
+            except Category.DoesNotExist:
+                pass
+        
+        # Filter berdasarkan bulan dan tahun
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+        
+        if month and year:
+            try:
+                month = int(month)
+                year = int(year)
+                queryset = queryset.filter(date__year=year, date__month=month)
+            except (ValueError, TypeError):
+                pass
+        elif year:
+            try:
+                year = int(year)
+                queryset = queryset.filter(date__year=year)
+            except (ValueError, TypeError):
+                pass
+        
+        return queryset.order_by('-date', '-created_at')
+    
+    def get(self, request, *args, **kwargs):
+        """Generate PDF response"""
+        queryset = self.get_queryset()
+        user = request.user
+        
+        # Buat response dengan content type PDF
+        response = HttpResponse(content_type='application/pdf')
+        filename = f'history_transaksi_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        # Buat PDF document
+        doc = SimpleDocTemplate(response, pagesize=A4)
+        story = []
+        
+        # Styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#4F46E5'),
+            spaceAfter=12,
+            alignment=TA_CENTER
+        )
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=14,
+            textColor=colors.HexColor('#1F2937'),
+            spaceAfter=8
+        )
+        normal_style = styles['Normal']
+        normal_style.fontSize = 10
+        
+        # Header
+        story.append(Paragraph('History Transaksi', title_style))
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Info User dan Filter
+        info_data = [
+            ['User', user.username],
+            ['Tanggal Generate', datetime.now().strftime('%d %B %Y %H:%M:%S')],
+        ]
+        
+        # Tambahkan info filter jika ada
+        account_id = request.GET.get('account')
+        category_id = request.GET.get('category')
+        month = request.GET.get('month')
+        year = request.GET.get('year')
+        
+        if account_id:
+            try:
+                account = Account.objects.get(id=account_id, user=user)
+                info_data.append(['Filter Dompet', account.name])
+            except Account.DoesNotExist:
+                pass
+        
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id, user=user)
+                info_data.append(['Filter Kategori', f"{category.name} ({category.get_type_display()})"])
+            except Category.DoesNotExist:
+                pass
+        
+        if month and year:
+            try:
+                month_names = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+                info_data.append(['Filter Periode', f"{month_names[int(month)]} {year}"])
+            except (ValueError, TypeError):
+                pass
+        elif year:
+            info_data.append(['Filter Tahun', str(year)])
+        
+        info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+        info_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#F3F4F6')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        story.append(info_table)
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Summary
+        total_income = queryset.filter(type='Pemasukan').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        total_expense = queryset.filter(type='Pengeluaran').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        net_balance = total_income - total_expense
+        
+        summary_data = [
+            ['Total Pemasukan', f'Rp {total_income:,.2f}'],
+            ['Total Pengeluaran', f'Rp {total_expense:,.2f}'],
+            ['Saldo Bersih', f'Rp {net_balance:,.2f}'],
+        ]
+        
+        summary_table = Table(summary_data, colWidths=[3*inch, 3*inch])
+        summary_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#10B981')),
+            ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#EF4444')),
+            ('BACKGROUND', (0, 2), (-1, 2), colors.HexColor('#4F46E5')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ]))
+        story.append(Paragraph('Ringkasan', heading_style))
+        story.append(summary_table)
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Daftar Transaksi
+        story.append(Paragraph('Daftar Transaksi', heading_style))
+        
+        if queryset.exists():
+            # Header tabel
+            table_data = [['Tanggal', 'Tipe', 'Dompet', 'Kategori', 'Deskripsi', 'Jumlah']]
+            
+            # Data transaksi
+            for transaction in queryset:
+                tipe = 'Pemasukan' if transaction.type == 'Pemasukan' else 'Pengeluaran'
+                jumlah = f"{'-' if transaction.type == 'Pengeluaran' else ''}Rp {transaction.amount:,.2f}"
+                deskripsi = transaction.description[:30] + '...' if transaction.description and len(transaction.description) > 30 else (transaction.description or '-')
+                
+                table_data.append([
+                    transaction.date.strftime('%d/%m/%Y'),
+                    tipe,
+                    transaction.account.name,
+                    transaction.category.name,
+                    deskripsi,
+                    jumlah
+                ])
+            
+            # Buat tabel
+            transaction_table = Table(table_data, colWidths=[0.8*inch, 0.9*inch, 1*inch, 1*inch, 1.5*inch, 1*inch])
+            transaction_table.setStyle(TableStyle([
+                # Header style
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4F46E5')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+                ('TOPPADDING', (0, 0), (-1, 0), 10),
+                # Data style
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                # Alternating row colors
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
+                # Grid
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                # Text alignment
+                ('ALIGN', (0, 1), (0, -1), 'LEFT'),  # Tanggal
+                ('ALIGN', (5, 1), (5, -1), 'RIGHT'),  # Jumlah
+            ]))
+            
+            story.append(transaction_table)
+            story.append(Spacer(1, 0.2*inch))
+            story.append(Paragraph(f'Total: {queryset.count()} transaksi', normal_style))
+        else:
+            story.append(Paragraph('Tidak ada transaksi yang sesuai dengan filter yang dipilih.', normal_style))
+        
+        # Build PDF
+        doc.build(story)
+        
+        return response
