@@ -103,9 +103,25 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
-        // All transactions for transactions view
-        $allTransactions = Transaction::where('user_id', $user->id)
-            ->with(['account', 'category'])
+        // All transactions for transactions view with optional filters
+        $allTransactionsQuery = Transaction::where('user_id', $user->id)
+            ->with(['account', 'category']);
+
+        // Search filter
+        if ($request->filled('transaction_search')) {
+            $search = $request->get('transaction_search');
+            $allTransactionsQuery->where(function ($q) use ($search) {
+                $q->where('description', 'like', '%' . $search . '%')
+                  ->orWhere('notes', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Category filter
+        if ($request->filled('transaction_category_id')) {
+            $allTransactionsQuery->where('category_id', $request->get('transaction_category_id'));
+        }
+
+        $allTransactions = $allTransactionsQuery
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit(50)

@@ -79,11 +79,11 @@
         <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
             <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Menu Utama</p>
             
-            <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left">
+            <button id="nav-dashboard" onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left">
                 <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
             </button>
             
-            <button onclick="switchView('transactions', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+            <button id="nav-transactions" onclick="switchView('transactions', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> Transaksi
             </button>
             
@@ -404,25 +404,40 @@
 
             <!-- VIEW 2: TRANSAKSI -->
             <div id="view-transactions" class="content-section hidden">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <form method="GET" action="{{ route('dashboard') }}" class="bg-white p-4 rounded-xl border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
                     <div class="relative w-full sm:w-64">
-                        <input type="text" placeholder="Cari transaksi..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                        <input
+                            type="text"
+                            name="transaction_search"
+                            value="{{ request('transaction_search') }}"
+                            placeholder="Cari transaksi..."
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary"
+                        >
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
                     </div>
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <select class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        <select
+                            name="transaction_category_id"
+                            class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                        >
                             <option value="">Semua Kategori</option>
                             @foreach($filterCategories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" @selected(request('transaction_category_id') == $category->id)>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
-                        <a href="{{ route('transactions.index') }}" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition"><i class="fa-solid fa-download mr-1"></i> Export</a>
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
+                            <i class="fa-solid fa-search"></i>
+                            <span>Filter</span>
+                        </button>
                     </div>
-                </div>
+                </form>
 
                 <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                     @php
-                        $groupedTransactions = $recentTransactions->groupBy(function($transaction) {
+                        // Gunakan $allTransactions untuk tampilan daftar transaksi (agar filter bekerja)
+                        $groupedTransactions = $allTransactions->groupBy(function($transaction) {
                             return $transaction->date->format('Y-m-d');
                         });
                     @endphp
@@ -969,6 +984,9 @@
             // Reload page with new period parameter
             const url = new URL(window.location.href);
             url.searchParams.set('period', period);
+            // Hapus parameter yang khusus untuk filter transaksi agar tidak memaksa view Transaksi
+            url.searchParams.delete('transaction_search');
+            url.searchParams.delete('transaction_category_id');
             window.location.href = url.toString();
         }
 
@@ -1201,6 +1219,22 @@
                         closeTransactionModal();
                     }
                 });
+            }
+
+            // Set initial view based on URL params (stay on Transactions after filtering)
+            const params = new URLSearchParams(window.location.search);
+            const hasTransactionFilter = params.has('transaction_search') || params.has('transaction_category_id');
+            if (hasTransactionFilter) {
+                const transactionsBtn = document.getElementById('nav-transactions');
+                if (transactionsBtn) {
+                    switchView('transactions', transactionsBtn);
+                }
+            } else {
+                // Ensure default view is Dashboard
+                const dashboardBtn = document.getElementById('nav-dashboard');
+                if (dashboardBtn) {
+                    switchView('dashboard', dashboardBtn);
+                }
             }
         });
     </script>
