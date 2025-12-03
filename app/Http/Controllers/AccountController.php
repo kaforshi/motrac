@@ -25,13 +25,24 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:cash,bank,ewallet,liability,investment',
-            'initial_balance' => 'nullable|numeric',
-            'currency' => 'nullable|string|max:3',
-            'notes' => 'nullable|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:cash,bank,ewallet,liability,investment',
+                'initial_balance' => 'nullable|numeric',
+                'currency' => 'nullable|string|max:3',
+                'notes' => 'nullable|string',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
+        }
 
         $account = Account::create([
             'user_id' => auth()->id(),
@@ -40,8 +51,16 @@ class AccountController extends Controller
             'balance' => $validated['initial_balance'] ?? 0,
             'initial_balance' => $validated['initial_balance'] ?? 0,
             'currency' => $validated['currency'] ?? 'IDR',
-            'notes' => $validated['notes'],
+            'notes' => $validated['notes'] ?? null,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Account created successfully.',
+                'account' => $account,
+            ]);
+        }
 
         return redirect()->route('accounts.index')->with('success', 'Account created successfully.');
     }

@@ -481,10 +481,10 @@
             <div id="view-wallets" class="content-section hidden">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Add Wallet Button -->
-                    <a href="{{ route('accounts.create') }}" class="border-2 border-dashed border-gray-300 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition h-48 bg-gray-50 hover:bg-white">
+                    <button type="button" onclick="openAccountModal()" class="border-2 border-dashed border-gray-300 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition h-48 bg-gray-50 hover:bg-white">
                         <i class="fa-solid fa-plus text-3xl mb-2"></i>
                         <span class="font-medium">Tambah Dompet Baru</span>
-                    </a>
+                    </button>
 
                     @php
                         $accounts = \App\Models\Account::where('user_id', auth()->id())->get();
@@ -1105,6 +1105,7 @@
         function showError(field, message) {
             // Map field names to actual input IDs
             const fieldMap = {
+                // Transaction modal
                 'modal_account_id': 'modal_account_id',
                 'modal_from_account_id': 'modal_from_account_id',
                 'modal_to_account_id': 'modal_to_account_id',
@@ -1114,7 +1115,13 @@
                 'modal_date': 'modal_date',
                 'modal_notes': 'modal_notes',
                 'modal_receipt': 'modal_receipt',
-                'modal_type': 'modal_transactionType'
+                'modal_type': 'modal_transactionType',
+                // Account modal
+                'name': 'account_name',
+                'type': 'account_type',
+                'initial_balance': 'account_initial_balance',
+                'currency': 'account_currency',
+                'notes': 'account_notes',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -1199,7 +1206,77 @@
             }
         }
 
-        // Initialize transaction type change handler
+        // 5. Account (Wallet) Modal Functions
+        function openAccountModal() {
+            const modal = document.getElementById('accountModal');
+            modal.classList.remove('hidden');
+            const form = document.getElementById('accountForm');
+            form.reset();
+            document.getElementById('account_currency').value = 'IDR';
+            document.getElementById('account_initial_balance').value = 0;
+            clearErrors();
+        }
+
+        function closeAccountModal() {
+            const modal = document.getElementById('accountModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitAccountForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("accounts.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Dompet berhasil ditambahkan!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeAccountModal();
+                        window.location.reload();
+                    }, 1500);
+                } else if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                        showError(field, errorMessage);
+                    });
+                } else {
+                    alert(data.message || 'Gagal menyimpan dompet');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Initialize handlers
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('modal_transactionType');
             if (typeSelect) {
@@ -1217,6 +1294,21 @@
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
                         closeTransactionModal();
+                    }
+                });
+            }
+
+            // Account modal events
+            const accountForm = document.getElementById('accountForm');
+            if (accountForm) {
+                accountForm.addEventListener('submit', submitAccountForm);
+            }
+
+            const accountModal = document.getElementById('accountModal');
+            if (accountModal) {
+                accountModal.addEventListener('click', function(e) {
+                    if (e.target === accountModal) {
+                        closeAccountModal();
                     }
                 });
             }
@@ -1322,6 +1414,94 @@
                         <i class="fa-solid fa-save mr-2"></i> Simpan Transaksi
                     </button>
                     <button type="button" onclick="closeTransactionModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Account (Wallet) Modal -->
+    <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Tambah Dompet Baru</h3>
+                <button onclick="closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="accountForm" class="p-6 space-y-4">
+                @csrf
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dompet</label>
+                    <input
+                        type="text"
+                        name="name"
+                        id="account_name"
+                        required
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="Contoh: BCA, Dompet Cash"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Dompet</label>
+                    <select
+                        name="type"
+                        id="account_type"
+                        required
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
+                        <option value="cash">Cash</option>
+                        <option value="bank">Rekening Bank</option>
+                        <option value="ewallet">E-Wallet</option>
+                        <option value="liability">Kewajiban (Kartu Kredit, Paylater)</option>
+                        <option value="investment">Investasi</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Saldo Awal</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="initial_balance"
+                        id="account_initial_balance"
+                        value="0"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mata Uang</label>
+                    <input
+                        type="text"
+                        name="currency"
+                        id="account_currency"
+                        value="IDR"
+                        maxlength="3"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                    <textarea
+                        name="notes"
+                        id="account_notes"
+                        rows="3"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="Catatan tambahan (opsional)"
+                    ></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan Dompet
+                    </button>
+                    <button type="button" onclick="closeAccountModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>
