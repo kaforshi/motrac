@@ -73,18 +73,42 @@ class AccountController extends Controller
 
     public function update(Request $request, $id)
     {
-        $account = Account::where('user_id', auth()->id())->findOrFail($id);
+        $user = auth()->user();
+        $account = Account::where('user_id', $user->id)->findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:cash,bank,ewallet,liability,investment',
-            'currency' => 'nullable|string|max:3',
-            'is_hidden' => 'boolean',
-            'is_active' => 'boolean',
-            'notes' => 'nullable|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:cash,bank,ewallet,liability,investment',
+                'currency' => 'nullable|string|max:3',
+                'is_hidden' => 'sometimes|boolean',
+                'is_active' => 'sometimes|boolean',
+                'notes' => 'nullable|string',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
+        }
+
+        // Normalisasi checkbox (jika tidak dikirim dianggap false)
+        $validated['is_hidden'] = $request->has('is_hidden');
+        $validated['is_active'] = $request->has('is_active');
 
         $account->update($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Account updated successfully.',
+                'account' => $account,
+            ]);
+        }
 
         return redirect()->route('accounts.index')->with('success', 'Account updated successfully.');
     }

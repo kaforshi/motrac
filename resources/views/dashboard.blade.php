@@ -516,7 +516,20 @@
                                         <p class="text-xs text-gray-400">{{ ucfirst($account->type) }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('accounts.edit', $account->id) }}" class="text-gray-300 hover:text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></a>
+                                <button
+                                    type="button"
+                                    class="text-gray-300 hover:text-dark"
+                                    data-id="{{ $account->id }}"
+                                    data-name="{{ e($account->name) }}"
+                                    data-type="{{ $account->type }}"
+                                    data-currency="{{ $account->currency }}"
+                                    data-notes="{{ e($account->notes) }}"
+                                    data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
+                                    data-is-active="{{ $account->is_active ? 1 : 0 }}"
+                                    onclick="openAccountEditFromButton(this)"
+                                >
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
                             </div>
                             <div class="pl-2">
                                 <p class="text-2xl font-bold text-dark sensitive-data">Rp {{ number_format($account->balance, 0, ',', '.') }}</p>
@@ -1136,6 +1149,8 @@
                 'initial_balance': 'account_initial_balance',
                 'currency': 'account_currency',
                 'notes': 'account_notes',
+                'is_hidden': 'account_is_hidden',
+                'is_active': 'account_is_active',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -1221,20 +1236,61 @@
         }
 
         // 5. Account (Wallet) Modal Functions
-        function openAccountModal() {
+        let editingAccountId = null;
+
+        function openAccountEditFromButton(btn) {
+            const account = {
+                id: btn.dataset.id,
+                name: btn.dataset.name || '',
+                type: btn.dataset.type || 'cash',
+                currency: btn.dataset.currency || 'IDR',
+                notes: btn.dataset.notes || '',
+                is_hidden: btn.dataset.isHidden === '1',
+                is_active: btn.dataset.isActive === '1',
+            };
+            openAccountModal(account);
+        }
+
+        function openAccountModal(account = null) {
             const modal = document.getElementById('accountModal');
-            modal.classList.remove('hidden');
             const form = document.getElementById('accountForm');
+            const title = document.getElementById('accountModalTitle');
+
+            modal.classList.remove('hidden');
             form.reset();
-            document.getElementById('account_currency').value = 'IDR';
-            document.getElementById('account_initial_balance').value = 0;
             clearErrors();
+
+            if (account && account.id) {
+                // Edit mode
+                editingAccountId = account.id;
+                title.innerText = 'Edit Dompet';
+                document.getElementById('account_name').value = account.name || '';
+                document.getElementById('account_type').value = account.type || 'cash';
+                document.getElementById('account_currency').value = account.currency || 'IDR';
+                document.getElementById('account_initial_balance').value = '';
+                document.getElementById('account_notes').value = account.notes || '';
+                const hiddenCheckbox = document.getElementById('account_is_hidden');
+                const activeCheckbox = document.getElementById('account_is_active');
+                if (hiddenCheckbox) hiddenCheckbox.checked = !!account.is_hidden;
+                if (activeCheckbox) activeCheckbox.checked = !!account.is_active;
+            } else {
+                // Create mode
+                editingAccountId = null;
+                title.innerText = 'Tambah Dompet Baru';
+                document.getElementById('account_currency').value = 'IDR';
+                document.getElementById('account_initial_balance').value = 0;
+                const hiddenCheckbox = document.getElementById('account_is_hidden');
+                const activeCheckbox = document.getElementById('account_is_active');
+                if (hiddenCheckbox) hiddenCheckbox.checked = false;
+                if (activeCheckbox) activeCheckbox.checked = true;
+            }
         }
 
         function closeAccountModal() {
             const modal = document.getElementById('accountModal');
             modal.classList.add('hidden');
             clearErrors();
+            editingAccountId = null;
         }
 
         async function submitAccountForm(e) {
@@ -1250,7 +1306,13 @@
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                const response = await fetch('{{ route("accounts.store") }}', {
+                let url = '{{ route("accounts.store") }}';
+                if (editingAccountId) {
+                    url = '{{ url("accounts") }}/' + editingAccountId;
+                    formData.append('_method', 'PUT');
+                }
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -1265,7 +1327,7 @@
                 if (response.ok && data.success) {
                     const notification = document.createElement('div');
                     notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Dompet berhasil ditambahkan!';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + (editingAccountId ? 'Dompet berhasil diperbarui!' : 'Dompet berhasil ditambahkan!');
                     document.body.appendChild(notification);
 
                     setTimeout(() => {
@@ -1439,7 +1501,7 @@
     <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark">Tambah Dompet Baru</h3>
+                <h3 id="accountModalTitle" class="text-xl font-bold text-dark">Tambah Dompet Baru</h3>
                 <button onclick="closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
@@ -1498,6 +1560,31 @@
                         maxlength="3"
                         class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
                     >
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                        <input
+                            type="checkbox"
+                            name="is_hidden"
+                            id="account_is_hidden"
+                            class="rounded border-gray-300"
+                        >
+                        <span>Sembunyikan dari ringkasan saldo</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            id="account_is_active"
+                            class="rounded border-gray-300"
+                            checked
+                        >
+                        <span>Dompet aktif</span>
+                    </label>
                 </div>
 
                 <div>
