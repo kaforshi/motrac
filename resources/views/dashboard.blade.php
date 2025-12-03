@@ -905,8 +905,12 @@
         </div>
     </main>
 
-    <!-- Floating Action Button (Global) -->
-    <button type="button" onclick="openTransactionModal()" class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
+    <!-- Floating Action Button (Global - hanya untuk view selain Dompet) -->
+    <button
+        id="add-transaction-fab"
+        type="button"
+        onclick="openTransactionModal()"
+        class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
         <i class="fa-solid fa-plus"></i>
     </button>
 
@@ -939,6 +943,16 @@
                 // Update Title
                 const text = btnElement.innerText.trim();
                 document.getElementById('page-title').innerText = text;
+            }
+
+            // Tampilkan / sembunyikan tombol FAB tambah transaksi
+            const fab = document.getElementById('add-transaction-fab');
+            if (fab) {
+                if (viewId === 'wallets') {
+                    fab.classList.add('hidden');
+                } else {
+                    fab.classList.remove('hidden');
+                }
             }
         }
 
