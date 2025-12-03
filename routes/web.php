@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Transactions
+    Route::get('/transactions/form-data', [TransactionController::class, 'getFormData'])->name('transactions.formData');
     Route::resource('transactions', TransactionController::class);
     
     // Accounts

@@ -97,6 +97,12 @@ class DashboardController extends Controller
             ->where('is_active', true)
             ->get();
 
+        // All active categories for transactions filter dropdown
+        $filterCategories = \App\Models\Category::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         // All transactions for transactions view
         $allTransactions = Transaction::where('user_id', $user->id)
             ->with(['account', 'category'])
@@ -277,7 +283,8 @@ class DashboardController extends Controller
             'totalTransfer',
             'cashFlowData',
             'maxCashFlow',
-            'periodType'
+            'periodType',
+            'filterCategories'
         ));
     }
 }

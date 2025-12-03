@@ -83,6 +83,47 @@ class TransactionController extends Controller
         return view('transactions.create', compact('accounts', 'categories', 'templates'));
     }
 
+    public function getFormData()
+    {
+        try {
+            $userId = auth()->id();
+
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated.',
+                    'accounts' => [],
+                    'categories' => [],
+                ], 401);
+            }
+
+            $accounts = Account::where('user_id', $userId)
+                ->where('is_active', true)
+                ->get();
+
+            $categories = Category::where('user_id', $userId)
+                ->where('is_active', true)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'accounts' => $accounts,
+                'categories' => $categories,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error in getFormData: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data form.',
+                'accounts' => [],
+                'categories' => [],
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         $user = auth()->user();
@@ -126,7 +167,18 @@ class TransactionController extends Controller
             Rule::exists('categories', 'id')->where('user_id', $user->id),
         ];
 
-        $validated = $request->validate($rules);
+        try {
+            $validated = $request->validate($rules);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        }
 
         DB::beginTransaction();
         try {
@@ -189,9 +241,30 @@ class TransactionController extends Controller
             }
 
             DB::commit();
+            
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                $transaction->load(['account', 'category', 'fromAccount', 'toAccount']);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Transaction created successfully.',
+                    'transaction' => $transaction
+                ]);
+            }
+            
             return redirect()->route('transactions.index')->with('success', 'Transaction created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create transaction: ' . $e->getMessage(),
+                    'errors' => $e->getMessage()
+                ], 422);
+            }
+            
             return back()->withErrors(['error' => 'Failed to create transaction: ' . $e->getMessage()])->withInput();
         }
     }

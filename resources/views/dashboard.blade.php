@@ -394,7 +394,9 @@
                         <div class="text-center py-8">
                             <i class="fa-solid fa-receipt text-gray-300 text-3xl mb-3"></i>
                             <p class="text-sm text-gray-400 font-medium">Belum ada transaksi hari ini</p>
-                            <a href="{{ route('transactions.create') }}" class="text-primary hover:underline text-xs mt-2 inline-block">Tambah transaksi</a>
+                            <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline text-xs mt-2 inline-block">
+                                Tambah transaksi
+                            </button>
                         </div>
                     @endif
                 </div>
@@ -408,7 +410,12 @@
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
                     </div>
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <select class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"><option>Semua Kategori</option><option>Makanan</option><option>Transport</option></select>
+                        <select class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                            <option value="">Semua Kategori</option>
+                            @foreach($filterCategories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
                         <a href="{{ route('transactions.index') }}" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition"><i class="fa-solid fa-download mr-1"></i> Export</a>
                     </div>
                 </div>
@@ -447,7 +454,9 @@
                     @empty
                         <div class="p-8 text-center text-gray-400">
                             <p>Belum ada transaksi</p>
-                            <a href="{{ route('transactions.create') }}" class="text-primary hover:underline mt-2 inline-block">Tambah transaksi pertama</a>
+                            <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline mt-2 inline-block">
+                                Tambah transaksi pertama
+                            </button>
                         </div>
                     @endforelse
                 </div>
@@ -882,9 +891,9 @@
     </main>
 
     <!-- Floating Action Button (Global) -->
-    <a href="{{ route('transactions.create') }}" class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
+    <button type="button" onclick="openTransactionModal()" class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
         <i class="fa-solid fa-plus"></i>
-    </a>
+    </button>
 
     <!-- JavaScript Interactions -->
     <script>
@@ -962,6 +971,328 @@
             url.searchParams.set('period', period);
             window.location.href = url.toString();
         }
+
+        // 4. Transaction Modal Functions
+        let accountsData = [];
+        let categoriesData = [];
+
+        async function openTransactionModal() {
+            const modal = document.getElementById('transactionModal');
+            modal.classList.remove('hidden');
+            
+            // Reset form
+            document.getElementById('transactionForm').reset();
+            document.getElementById('modal_date').value = new Date().toISOString().split('T')[0];
+            clearErrors();
+            
+            // Load form data if not already loaded
+            if (accountsData.length === 0) {
+                try {
+                    const response = await fetch('{{ route("transactions.formData") }}', {
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin'
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        console.error('Failed loading form data:', data);
+                        alert(data.message || 'Gagal memuat data form. Silakan refresh halaman.');
+                        return;
+                    }
+
+                    accountsData = Array.isArray(data.accounts) ? data.accounts : [];
+                    categoriesData = Array.isArray(data.categories) ? data.categories : [];
+                    populateFormSelects();
+                } catch (error) {
+                    console.error('Error loading form data:', error);
+                    alert('Gagal memuat data form. Silakan refresh halaman.');
+                }
+            } else {
+                // Re-populate if already loaded
+                populateFormSelects();
+            }
+        }
+
+        function closeTransactionModal() {
+            const modal = document.getElementById('transactionModal');
+            modal.classList.add('hidden');
+            document.getElementById('transactionForm').reset();
+            document.getElementById('singleAccountField').style.display = 'block';
+            document.getElementById('transferAccountsField').style.display = 'none';
+            clearErrors();
+        }
+
+        function populateFormSelects() {
+            // Populate accounts
+            const accountSelect = document.getElementById('modal_account_id');
+            const fromAccountSelect = document.getElementById('modal_from_account_id');
+            const toAccountSelect = document.getElementById('modal_to_account_id');
+            
+            [accountSelect, fromAccountSelect, toAccountSelect].forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="">Pilih akun</option>';
+                    accountsData.forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id;
+                        option.textContent = account.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Populate categories
+            const categorySelect = document.getElementById('modal_category_id');
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
+                categoriesData.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            }
+        }
+
+        function handleTransactionTypeChange() {
+            const type = document.getElementById('modal_transactionType').value;
+            const singleAccountField = document.getElementById('singleAccountField');
+            const transferAccountsField = document.getElementById('transferAccountsField');
+            
+            if (type === 'transfer') {
+                singleAccountField.style.display = 'none';
+                transferAccountsField.style.display = 'block';
+                document.getElementById('modal_account_id').removeAttribute('required');
+                document.getElementById('modal_from_account_id').setAttribute('required', 'required');
+                document.getElementById('modal_to_account_id').setAttribute('required', 'required');
+            } else {
+                singleAccountField.style.display = 'block';
+                transferAccountsField.style.display = 'none';
+                document.getElementById('modal_account_id').setAttribute('required', 'required');
+                document.getElementById('modal_from_account_id').removeAttribute('required');
+                document.getElementById('modal_to_account_id').removeAttribute('required');
+            }
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            document.querySelectorAll('.border-red-500').forEach(el => {
+                el.classList.remove('border-red-500');
+                el.classList.add('border-gray-200');
+            });
+        }
+
+        function showError(field, message) {
+            // Map field names to actual input IDs
+            const fieldMap = {
+                'modal_account_id': 'modal_account_id',
+                'modal_from_account_id': 'modal_from_account_id',
+                'modal_to_account_id': 'modal_to_account_id',
+                'modal_category_id': 'modal_category_id',
+                'modal_amount': 'modal_amount',
+                'modal_description': 'modal_description',
+                'modal_date': 'modal_date',
+                'modal_notes': 'modal_notes',
+                'modal_receipt': 'modal_receipt',
+                'modal_type': 'modal_transactionType'
+            };
+            
+            const actualFieldId = fieldMap[field] || field;
+            const input = document.getElementById(actualFieldId);
+            if (input) {
+                input.classList.remove('border-gray-200');
+                input.classList.add('border-red-500');
+                // Remove existing error message
+                const existingError = input.parentElement.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message text-red-500 text-xs mt-1';
+                errorDiv.textContent = message;
+                input.parentElement.appendChild(errorDiv);
+            }
+        }
+
+        async function submitTransactionForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("transactions.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Transaksi berhasil ditambahkan!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        closeTransactionModal();
+                        // Reload page to show new transaction
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    // Show validation errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            // Map field names to modal field IDs
+                            let fieldName = 'modal_' + field;
+                            // Handle nested fields (e.g., split_transactions.0.category_id)
+                            if (field.includes('.')) {
+                                const parts = field.split('.');
+                                fieldName = 'modal_' + parts[parts.length - 1];
+                            }
+                            const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                            showError(fieldName, errorMessage);
+                        });
+                    } else {
+                        alert(data.message || 'Gagal menyimpan transaksi');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Initialize transaction type change handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.getElementById('modal_transactionType');
+            if (typeSelect) {
+                typeSelect.addEventListener('change', handleTransactionTypeChange);
+            }
+
+            const form = document.getElementById('transactionForm');
+            if (form) {
+                form.addEventListener('submit', submitTransactionForm);
+            }
+
+            // Close modal on backdrop click
+            const modal = document.getElementById('transactionModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeTransactionModal();
+                    }
+                });
+            }
+        });
     </script>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Tambah Transaksi</h3>
+                <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="transactionForm" class="p-6 space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Transaksi</label>
+                    <select name="type" id="modal_transactionType" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="income">Pemasukan</option>
+                        <option value="expense">Pengeluaran</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                </div>
+
+                <div id="singleAccountField">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Akun</label>
+                    <select name="account_id" id="modal_account_id" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih akun</option>
+                    </select>
+                </div>
+
+                <div id="transferAccountsField" style="display: none;">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dari Akun</label>
+                            <select name="from_account_id" id="modal_from_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                                <option value="">Pilih akun</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ke Akun</label>
+                            <select name="to_account_id" id="modal_to_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                                <option value="">Pilih akun</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                    <select name="category_id" id="modal_category_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih kategori</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+                    <input type="number" name="amount" id="modal_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                    <input type="text" name="description" id="modal_description" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Masukkan deskripsi">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                    <input type="date" name="date" id="modal_date" value="{{ date('Y-m-d') }}" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                    <textarea name="notes" id="modal_notes" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan (opsional)"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Foto Struk (Opsional)</label>
+                    <input type="file" name="receipt" id="modal_receipt" accept="image/*" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan Transaksi
+                    </button>
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
