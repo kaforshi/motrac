@@ -648,13 +648,18 @@
                             </div>
                         </form>
                         <div class="flex gap-2 w-full lg:w-auto">
+                            @php
+                                $exportDateFrom = $reportFrom ?? request('report_from', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d'));
+                                $exportDateTo = $reportTo ?? request('report_to', \Carbon\Carbon::now()->format('Y-m-d'));
+                                $exportType = $reportType ?? request('report_type', 'all');
+                            @endphp
                             <a href="{{ route('reports.calendar') }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
                                 <i class="fa-regular fa-calendar"></i> Kalender
                             </a>
-                            <a href="{{ route('reports.export') }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                            <a href="{{ route('reports.export', ['date_from' => $exportDateFrom, 'date_to' => $exportDateTo, 'type' => $exportType]) }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
                                 <i class="fa-solid fa-file-csv"></i> CSV
                             </a>
-                            <a href="{{ route('reports.exportPdf') }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                            <a href="{{ route('reports.exportPdf', ['date_from' => $exportDateFrom, 'date_to' => $exportDateTo, 'type' => $exportType]) }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
                                 <i class="fa-solid fa-file-pdf"></i> PDF
                             </a>
                         </div>
