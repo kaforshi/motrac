@@ -286,16 +286,31 @@
                         <div class="space-y-6">
                             @forelse($budgets->take(2) as $budget)
                                 @php
-                                    $percentage = min(100, ($budget->spent / max($budget->amount, 1)) * 100);
+                                    $available = $budget->amount + ($budget->rollover_enabled ? $budget->rollover_amount : 0);
+                                    $spent = $budget->spent;
+                                    $remaining = $budget->remaining;
+                                    $percentage = $available > 0 ? min(100, ($spent / $available) * 100) : 0;
                                     $colorClass = $percentage >= 90 ? 'bg-orange-500' : ($percentage >= 70 ? 'bg-yellow-500' : 'bg-blue-500');
                                 @endphp
                                 <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="font-medium text-gray-600">{{ $budget->category->name ?? 'N/A' }}</span>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-gray-600 text-sm">{{ $budget->category->name ?? 'N/A' }}</span>
                                         <span class="text-xs {{ $percentage >= 90 ? 'text-orange-500' : ($percentage >= 70 ? 'text-yellow-500' : 'text-emerald-500') }} font-bold">{{ number_format($percentage, 0) }}%</span>
                                     </div>
-                                    <div class="w-full bg-gray-100 rounded-full h-2">
-                                        <div class="{{ $colorClass }} h-2 rounded-full" style="width: {{ $percentage }}%"></div>
+                                    <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+                                        <div class="{{ $colorClass }} h-2 rounded-full transition-all" style="width: {{ $percentage }}%"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs">
+                                        <div class="flex flex-col">
+                                            <span class="text-gray-400 mb-0.5">Digunakan</span>
+                                            <span class="font-semibold text-gray-700 sensitive-data">Rp {{ number_format($spent, 0, ',', '.') }}</span>
+                                        </div>
+                                        <div class="flex flex-col text-right">
+                                            <span class="text-gray-400 mb-0.5">Sisa</span>
+                                            <span class="font-semibold {{ $remaining >= 0 ? 'text-emerald-600' : 'text-rose-600' }} sensitive-data">
+                                                {{ $remaining >= 0 ? '' : '-' }}Rp {{ number_format(abs($remaining), 0, ',', '.') }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
