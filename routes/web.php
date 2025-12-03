@@ -51,7 +51,6 @@ Route::middleware('auth')->group(function () {
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/trends', [ReportController::class, 'trends'])->name('reports.trends');
-    Route::get('/reports/calendar', [ReportController::class, 'calendar'])->name('reports.calendar');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.exportPdf');
     

@@ -118,24 +118,6 @@ class ReportController extends Controller
         ]);
     }
 
-    public function calendar(Request $request)
-    {
-        $user = auth()->user();
-        $year = $request->get('year', Carbon::now()->year);
-        $month = $request->get('month', Carbon::now()->month);
-
-        $transactions = Transaction::where('user_id', $user->id)
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->with(['account', 'category'])
-            ->get()
-            ->groupBy(function($transaction) {
-                return Carbon::parse($transaction->date)->format('Y-m-d');
-            });
-
-        return view('reports.calendar', compact('transactions', 'year', 'month'));
-    }
-
     public function export(Request $request)
     {
         $user = auth()->user();

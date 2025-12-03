@@ -73,9 +73,6 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
                 <div class="space-y-3">
-                    <a href="{{ route('reports.calendar') }}" class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-center">
-                        Calendar View
-                    </a>
                     <a href="{{ route('reports.export') }}?{{ http_build_query(request()->all()) }}" class="block w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center">
                         Export to CSV
                     </a>
