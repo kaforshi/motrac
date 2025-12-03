@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Lengkap - Finku</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#10B981', // Emerald 500
+                        secondary: '#3B82F6', // Blue 500
+                        dark: '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* CSS Chart Utilities */
+        /* Expense Gradient: Rose, Amber, Purple, Slate */
+        .conic-expense {
+            background: conic-gradient(
+                #F43F5E 0% 40%, 
+                #F59E0B 40% 70%, 
+                #8B5CF6 70% 90%, 
+                #64748B 90% 100%
+            );
+            border-radius: 50%;
+        }
+        /* Income Gradient: Emerald, Blue, Cyan */
+        .conic-income {
+            background: conic-gradient(
+                #10B981 0% 60%, 
+                #3B82F6 60% 85%, 
+                #06B6D4 85% 100%
+            );
+            border-radius: 50%;
+        }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans text-slate-800 bg-gray-50 flex h-screen overflow-hidden">
+
+    <!-- ================= Sidebar ================= -->
+    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col z-10 transition-all duration-300">
+        <!-- Logo -->
+        <a href="landing_page.html" class="h-16 flex items-center px-6 border-b border-gray-100 hover:bg-gray-50 transition">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold mr-2">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <span class="text-lg font-bold text-dark">Finku</span>
+        </a>
+
+        <!-- Menu -->
+        <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Menu Utama</p>
+            
+            <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left">
+                <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+            </button>
+            
+            <button onclick="switchView('transactions', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> Transaksi
+            </button>
+            
+            <button onclick="switchView('wallets', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-wallet w-5 text-center group-hover:text-primary"></i> Dompet
+            </button>
+
+            <!-- Menu Kategori Baru -->
+            <button onclick="switchView('categories', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> Kategori
+            </button>
+            
+            <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> Laporan
+            </button>
+
+            <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-2">Planning</p>
+            
+            <button onclick="switchView('budget', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-bullseye w-5 text-center group-hover:text-primary"></i> Budget
+            </button>
+            
+            <button onclick="switchView('debts', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+                <i class="fa-solid fa-hand-holding-dollar w-5 text-center group-hover:text-primary"></i> Utang & Piutang
+            </button>
+        </div>
+
+        <!-- User Footer -->
+        <div class="p-4 border-t border-gray-100">
+            <a href="landing_page.html" class="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 font-medium w-full px-2 py-2 rounded hover:bg-red-50 transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+            </a>
+        </div>
+    </aside>
+
+    <!-- ================= Main Content Wrapper ================= -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        
+        <!-- Top Header (Sticky) -->
+        <header class="bg-white h-16 border-b border-gray-200 flex-shrink-0 px-4 sm:px-8 flex items-center justify-between z-20">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-gray-500 hover:text-dark"><i class="fa-solid fa-bars text-xl"></i></button>
+                <div>
+                    <h2 class="text-lg font-bold text-dark" id="page-title">Dashboard Overview</h2>
+                    <p class="text-xs text-gray-400 hidden sm:block">Halo Budi, kelola keuanganmu dengan bijak.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <select class="hidden sm:block bg-gray-50 border border-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary">
+                    <option>Desember 2024</option>
+                    <option>November 2024</option>
+                </select>
+                <button class="w-9 h-9 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 flex items-center justify-center transition" title="Privacy Mode" onclick="togglePrivacy(this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+                <div class="relative">
+                    <button class="w-9 h-9 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 flex items-center justify-center transition">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Budi+Santoso&background=10B981&color=fff" class="w-9 h-9 rounded-full border border-gray-200 cursor-pointer">
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8 bg-gray-50 relative">
+
+            <!-- VIEW 1: DASHBOARD (Default) -->
+            <div id="view-dashboard" class="content-section animate-fade-in">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition"><i class="fa-solid fa-wallet text-6xl text-blue-500"></i></div>
+                        <p class="text-sm text-gray-500 font-medium mb-1">Total Saldo</p>
+                        <h3 class="text-2xl font-bold text-dark sensitive-data">Rp 15.450.000</h3>
+                        <div class="flex items-center gap-1 mt-2 text-xs text-gray-400"><span class="text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">+2.5%</span> dari bulan lalu</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-arrow-down"></i></div><span class="text-sm font-medium text-gray-500">Pemasukan</span></div>
+                        <h3 class="text-2xl font-bold text-emerald-600 sensitive-data">Rp 8.500.000</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600"><i class="fa-solid fa-arrow-up"></i></div><span class="text-sm font-medium text-gray-500">Pengeluaran</span></div>
+                        <h3 class="text-2xl font-bold text-rose-600 sensitive-data">Rp 3.250.000</h3>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Simple Chart -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-dark mb-6">Arus Kas Mingguan</h3>
+                        <div class="h-64 flex items-end justify-between gap-4 px-2">
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[40%]"></div>
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[30%]"></div>
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[80%]"></div>
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[50%]"></div>
+                            <div class="w-full bg-primary rounded-t h-[90%] shadow-lg"></div>
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[20%]"></div>
+                            <div class="w-full bg-emerald-400/80 rounded-t h-[55%]"></div>
+                        </div>
+                    </div>
+                    <!-- Quick Budget -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-dark mb-4">Pantauan Budget</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="font-medium text-gray-600">Makanan</span><span class="text-xs text-orange-500 font-bold">90%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-orange-500 h-2 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="font-medium text-gray-600">Transport</span><span class="text-xs text-emerald-500 font-bold">45%</span></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: TRANSAKSI -->
+            <div id="view-transactions" class="content-section hidden">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" placeholder="Cari transaksi..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <select class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"><option>Semua Kategori</option><option>Makanan</option><option>Transport</option></select>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition"><i class="fa-solid fa-download mr-1"></i> Export</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                    <!-- Group: Hari Ini -->
+                    <div class="bg-gray-50 px-6 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Hari Ini, 3 Des</span>
+                        <span class="text-xs font-bold text-rose-500 sensitive-data">-Rp 135.000</span>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-utensils"></i></div>
+                                <div><p class="font-medium text-dark text-sm">Makan Siang Pizza</p><p class="text-xs text-gray-400">Dompet: Gopay</p></div>
+                            </div>
+                            <span class="font-bold text-rose-500 text-sm sensitive-data">-Rp 85.000</span>
+                        </div>
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-car"></i></div>
+                                <div><p class="font-medium text-dark text-sm">Grab ke Kantor</p><p class="text-xs text-gray-400">Dompet: OVO</p></div>
+                            </div>
+                            <span class="font-bold text-rose-500 text-sm sensitive-data">-Rp 50.000</span>
+                        </div>
+                    </div>
+
+                    <!-- Group: Kemarin -->
+                    <div class="bg-gray-50 px-6 py-3 border-y border-gray-100 flex justify-between items-center mt-2">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Kemarin, 2 Des</span>
+                        <span class="text-xs font-bold text-emerald-500 sensitive-data">+Rp 500.000</span>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-money-bill-wave"></i></div>
+                                <div><p class="font-medium text-dark text-sm">Transfer Masuk (Teman)</p><p class="text-xs text-gray-400">Dompet: BCA</p></div>
+                            </div>
+                            <span class="font-bold text-emerald-500 text-sm sensitive-data">+Rp 500.000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: DOMPET (Wallets) -->
+            <div id="view-wallets" class="content-section hidden">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Add Wallet Button -->
+                    <button class="border-2 border-dashed border-gray-300 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition h-48 bg-gray-50 hover:bg-white">
+                        <i class="fa-solid fa-plus text-3xl mb-2"></i>
+                        <span class="font-medium">Tambah Dompet Baru</span>
+                    </button>
+
+                    <!-- Card BCA -->
+                    <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl p-6 text-white shadow-xl shadow-blue-100 relative overflow-hidden h-48 flex flex-col justify-between">
+                        <div class="absolute right-[-20px] top-[-20px] w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-blue-200 text-xs font-medium uppercase tracking-wider">Rekening Utama</p>
+                                <h3 class="font-bold text-xl mt-1">Bank BCA</h3>
+                            </div>
+                            <i class="fa-brands fa-cc-visa text-2xl opacity-70"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold tracking-tight sensitive-data">Rp 12.000.000</p>
+                            <div class="flex justify-between items-end mt-2">
+                                <p class="text-xs text-blue-200">**** 4421</p>
+                                <button class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded transition">History</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Gopay -->
+                    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm h-48 flex flex-col justify-between relative">
+                        <div class="w-1.5 h-full absolute left-0 top-0 bg-blue-500 rounded-l-2xl"></div>
+                        <div class="flex justify-between items-start pl-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-wallet"></i></div>
+                                <div><h3 class="font-bold text-dark">Gopay</h3><p class="text-xs text-gray-400">E-Wallet</p></div>
+                            </div>
+                            <button class="text-gray-300 hover:text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </div>
+                        <div class="pl-2">
+                            <p class="text-2xl font-bold text-dark sensitive-data">Rp 450.000</p>
+                            <p class="text-xs text-gray-400 mt-1">Updated: 2 jam lalu</p>
+                        </div>
+                    </div>
+
+                    <!-- Card Cash -->
+                    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm h-48 flex flex-col justify-between relative">
+                        <div class="w-1.5 h-full absolute left-0 top-0 bg-emerald-500 rounded-l-2xl"></div>
+                        <div class="flex justify-between items-start pl-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-money-bill-wave"></i></div>
+                                <div><h3 class="font-bold text-dark">Tunai / Cash</h3><p class="text-xs text-gray-400">Dompet Fisik</p></div>
+                            </div>
+                            <button class="text-gray-300 hover:text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </div>
+                        <div class="pl-2">
+                            <p class="text-2xl font-bold text-dark sensitive-data">Rp 3.000.000</p>
+                            <p class="text-xs text-gray-400 mt-1">Manual Input</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 7: CATEGORIES (Baru Ditambahkan) -->
+            <div id="view-categories" class="content-section hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-dark">Atur Kategori</h3>
+                        <p class="text-sm text-gray-500">Sesuaikan label pengeluaran dan pemasukan Anda.</p>
+                    </div>
+                    <button class="bg-primary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Kategori Baru
+                    </button>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Expense Categories -->
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                        <div class="bg-rose-50 p-4 border-b border-rose-100 flex items-center justify-between">
+                            <h4 class="font-bold text-rose-700 flex items-center gap-2"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</h4>
+                            <span class="text-xs bg-white text-rose-500 px-2 py-1 rounded font-bold">12 Kategori</span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <!-- Category Items -->
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-utensils"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Makanan</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-bus"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Transport</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-bag-shopping"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Belanja</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-heart-pulse"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Kesehatan</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-lightbulb"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Tagihan</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-rose-200 hover:bg-rose-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-ellipsis"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-rose-700">Lainnya</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Income Categories -->
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                        <div class="bg-emerald-50 p-4 border-b border-emerald-100 flex items-center justify-between">
+                            <h4 class="font-bold text-emerald-700 flex items-center gap-2"><i class="fa-solid fa-arrow-down"></i> Pemasukan</h4>
+                            <span class="text-xs bg-white text-emerald-500 px-2 py-1 rounded font-bold">5 Kategori</span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <!-- Category Items -->
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-sack-dollar"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-emerald-700">Gaji</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-briefcase"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-emerald-700">Freelance</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-chart-line"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-emerald-700">Investasi</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 cursor-pointer transition group">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mb-2 group-hover:scale-110 transition"><i class="fa-solid fa-gift"></i></div>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-emerald-700">Hadiah</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: LAPORAN (Reports - UPDATED) -->
+            <div id="view-reports" class="content-section hidden">
+                <div class="flex flex-col space-y-6">
+                    <!-- Filters & Quick Actions -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 shadow-sm">
+                        <div class="flex flex-wrap gap-4 w-full lg:w-auto">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
+                                <input type="date" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
+                                <input type="date" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Tipe Transaksi</label>
+                                <select class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                                    <option selected>Semua Tipe</option>
+                                    <option value="income">Pemasukan</option>
+                                    <option value="expense">Pengeluaran</option>
+                                    <option value="transfer">Transfer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 w-full lg:w-auto">
+                            <button class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition" onclick="alert('Open Calendar View')">
+                                <i class="fa-regular fa-calendar"></i> Kalender
+                            </button>
+                            <button class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-lg text-sm font-medium transition" onclick="alert('Exporting CSV...')">
+                                <i class="fa-solid fa-file-csv"></i> CSV
+                            </button>
+                            <button class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-700 px-4 py-2.5 rounded-lg text-sm font-medium transition" onclick="alert('Exporting PDF...')">
+                                <i class="fa-solid fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Total Income -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Income</p>
+                            <h3 class="text-xl font-bold text-emerald-600 sensitive-data">Rp 12.500.000</h3>
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +12%</span>
+                        </div>
+                        <!-- Total Expense -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Expense</p>
+                            <h3 class="text-xl font-bold text-rose-600 sensitive-data">Rp 4.250.000</h3>
+                            <span class="text-[10px] text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-down"></i> +5%</span>
+                        </div>
+                        <!-- Total Transfer -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Transfer</p>
+                            <h3 class="text-xl font-bold text-blue-600 sensitive-data">Rp 1.000.000</h3>
+                            <span class="text-[10px] text-gray-400 mt-1 inline-block">Internal mutations</span>
+                        </div>
+                        <!-- Net Amount -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm bg-gradient-to-br from-emerald-50 to-white">
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Net Amount</p>
+                            <h3 class="text-xl font-bold text-dark sensitive-data">Rp 8.250.000</h3>
+                            <span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">Healthy Cashflow</span>
+                        </div>
+                    </div>
+
+                    <!-- Category Charts Row -->
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        <!-- Income by Category -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                            <h3 class="font-bold text-dark self-start mb-6 border-l-4 border-emerald-500 pl-3">Income by Category</h3>
+                            <div class="flex flex-col sm:flex-row items-center gap-8 w-full justify-center">
+                                <div class="relative w-40 h-40 conic-income shadow-lg flex-shrink-0">
+                                    <div class="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center">
+                                        <span class="text-[10px] text-gray-400">Total</span>
+                                        <span class="font-bold text-sm text-dark sensitive-data">12.5 Jt</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3 text-sm w-full max-w-xs">
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-gray-600">Gaji (60%)</span></div><span class="font-bold text-dark sensitive-data">7.5jt</span></div>
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-gray-600">Freelance (25%)</span></div><span class="font-bold text-dark sensitive-data">3.1jt</span></div>
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-500"></span><span class="text-gray-600">Investasi (15%)</span></div><span class="font-bold text-dark sensitive-data">1.9jt</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expense by Category -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                            <h3 class="font-bold text-dark self-start mb-6 border-l-4 border-rose-500 pl-3">Expense by Category</h3>
+                            <div class="flex flex-col sm:flex-row items-center gap-8 w-full justify-center">
+                                <div class="relative w-40 h-40 conic-expense shadow-lg flex-shrink-0">
+                                    <div class="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center">
+                                        <span class="text-[10px] text-gray-400">Total</span>
+                                        <span class="font-bold text-sm text-dark sensitive-data">4.2 Jt</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3 text-sm w-full max-w-xs">
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-rose-500"></span><span class="text-gray-600">Makanan (40%)</span></div><span class="font-bold text-dark sensitive-data">1.7jt</span></div>
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span><span class="text-gray-600">Transport (30%)</span></div><span class="font-bold text-dark sensitive-data">1.2jt</span></div>
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-violet-500"></span><span class="text-gray-600">Belanja (20%)</span></div><span class="font-bold text-dark sensitive-data">850rb</span></div>
+                                    <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-500"></span><span class="text-gray-600">Lainnya (10%)</span></div><span class="font-bold text-dark sensitive-data">425rb</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Transactions Table -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                        <div class="p-4 border-b border-gray-100">
+                            <h3 class="font-bold text-dark">Detailed Transactions</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-xs text-gray-500 uppercase">
+                                        <th class="px-6 py-3 font-medium">Tanggal</th>
+                                        <th class="px-6 py-3 font-medium">Deskripsi</th>
+                                        <th class="px-6 py-3 font-medium">Kategori</th>
+                                        <th class="px-6 py-3 font-medium">Tipe</th>
+                                        <th class="px-6 py-3 font-medium text-right">Nominal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-gray-500">3 Des 2024</td>
+                                        <td class="px-6 py-4 font-medium text-dark">Makan Siang Pizza</td>
+                                        <td class="px-6 py-4"><span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-bold">Makanan</span></td>
+                                        <td class="px-6 py-4 text-rose-500 text-xs font-bold uppercase">Expense</td>
+                                        <td class="px-6 py-4 text-right font-bold text-rose-600 sensitive-data">-Rp 85.000</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-gray-500">2 Des 2024</td>
+                                        <td class="px-6 py-4 font-medium text-dark">Gaji Bulanan</td>
+                                        <td class="px-6 py-4"><span class="bg-emerald-100 text-emerald-600 px-2 py-1 rounded text-xs font-bold">Gaji</span></td>
+                                        <td class="px-6 py-4 text-emerald-500 text-xs font-bold uppercase">Income</td>
+                                        <td class="px-6 py-4 text-right font-bold text-emerald-600 sensitive-data">+Rp 8.500.000</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-gray-500">1 Des 2024</td>
+                                        <td class="px-6 py-4 font-medium text-dark">Transfer ke Gopay</td>
+                                        <td class="px-6 py-4"><span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">Topup</span></td>
+                                        <td class="px-6 py-4 text-blue-500 text-xs font-bold uppercase">Transfer</td>
+                                        <td class="px-6 py-4 text-right font-bold text-gray-600 sensitive-data">Rp 200.000</td>
+                                    </tr>
+                                     <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-gray-500">30 Nov 2024</td>
+                                        <td class="px-6 py-4 font-medium text-dark">Bensin Mobil</td>
+                                        <td class="px-6 py-4"><span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">Transport</span></td>
+                                        <td class="px-6 py-4 text-rose-500 text-xs font-bold uppercase">Expense</td>
+                                        <td class="px-6 py-4 text-right font-bold text-rose-600 sensitive-data">-Rp 300.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-gray-100 text-center">
+                            <button class="text-sm text-primary font-medium hover:underline">Load More Records</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: BUDGET -->
+            <div id="view-budget" class="content-section hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-dark">Budget Planner</h3>
+                        <p class="text-sm text-gray-500">Sisa budget total: <span class="text-emerald-600 font-bold sensitive-data">Rp 1.500.000</span></p>
+                    </div>
+                    <button class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ Buat Baru</button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Budget Item: Critical -->
+                    <div class="bg-white p-5 rounded-xl border border-rose-200 shadow-sm relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-2 relative z-10">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-utensils"></i></div>
+                                <div><h4 class="font-bold text-dark">Makanan & Minuman</h4><p class="text-xs text-rose-500 font-bold">Overspending risk!</p></div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Sisa</p>
+                                <p class="font-bold text-dark sensitive-data">Rp 150.000</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-3 mt-2 relative z-10">
+                            <div class="bg-rose-500 h-3 rounded-full flex items-center justify-end pr-2 text-[8px] text-white font-bold" style="width: 90%">90%</div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2 relative z-10">Terpakai <span class="sensitive-data">Rp 1.350.000</span> dari Rp 1.500.000</p>
+                    </div>
+
+                    <!-- Budget Item: Safe -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-bus"></i></div>
+                                <div><h4 class="font-bold text-dark">Transportasi</h4><p class="text-xs text-emerald-500 font-bold">Aman terkendali</p></div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Sisa</p>
+                                <p class="font-bold text-dark sensitive-data">Rp 550.000</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-3 mt-2">
+                            <div class="bg-blue-500 h-3 rounded-full flex items-center justify-end pr-2 text-[8px] text-white font-bold" style="width: 45%">45%</div>
+                        </div>
+                         <p class="text-xs text-gray-400 mt-2">Terpakai <span class="sensitive-data">Rp 450.000</span> dari Rp 1.000.000</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 6: UTANG (Debts) -->
+            <div id="view-debts" class="content-section hidden">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Column: Piutang (Orang berutang ke saya) -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-emerald-50 p-4 border-b border-emerald-100 flex justify-between items-center">
+                            <h3 class="font-bold text-emerald-800">Piutang (Uang Saya)</h3>
+                            <span class="bg-white text-emerald-600 text-xs px-2 py-1 rounded font-bold sensitive-data">Total: Rp 1.200.000</span>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                            <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                <div>
+                                    <p class="font-bold text-dark">Andi (Teman Kantor)</p>
+                                    <p class="text-xs text-gray-400">Jatuh tempo: 10 Des</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-emerald-600 sensitive-data">Rp 200.000</p>
+                                    <button class="text-[10px] text-blue-500 hover:underline">Ingatkan</button>
+                                </div>
+                            </div>
+                            <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                <div>
+                                    <p class="font-bold text-dark">Budi (Sepupu)</p>
+                                    <p class="text-xs text-gray-400">Jatuh tempo: Lewat 2 hari</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-emerald-600 sensitive-data">Rp 1.000.000</p>
+                                    <button class="text-[10px] text-red-500 hover:underline font-bold">Tagih!</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 text-sm text-gray-500 hover:text-emerald-600 border-t border-gray-100 transition">+ Tambah Piutang</button>
+                    </div>
+
+                    <!-- Column: Utang (Saya berutang ke orang) -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-rose-50 p-4 border-b border-rose-100 flex justify-between items-center">
+                            <h3 class="font-bold text-rose-800">Utang Saya</h3>
+                            <span class="bg-white text-rose-600 text-xs px-2 py-1 rounded font-bold sensitive-data">Total: Rp 5.000.000</span>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                             <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                <div>
+                                    <p class="font-bold text-dark">Kartu Kredit BCA</p>
+                                    <p class="text-xs text-gray-400">Cicilan Laptop (3/12)</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-rose-600 sensitive-data">Rp 5.000.000</p>
+                                    <button class="text-[10px] text-gray-500 hover:underline">Bayar Cicilan</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 text-sm text-gray-500 hover:text-rose-600 border-t border-gray-100 transition">+ Catat Utang Baru</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Floating Action Button (Global) -->
+    <button class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        // 1. Navigation Logic (SPA Switcher)
+        function switchView(viewId, btnElement) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Show target section
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+
+            // Update Sidebar Styles
+            document.querySelectorAll('.nav-item').forEach(el => {
+                // Reset style to inactive
+                el.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left';
+                const icon = el.querySelector('i');
+                if(icon) icon.className = icon.className.replace('text-center', 'text-center group-hover:text-primary'); // reset icon color logic
+            });
+
+            // Set Active Style
+            if(btnElement) {
+                btnElement.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left';
+                // Update Title
+                const iconClass = btnElement.querySelector('i').classList[1]; // get icon class
+                const text = btnElement.innerText.trim();
+                document.getElementById('page-title').innerText = text;
+            }
+        }
+
+        // 2. Privacy Toggle Logic
+        let isHidden = false;
+        function togglePrivacy(btn) {
+            const sensitiveElements = document.querySelectorAll('.sensitive-data');
+            const icon = btn.querySelector('i');
+            
+            isHidden = !isHidden;
+
+            if(isHidden) {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                sensitiveElements.forEach(el => {
+                    el.dataset.original = el.innerText;
+                    el.innerText = '•••••••';
+                    el.classList.add('blur-sm');
+                });
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                sensitiveElements.forEach(el => {
+                    if(el.dataset.original) {
+                        el.innerText = el.dataset.original;
+                    }
+                    el.classList.remove('blur-sm');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
