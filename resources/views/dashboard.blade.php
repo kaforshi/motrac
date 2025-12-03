@@ -96,7 +96,7 @@
                 <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> Kategori
             </button>
             
-            <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
+            <button id="nav-reports" onclick="switchView('reports', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-dark rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> Laporan
             </button>
 
@@ -608,25 +608,45 @@
                 <div class="flex flex-col space-y-6">
                     <!-- Filters & Quick Actions -->
                     <div class="bg-white p-5 rounded-xl border border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 shadow-sm">
-                        <div class="flex flex-wrap gap-4 w-full lg:w-auto">
+                        <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap gap-4 w-full lg:w-auto items-end">
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
-                                <input type="date" value="{{ \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                                <input
+                                    type="date"
+                                    name="report_from"
+                                    value="{{ $reportFrom ?? request('report_from', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d')) }}"
+                                    class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                >
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
-                                <input type="date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                                <input
+                                    type="date"
+                                    name="report_to"
+                                    value="{{ $reportTo ?? request('report_to', \Carbon\Carbon::now()->format('Y-m-d')) }}"
+                                    class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                >
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Tipe Transaksi</label>
-                                <select class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
-                                    <option selected>Semua Tipe</option>
-                                    <option value="income">Pemasukan</option>
-                                    <option value="expense">Pengeluaran</option>
-                                    <option value="transfer">Transfer</option>
+                                <select
+                                    name="report_type"
+                                    class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                >
+                                    @php $rt = $reportType ?? request('report_type', 'all'); @endphp
+                                    <option value="all" {{ $rt === 'all' ? 'selected' : '' }}>Semua Tipe</option>
+                                    <option value="income" {{ $rt === 'income' ? 'selected' : '' }}>Pemasukan</option>
+                                    <option value="expense" {{ $rt === 'expense' ? 'selected' : '' }}>Pengeluaran</option>
+                                    <option value="transfer" {{ $rt === 'transfer' ? 'selected' : '' }}>Transfer</option>
                                 </select>
                             </div>
-                        </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <span>Filter</span>
+                                </button>
+                            </div>
+                        </form>
                         <div class="flex gap-2 w-full lg:w-auto">
                             <a href="{{ route('reports.calendar') }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
                                 <i class="fa-regular fa-calendar"></i> Kalender
@@ -1480,16 +1500,23 @@
                 });
             }
 
-            // Set initial view based on URL params (stay on Transactions after filtering)
+            // Set initial view based on URL params
             const params = new URLSearchParams(window.location.search);
             const hasTransactionFilter = params.has('transaction_search') || params.has('transaction_category_id');
+            const hasReportFilter = params.has('report_from') || params.has('report_to') || params.has('report_type');
+
             if (hasTransactionFilter) {
                 const transactionsBtn = document.getElementById('nav-transactions');
                 if (transactionsBtn) {
                     switchView('transactions', transactionsBtn);
                 }
+            } else if (hasReportFilter) {
+                const reportsBtn = document.getElementById('nav-reports');
+                if (reportsBtn) {
+                    switchView('reports', reportsBtn);
+                }
             } else {
-                // Ensure default view is Dashboard
+                // Default view is Dashboard
                 const dashboardBtn = document.getElementById('nav-dashboard');
                 if (dashboardBtn) {
                     switchView('dashboard', dashboardBtn);

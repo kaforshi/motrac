@@ -21,17 +21,37 @@ class DashboardController extends Controller
             ->where('is_hidden', false)
             ->sum('balance');
 
-        // Monthly income and expense
-        $currentMonth = Carbon::now()->startOfMonth();
-        $monthlyIncome = Transaction::where('user_id', $user->id)
-            ->where('type', Transaction::TYPE_INCOME)
-            ->where('date', '>=', $currentMonth)
-            ->sum('amount');
+        // Report filters (date range & type)
+        $reportFrom = $request->get('report_from');
+        $reportTo = $request->get('report_to');
+        $reportType = $request->get('report_type', 'all'); // all, income, expense, transfer
 
-        $monthlyExpense = Transaction::where('user_id', $user->id)
-            ->where('type', Transaction::TYPE_EXPENSE)
-            ->where('date', '>=', $currentMonth)
-            ->sum('amount');
+        $fromDate = $reportFrom
+            ? Carbon::parse($reportFrom)->startOfDay()
+            : Carbon::now()->startOfMonth();
+
+        $toDate = $reportTo
+            ? Carbon::parse($reportTo)->endOfDay()
+            : Carbon::now()->endOfDay();
+
+        // Monthly income and expense (respect filters)
+        if ($reportType !== 'all' && $reportType !== Transaction::TYPE_INCOME) {
+            $monthlyIncome = 0;
+        } else {
+            $monthlyIncome = Transaction::where('user_id', $user->id)
+                ->where('type', Transaction::TYPE_INCOME)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->sum('amount');
+        }
+
+        if ($reportType !== 'all' && $reportType !== Transaction::TYPE_EXPENSE) {
+            $monthlyExpense = 0;
+        } else {
+            $monthlyExpense = Transaction::where('user_id', $user->id)
+                ->where('type', Transaction::TYPE_EXPENSE)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->sum('amount');
+        }
 
         // Recent transactions
         $recentTransactions = Transaction::where('user_id', $user->id)
@@ -62,23 +82,31 @@ class DashboardController extends Controller
             ->where('due_date', '<', Carbon::now())
             ->count();
 
-        // Expense by category (current month)
-        $expenseByCategory = Transaction::where('user_id', $user->id)
-            ->where('type', Transaction::TYPE_EXPENSE)
-            ->where('date', '>=', $currentMonth)
-            ->select('category_id', DB::raw('SUM(amount) as total'))
-            ->groupBy('category_id')
-            ->with('category')
-            ->get();
+        // Expense by category (respect report filters)
+        if ($reportType === 'all' || $reportType === Transaction::TYPE_EXPENSE) {
+            $expenseByCategory = Transaction::where('user_id', $user->id)
+                ->where('type', Transaction::TYPE_EXPENSE)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->select('category_id', DB::raw('SUM(amount) as total'))
+                ->groupBy('category_id')
+                ->with('category')
+                ->get();
+        } else {
+            $expenseByCategory = collect();
+        }
 
-        // Income by category (current month)
-        $incomeByCategory = Transaction::where('user_id', $user->id)
-            ->where('type', Transaction::TYPE_INCOME)
-            ->where('date', '>=', $currentMonth)
-            ->select('category_id', DB::raw('SUM(amount) as total'))
-            ->groupBy('category_id')
-            ->with('category')
-            ->get();
+        // Income by category (respect report filters)
+        if ($reportType === 'all' || $reportType === Transaction::TYPE_INCOME) {
+            $incomeByCategory = Transaction::where('user_id', $user->id)
+                ->where('type', Transaction::TYPE_INCOME)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->select('category_id', DB::raw('SUM(amount) as total'))
+                ->groupBy('category_id')
+                ->with('category')
+                ->get();
+        } else {
+            $incomeByCategory = collect();
+        }
 
         // Accounts for wallets view
         $accounts = Account::where('user_id', $user->id)
@@ -103,11 +131,11 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
-        // All transactions for transactions view with optional filters
+        // All transactions for transactions & reports detailed view with optional filters
         $allTransactionsQuery = Transaction::where('user_id', $user->id)
             ->with(['account', 'category']);
 
-        // Search filter
+        // Search filter (Transactions tab)
         if ($request->filled('transaction_search')) {
             $search = $request->get('transaction_search');
             $allTransactionsQuery->where(function ($q) use ($search) {
@@ -116,9 +144,18 @@ class DashboardController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (Transactions tab)
         if ($request->filled('transaction_category_id')) {
             $allTransactionsQuery->where('category_id', $request->get('transaction_category_id'));
+        }
+
+        // Report filters (date range & type) should also affect Detailed Transactions table
+        if (isset($fromDate, $toDate)) {
+            $allTransactionsQuery->whereBetween('date', [$fromDate, $toDate]);
+        }
+
+        if (!empty($reportType) && $reportType !== 'all') {
+            $allTransactionsQuery->where('type', $reportType);
         }
 
         $allTransactions = $allTransactionsQuery
@@ -147,11 +184,15 @@ class DashboardController extends Controller
             return max(0, $budget->amount - $budget->spent);
         });
 
-        // Reports data (current month)
-        $totalTransfer = Transaction::where('user_id', $user->id)
-            ->where('type', Transaction::TYPE_TRANSFER)
-            ->where('date', '>=', $currentMonth)
-            ->sum('amount');
+        // Reports data - transfer total (respect filters)
+        if ($reportType !== 'all' && $reportType !== Transaction::TYPE_TRANSFER) {
+            $totalTransfer = 0;
+        } else {
+            $totalTransfer = Transaction::where('user_id', $user->id)
+                ->where('type', Transaction::TYPE_TRANSFER)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->sum('amount');
+        }
 
         // Cash flow data based on period type
         $periodType = $request->get('period', 'weekly'); // daily, weekly, monthly, yearly
@@ -300,7 +341,10 @@ class DashboardController extends Controller
             'cashFlowData',
             'maxCashFlow',
             'periodType',
-            'filterCategories'
+            'filterCategories',
+            'reportFrom',
+            'reportTo',
+            'reportType'
         ));
     }
 }
