@@ -640,11 +640,14 @@
                                     <option value="transfer" {{ $rt === 'transfer' ? 'selected' : '' }}>Transfer</option>
                                 </select>
                             </div>
-                            <div class="flex items-end">
+                            <div class="flex items-end gap-2">
                                 <button type="submit" class="bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
                                     <i class="fa-solid fa-filter"></i>
                                     <span>Filter</span>
                                 </button>
+                                <a href="{{ route('dashboard', ['view' => 'reports']) }}" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+                                    Clear
+                                </a>
                             </div>
                         </form>
                         <div class="flex gap-2 w-full lg:w-auto">
@@ -1509,13 +1512,14 @@
             const params = new URLSearchParams(window.location.search);
             const hasTransactionFilter = params.has('transaction_search') || params.has('transaction_category_id');
             const hasReportFilter = params.has('report_from') || params.has('report_to') || params.has('report_type');
+            const viewParam = params.get('view');
 
             if (hasTransactionFilter) {
                 const transactionsBtn = document.getElementById('nav-transactions');
                 if (transactionsBtn) {
                     switchView('transactions', transactionsBtn);
                 }
-            } else if (hasReportFilter) {
+            } else if (hasReportFilter || viewParam === 'reports') {
                 const reportsBtn = document.getElementById('nav-reports');
                 if (reportsBtn) {
                     switchView('reports', reportsBtn);
