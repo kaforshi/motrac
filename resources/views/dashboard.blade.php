@@ -184,27 +184,100 @@
                 </div>
 
                 <div class="grid lg:grid-cols-3 gap-8">
-                    <!-- Simple Chart -->
+                    <!-- Cash Flow Chart -->
                     <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-dark mb-6">Arus Kas Mingguan</h3>
-                        <div class="h-64 flex items-end justify-between gap-4 px-2">
-                            @for($i = 0; $i < 7; $i++)
-                                @php
-                                    $date = \Carbon\Carbon::now()->subDays(6 - $i);
-                                    $dayIncome = \App\Models\Transaction::where('user_id', auth()->id())
-                                        ->where('type', \App\Models\Transaction::TYPE_INCOME)
-                                        ->whereDate('date', $date)
-                                        ->sum('amount');
-                                    $dayExpense = \App\Models\Transaction::where('user_id', auth()->id())
-                                        ->where('type', \App\Models\Transaction::TYPE_EXPENSE)
-                                        ->whereDate('date', $date)
-                                        ->sum('amount');
-                                    $dayNet = $dayIncome - $dayExpense;
-                                    $maxAmount = max($monthlyIncome, $monthlyExpense, 1);
-                                    $height = min(100, ($dayNet / $maxAmount) * 100);
-                                @endphp
-                                <div class="w-full {{ $i == 6 ? 'bg-primary' : 'bg-emerald-400/80' }} rounded-t {{ $i == 6 ? 'shadow-lg' : '' }}" style="height: {{ max(5, $height) }}%"></div>
-                            @endfor
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg text-dark" id="chart-title">
+                                @if(isset($periodType))
+                                    @if($periodType === 'daily')
+                                        Arus Kas Harian
+                                    @elseif($periodType === 'monthly')
+                                        Arus Kas Bulanan
+                                    @elseif($periodType === 'yearly')
+                                        Arus Kas Tahunan
+                                    @else
+                                        Arus Kas Mingguan
+                                    @endif
+                                @else
+                                    Arus Kas Mingguan
+                                @endif
+                            </h3>
+                            <select id="period-selector" onchange="changePeriod(this.value)" class="bg-gray-50 border border-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                <option value="daily" {{ (isset($periodType) && $periodType === 'daily') ? 'selected' : '' }}>Harian</option>
+                                <option value="weekly" {{ (!isset($periodType) || $periodType === 'weekly') ? 'selected' : '' }}>Mingguan</option>
+                                <option value="monthly" {{ (isset($periodType) && $periodType === 'monthly') ? 'selected' : '' }}>Bulanan</option>
+                                <option value="yearly" {{ (isset($periodType) && $periodType === 'yearly') ? 'selected' : '' }}>Tahunan</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-center py-6" id="cash-flow-chart" style="min-height: 280px; width: 100%;">
+                            @php
+                                $chartData = isset($cashFlowData) && is_array($cashFlowData) && count($cashFlowData) > 0 ? $cashFlowData : [];
+                                
+                                // Calculate total income and expense for the period
+                                $totalIncome = 0;
+                                $totalExpense = 0;
+                                $totalNet = 0;
+                                
+                                foreach($chartData as $period) {
+                                    $totalIncome += isset($period['income']) ? $period['income'] : 0;
+                                    $totalExpense += isset($period['expense']) ? $period['expense'] : 0;
+                                    $totalNet += isset($period['net']) ? $period['net'] : 0;
+                                }
+                                
+                                $totalAmount = $totalIncome + $totalExpense;
+                                $incomePercent = $totalAmount > 0 ? ($totalIncome / $totalAmount) * 100 : 0;
+                                $expensePercent = $totalAmount > 0 ? ($totalExpense / $totalAmount) * 100 : 0;
+                            @endphp
+                            @if(count($chartData) > 0 && $totalAmount > 0)
+                                <div class="flex flex-col items-center gap-8 w-full">
+                                    <!-- Circle Chart -->
+                                    <div class="relative" style="width: 280px; height: 280px;">
+                                        <div class="relative w-full h-full" style="background: conic-gradient(
+                                            #10B981 0deg {{ $incomePercent * 3.6 }}deg,
+                                            #EF4444 {{ $incomePercent * 3.6 }}deg {{ ($incomePercent + $expensePercent) * 3.6 }}deg,
+                                            #E5E7EB {{ ($incomePercent + $expensePercent) * 3.6 }}deg 360deg
+                                        ); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+                                            <div class="absolute inset-0 m-auto bg-white rounded-full flex flex-col items-center justify-center shadow-inner" style="width: 160px; height: 160px;">
+                                                <span class="text-xs text-gray-400 font-medium mb-1">Net Cash Flow</span>
+                                                <span class="font-bold text-lg {{ $totalNet >= 0 ? 'text-emerald-500' : 'text-rose-500' }} sensitive-data">
+                                                    {{ $totalNet >= 0 ? '+' : '' }}Rp {{ number_format(abs($totalNet), 0, ',', '.') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Legend -->
+                                    <div class="flex flex-wrap justify-center gap-6 w-full max-w-md">
+                                        <div class="flex items-center gap-3 bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-100 flex-1 min-w-[140px]">
+                                            <div class="w-5 h-5 rounded-full bg-emerald-500 shadow-sm"></div>
+                                            <div class="flex-1">
+                                                <p class="text-[11px] text-gray-500 font-medium mb-0.5">Pemasukan</p>
+                                                <p class="font-bold text-sm text-dark sensitive-data">Rp {{ number_format($totalIncome, 0, ',', '.') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3 bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex-1 min-w-[140px]">
+                                            <div class="w-5 h-5 rounded-full bg-rose-500 shadow-sm"></div>
+                                            <div class="flex-1">
+                                                <p class="text-[11px] text-gray-500 font-medium mb-0.5">Pengeluaran</p>
+                                                <p class="font-bold text-sm text-dark sensitive-data">Rp {{ number_format($totalExpense, 0, ',', '.') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- Empty state -->
+                                <div class="flex flex-col items-center gap-4">
+                                    <div class="relative" style="width: 280px; height: 280px;">
+                                        <div class="relative w-full h-full bg-gray-100 rounded-full flex items-center justify-center shadow-inner">
+                                            <div class="absolute inset-0 m-auto bg-white rounded-full flex flex-col items-center justify-center" style="width: 160px; height: 160px;">
+                                                <i class="fa-solid fa-chart-pie text-gray-300 text-2xl mb-2"></i>
+                                                <span class="text-xs text-gray-400 font-medium">Tidak ada data</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-400 font-medium">Belum ada transaksi untuk periode ini</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <!-- Quick Budget -->
@@ -777,6 +850,23 @@
                     el.classList.remove('blur-sm');
                 });
             }
+        }
+
+        // 3. Change Period for Cash Flow Chart
+        function changePeriod(period) {
+            const titles = {
+                'daily': 'Arus Kas Harian',
+                'weekly': 'Arus Kas Mingguan',
+                'monthly': 'Arus Kas Bulanan',
+                'yearly': 'Arus Kas Tahunan'
+            };
+            
+            document.getElementById('chart-title').innerText = titles[period] || 'Arus Kas';
+            
+            // Reload page with new period parameter
+            const url = new URL(window.location.href);
+            url.searchParams.set('period', period);
+            window.location.href = url.toString();
         }
     </script>
 </body>
