@@ -29,29 +29,50 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:income,expense,transfer',
-            'parent_id' => 'nullable|exists:categories,id',
-            'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:7',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:income,expense,transfer',
+                'parent_id' => 'nullable|exists:categories,id',
+                'icon' => 'nullable|string|max:50',
+                'color' => 'nullable|string|max:7',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
+        }
 
         // Validate that parent category has the same type
-        if ($validated['parent_id']) {
+        if (!empty($validated['parent_id'])) {
             $parent = Category::where('user_id', auth()->id())
                 ->where('id', $validated['parent_id'])
                 ->where('type', $validated['type'])
                 ->first();
             
             if (!$parent) {
+                $error = ['parent_id' => ['Parent category must be of the same type.']];
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Validation failed',
+                        'errors' => $error,
+                    ], 422);
+                }
+
                 return redirect()->route('categories.index')
-                    ->withErrors(['parent_id' => 'Parent category must be of the same type.'])
+                    ->withErrors($error)
                     ->withInput();
             }
         }
 
-        Category::create([
+        $category = Category::create([
             'user_id' => auth()->id(),
             'name' => $validated['name'],
             'type' => $validated['type'],
@@ -59,6 +80,14 @@ class CategoryController extends Controller
             'icon' => $validated['icon'] ?? null,
             'color' => $validated['color'] ?? null,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category created successfully.',
+                'category' => $category,
+            ]);
+        }
 
         return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }

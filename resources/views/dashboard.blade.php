@@ -547,9 +547,9 @@
                         <h3 class="text-xl font-bold text-dark">Atur Kategori</h3>
                         <p class="text-sm text-gray-500">Sesuaikan label pengeluaran dan pemasukan Anda.</p>
                     </div>
-                    <a href="{{ route('categories.index') }}" class="bg-primary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <button type="button" onclick="openCategoryModal()" class="bg-primary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Kategori Baru
-                    </a>
+                    </button>
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-8">
@@ -1151,6 +1151,12 @@
                 'notes': 'account_notes',
                 'is_hidden': 'account_is_hidden',
                 'is_active': 'account_is_active',
+                // Category modal
+                'name': 'category_name',
+                'type': 'category_type',
+                'icon': 'category_icon',
+                'color': 'category_color',
+                'parent_id': 'category_parent_id',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -1352,6 +1358,75 @@
             }
         }
 
+        // 6. Category Modal Functions (Add Category via AJAX)
+        function openCategoryModal() {
+            const modal = document.getElementById('categoryModal');
+            const form = document.getElementById('categoryForm');
+            modal.classList.remove('hidden');
+            form.reset();
+            clearErrors();
+            document.getElementById('category_type').value = 'expense';
+        }
+
+        function closeCategoryModal() {
+            const modal = document.getElementById('categoryModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitCategoryForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("categories.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Kategori berhasil ditambahkan!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeCategoryModal();
+                        window.location.reload();
+                    }, 1500);
+                } else if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                        showError(field, errorMessage);
+                    });
+                } else {
+                    alert(data.message || 'Gagal menyimpan kategori');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         // Initialize handlers
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('modal_transactionType');
@@ -1385,6 +1460,21 @@
                 accountModal.addEventListener('click', function(e) {
                     if (e.target === accountModal) {
                         closeAccountModal();
+                    }
+                });
+            }
+
+            // Category modal events
+            const categoryForm = document.getElementById('categoryForm');
+            if (categoryForm) {
+                categoryForm.addEventListener('submit', submitCategoryForm);
+            }
+
+            const categoryModal = document.getElementById('categoryModal');
+            if (categoryModal) {
+                categoryModal.addEventListener('click', function(e) {
+                    if (e.target === categoryModal) {
+                        closeCategoryModal();
                     }
                 });
             }
@@ -1603,6 +1693,98 @@
                         <i class="fa-solid fa-save mr-2"></i> Simpan Dompet
                     </button>
                     <button type="button" onclick="closeAccountModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Tambah Kategori Baru</h3>
+                <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="categoryForm" class="p-6 space-y-4">
+                @csrf
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori</label>
+                    <input
+                        type="text"
+                        name="name"
+                        id="category_name"
+                        required
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="Contoh: Makan, Transport"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                    <select
+                        name="type"
+                        id="category_type"
+                        required
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
+                        <option value="expense">Pengeluaran</option>
+                        <option value="income">Pemasukan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Icon (opsional)</label>
+                    <input
+                        type="text"
+                        name="icon"
+                        id="category_icon"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="Contoh: utensils, car, shopping-bag"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Warna (opsional)</label>
+                    <input
+                        type="text"
+                        name="color"
+                        id="category_color"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="#F97316"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Parent (opsional)</label>
+                    <select
+                        name="parent_id"
+                        id="category_parent_id"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
+                        <option value="">Tanpa parent</option>
+                        @php
+                            $allCategoriesForParent = \App\Models\Category::where('user_id', auth()->id())
+                                ->whereNull('parent_id')
+                                ->orderBy('name')
+                                ->get();
+                        @endphp
+                        @foreach($allCategoriesForParent as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }} ({{ $cat->type }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan Kategori
+                    </button>
+                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>
