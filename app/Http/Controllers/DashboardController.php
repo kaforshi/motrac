@@ -41,6 +41,14 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        // Today's transactions
+        $today = Carbon::today();
+        $todayTransactions = Transaction::where('user_id', $user->id)
+            ->whereDate('date', $today)
+            ->with(['account', 'category', 'fromAccount', 'toAccount'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         // Budget status
         $budgets = Budget::where('user_id', $user->id)
             ->where('month', Carbon::now()->month)
@@ -254,6 +262,7 @@ class DashboardController extends Controller
             'monthlyIncome',
             'monthlyExpense',
             'recentTransactions',
+            'todayTransactions',
             'budgets',
             'overdueDebts',
             'expenseByCategory',

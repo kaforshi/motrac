@@ -319,6 +319,85 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Transaksi Harian -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-dark">Transaksi Hari Ini</h3>
+                        <span class="text-xs text-gray-400">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
+                    </div>
+                    @if($todayTransactions->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($todayTransactions as $transaction)
+                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                                            @if($transaction->type === 'income') bg-emerald-100 text-emerald-600
+                                            @elseif($transaction->type === 'expense') bg-rose-100 text-rose-600
+                                            @else bg-blue-100 text-blue-600
+                                            @endif">
+                                            <i class="fa-solid 
+                                                @if($transaction->type === 'income') fa-arrow-down
+                                                @elseif($transaction->type === 'expense') fa-arrow-up
+                                                @else fa-exchange-alt
+                                                @endif text-xs"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-medium text-sm text-dark truncate">{{ $transaction->description }}</p>
+                                            <div class="flex items-center gap-2 mt-0.5">
+                                                <span class="text-xs text-gray-400">
+                                                    @if($transaction->type === 'transfer')
+                                                        {{ $transaction->fromAccount->name ?? 'N/A' }} → {{ $transaction->toAccount->name ?? 'N/A' }}
+                                                    @else
+                                                        {{ $transaction->account->name ?? 'N/A' }}
+                                                    @endif
+                                                </span>
+                                                @if($transaction->category)
+                                                    <span class="text-xs text-gray-300">•</span>
+                                                    <span class="text-xs text-gray-400">{{ $transaction->category->name }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end ml-3">
+                                        <span class="font-bold text-sm
+                                            @if($transaction->type === 'income') text-emerald-600
+                                            @elseif($transaction->type === 'expense') text-rose-600
+                                            @else text-blue-600
+                                            @endif sensitive-data">
+                                            @if($transaction->type === 'income')+
+                                            @elseif($transaction->type === 'expense')-
+                                            @endif
+                                            Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-xs text-gray-400 mt-0.5">
+                                            {{ $transaction->created_at->format('H:i') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        @php
+                            $todayTotal = $todayTransactions->sum(function($t) {
+                                if ($t->type === 'income') return $t->amount;
+                                if ($t->type === 'expense') return -$t->amount;
+                                return 0;
+                            });
+                        @endphp
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Total Hari Ini</span>
+                            <span class="font-bold text-base {{ $todayTotal >= 0 ? 'text-emerald-600' : 'text-rose-600' }} sensitive-data">
+                                {{ $todayTotal >= 0 ? '+' : '' }}Rp {{ number_format(abs($todayTotal), 0, ',', '.') }}
+                            </span>
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <i class="fa-solid fa-receipt text-gray-300 text-3xl mb-3"></i>
+                            <p class="text-sm text-gray-400 font-medium">Belum ada transaksi hari ini</p>
+                            <a href="{{ route('transactions.create') }}" class="text-primary hover:underline text-xs mt-2 inline-block">Tambah transaksi</a>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <!-- VIEW 2: TRANSAKSI -->

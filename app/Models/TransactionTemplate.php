@@ -40,3 +40,4 @@ class TransactionTemplate extends Model
     }
 }
 
+
