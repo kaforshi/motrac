@@ -329,7 +329,7 @@
                     @if($todayTransactions->count() > 0)
                         <div class="space-y-3">
                             @foreach($todayTransactions as $transaction)
-                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
                                     <div class="flex items-center gap-3 flex-1">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
                                             @if($transaction->type === 'income') bg-emerald-100 text-emerald-600
@@ -813,8 +813,25 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="p-4 border-t border-gray-100 text-center">
-                            <a href="{{ route('reports.index') }}" class="text-sm text-primary font-medium hover:underline">Load More Records</a>
+                        <div class="p-4 border-t border-gray-100 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Total Transaksi: <span class="font-bold text-dark">{{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }}</span></span>
+                                <span class="text-xs text-gray-400">Menampilkan {{ min(10, $allTransactions->count()) }} dari {{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }} transaksi</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                                <div>
+                                    <span class="text-xs text-gray-500 uppercase block mb-1">Total Pemasukan</span>
+                                    <span class="text-lg font-bold text-emerald-600 sensitive-data">
+                                        +Rp {{ number_format($totalDetailedIncome ?? 0, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500 uppercase block mb-1">Total Pengeluaran</span>
+                                    <span class="text-lg font-bold text-rose-600 sensitive-data">
+                                        -Rp {{ number_format($totalDetailedExpense ?? 0, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

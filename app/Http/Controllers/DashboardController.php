@@ -158,6 +158,18 @@ class DashboardController extends Controller
             $allTransactionsQuery->where('type', $reportType);
         }
 
+        // Get total count before applying limit
+        $totalTransactionsCount = $allTransactionsQuery->count();
+        
+        // Calculate total income and expense from filtered transactions
+        $totalDetailedIncome = (clone $allTransactionsQuery)
+            ->where('type', Transaction::TYPE_INCOME)
+            ->sum('amount');
+        
+        $totalDetailedExpense = (clone $allTransactionsQuery)
+            ->where('type', Transaction::TYPE_EXPENSE)
+            ->sum('amount');
+        
         $allTransactions = $allTransactionsQuery
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -334,6 +346,9 @@ class DashboardController extends Controller
             'expenseCategories',
             'incomeCategories',
             'allTransactions',
+            'totalTransactionsCount',
+            'totalDetailedIncome',
+            'totalDetailedExpense',
             'receivables',
             'payables',
             'totalRemainingBudget',
