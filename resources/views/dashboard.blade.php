@@ -3244,7 +3244,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe Transaksi</label>
-                    <select name="type" id="modal_transactionType" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <select name="type" id="modal_transactionType" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="income">Pemasukan</option>
                         <option value="expense">Pengeluaran</option>
                         <option value="transfer">Transfer</option>
@@ -3253,7 +3253,7 @@
 
                 <div id="singleAccountField">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Akun</label>
-                    <select name="account_id" id="modal_account_id" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <select name="account_id" id="modal_account_id" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih akun</option>
                     </select>
                 </div>
@@ -3262,13 +3262,13 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dari Akun</label>
-                            <select name="from_account_id" id="modal_from_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                            <select name="from_account_id" id="modal_from_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                                 <option value="">Pilih akun</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ke Akun</label>
-                            <select name="to_account_id" id="modal_to_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                            <select name="to_account_id" id="modal_to_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                                 <option value="">Pilih akun</option>
                             </select>
                         </div>
@@ -3277,14 +3277,14 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
-                    <select name="category_id" id="modal_category_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <select name="category_id" id="modal_category_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih kategori</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
-                    <input type="number" name="amount" id="modal_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <input type="number" name="amount" id="modal_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
                 </div>
 
                 <div>
@@ -3558,7 +3558,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
-                    <select name="category_id" id="budget_category_id" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                    <select name="category_id" id="budget_category_id" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih kategori</option>
                         @foreach($expenseCategories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -3569,14 +3569,14 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Budget</label>
-                    <input type="number" name="amount" id="budget_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="0.00">
+                    <input type="number" name="amount" id="budget_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_amount"></span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bulan</label>
-                        <select name="month" id="budget_month" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                        <select name="month" id="budget_month" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                             @for($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ $i == date('n') ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i, 1)->locale('id')->monthName }}</option>
                             @endfor
@@ -3585,7 +3585,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
-                        <input type="number" name="year" id="budget_year" value="{{ date('Y') }}" min="2020" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                        <input type="number" name="year" id="budget_year" value="{{ date('Y') }}" min="2020" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_year"></span>
                     </div>
                 </div>
@@ -3630,37 +3630,37 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Kontak</label>
-                    <input type="text" name="contact_name" id="debt_contact_name" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="Nama orang/kontak">
+                    <input type="text" name="contact_name" id="debt_contact_name" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="Nama orang/kontak">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_name"></span>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor Telepon (Opsional)</label>
-                    <input type="text" name="contact_phone" id="debt_contact_phone" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="08xxxxxxxxxx">
+                    <input type="text" name="contact_phone" id="debt_contact_phone" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="08xxxxxxxxxx">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_phone"></span>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email (Opsional)</label>
-                    <input type="email" name="contact_email" id="debt_contact_email" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="email@example.com">
+                    <input type="email" name="contact_email" id="debt_contact_email" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="email@example.com">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_email"></span>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
-                    <input type="number" name="initial_amount" id="debt_initial_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="0.00">
+                    <input type="number" name="initial_amount" id="debt_initial_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_initial_amount"></span>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal Jatuh Tempo (Opsional)</label>
-                    <input type="date" name="due_date" id="debt_due_date" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                    <input type="date" name="due_date" id="debt_due_date" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_due_date"></span>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Akun Terkait (Opsional)</label>
-                    <select name="account_id" id="debt_account_id" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                    <select name="account_id" id="debt_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih akun (opsional)</option>
                         @foreach($accounts as $account)
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
@@ -3671,7 +3671,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi (Opsional)</label>
-                    <textarea name="description" id="debt_description" rows="3" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="Catatan tambahan"></textarea>
+                    <textarea name="description" id="debt_description" rows="3" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan"></textarea>
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_description"></span>
                 </div>
 
@@ -3740,7 +3740,7 @@
 
                 <div id="payment_account_field" style="display: none;">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Akun</label>
-                    <select name="account_id" id="payment_account_id" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                    <select name="account_id" id="payment_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih akun</option>
                         @foreach($accounts as $account)
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
@@ -3843,7 +3843,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Akun untuk Transaksi</label>
-                    <select name="account_id" id="mark_paid_account_id" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white">
+                    <select name="account_id" id="mark_paid_account_id" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <option value="">Pilih akun</option>
                         @foreach($accounts as $account)
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
