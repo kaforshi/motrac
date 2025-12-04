@@ -2,7 +2,58 @@
 
 Error 502 menunjukkan Cloudflare Tunnel bisa connect, tapi server backend tidak merespons.
 
-## Diagnosa Cepat
+## Error 500 Internal Server Error
+
+Jika mendapatkan error 500 (bukan 502), ini adalah error dari aplikasi Laravel.
+
+### Quick Fix untuk Error 500
+
+```bash
+cd /var/www/motrac
+sudo chmod +x fix-500-error.sh
+sudo ./fix-500-error.sh
+```
+
+Atau check error detail:
+```bash
+sudo chmod +x check-laravel-error.sh
+sudo ./check-laravel-error.sh
+```
+
+### Common Causes Error 500:
+
+1. **APP_KEY tidak di-set**
+   ```bash
+   sudo -u www-data php artisan key:generate
+   ```
+
+2. **Database connection error**
+   ```bash
+   # Check .env
+   cat .env | grep DB_
+   # Test connection
+   mysql -u motrac_user -p motrac
+   ```
+
+3. **Missing migrations**
+   ```bash
+   sudo -u www-data php artisan migrate --force
+   ```
+
+4. **Permission issues**
+   ```bash
+   sudo chown -R www-data:www-data /var/www/motrac
+   sudo chmod -R 775 storage bootstrap/cache
+   ```
+
+5. **Cache issues**
+   ```bash
+   sudo -u www-data php artisan config:clear
+   sudo -u www-data php artisan cache:clear
+   sudo -u www-data php artisan view:clear
+   ```
+
+## Diagnosa Cepat (502 Bad Gateway)
 
 ### 1. Check Nginx Status di Server 2
 
