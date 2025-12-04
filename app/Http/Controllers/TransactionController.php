@@ -290,6 +290,27 @@ class TransactionController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $transaction = Transaction::where('user_id', auth()->id())
+            ->with(['account', 'category', 'fromAccount', 'toAccount', 'splitTransactions.category'])
+            ->findOrFail($id);
+
+        // Return JSON response for AJAX requests
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'transaction' => $transaction
+            ]);
+        }
+
+        // For non-AJAX requests, you can return a view if needed
+        return response()->json([
+            'success' => true,
+            'transaction' => $transaction
+        ]);
+    }
+
     public function destroy($id)
     {
         $transaction = Transaction::where('user_id', auth()->id())->findOrFail($id);

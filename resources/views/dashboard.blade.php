@@ -790,7 +790,7 @@
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100">
                                     @forelse($allTransactions->take(10) as $transaction)
-                                        <tr class="hover:bg-gray-50 transition">
+                                        <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
                                             <td class="px-6 py-4 text-gray-500">{{ $transaction->date->format('d M Y') }}</td>
                                             <td class="px-6 py-4 font-medium text-dark">{{ $transaction->description }}</td>
                                             <td class="px-6 py-4">
@@ -1461,6 +1461,146 @@
             }
         }
 
+        // 7. Transaction Detail Modal Functions
+        async function openTransactionDetailModal(transactionId) {
+            const modal = document.getElementById('transactionDetailModal');
+            const content = document.getElementById('transactionDetailContent');
+            
+            modal.classList.remove('hidden');
+            content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
+
+            try {
+                const response = await fetch(`/transactions/${transactionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success && data.transaction) {
+                    const t = data.transaction;
+                    const typeLabels = {
+                        'income': 'Pemasukan',
+                        'expense': 'Pengeluaran',
+                        'transfer': 'Transfer'
+                    };
+                    const typeLabel = typeLabels[t.type] || t.type;
+                    
+                    // Get color classes based on type
+                    let badgeClass = 'px-3 py-1 rounded-full text-xs font-bold uppercase ';
+                    let amountClass = 'text-xl font-bold sensitive-data mt-1 ';
+                    let splitAmountClass = 'text-sm font-bold sensitive-data ';
+                    
+                    if (t.type === 'income') {
+                        badgeClass += 'bg-emerald-100 text-emerald-600';
+                        amountClass += 'text-emerald-600';
+                        splitAmountClass += 'text-emerald-600';
+                    } else if (t.type === 'expense') {
+                        badgeClass += 'bg-rose-100 text-rose-600';
+                        amountClass += 'text-rose-600';
+                        splitAmountClass += 'text-rose-600';
+                    } else {
+                        badgeClass += 'bg-blue-100 text-blue-600';
+                        amountClass += 'text-blue-600';
+                        splitAmountClass += 'text-blue-600';
+                    }
+
+                    let html = `
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                <div>
+                                    <h4 class="text-lg font-bold text-dark">${t.description || '-'}</h4>
+                                    <p class="text-sm text-gray-500 mt-1">${new Date(t.date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                </div>
+                                <span class="${badgeClass}">${typeLabel}</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase">Jumlah</label>
+                                    <p class="${amountClass}">
+                                        ${t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '')}Rp ${parseFloat(t.amount).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase">Kategori</label>
+                                    <p class="text-sm font-medium text-dark mt-1">${t.category ? t.category.name : 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            ${t.type === 'transfer' ? `
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 uppercase">Dari Akun</label>
+                                        <p class="text-sm font-medium text-dark mt-1">${t.from_account ? t.from_account.name : 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 uppercase">Ke Akun</label>
+                                        <p class="text-sm font-medium text-dark mt-1">${t.to_account ? t.to_account.name : 'N/A'}</p>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase">Akun</label>
+                                    <p class="text-sm font-medium text-dark mt-1">${t.account ? t.account.name : 'N/A'}</p>
+                                </div>
+                            `}
+
+                            ${t.notes ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase">Catatan</label>
+                                    <p class="text-sm text-gray-700 mt-1 whitespace-pre-wrap">${t.notes}</p>
+                                </div>
+                            ` : ''}
+
+                            ${t.receipt_path ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase">Foto Struk</label>
+                                    <div class="mt-2">
+                                        <img src="/storage/${t.receipt_path}" alt="Receipt" class="max-w-full h-auto rounded-lg border border-gray-200">
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${t.is_split && t.split_transactions && t.split_transactions.length > 0 ? `
+                                <div class="pt-4 border-t border-gray-200">
+                                    <label class="text-xs text-gray-500 uppercase mb-3 block">Transaksi Terpisah</label>
+                                    <div class="space-y-2">
+                                        ${t.split_transactions.map(st => `
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div>
+                                                    <p class="text-sm font-medium text-dark">${st.description || '-'}</p>
+                                                    <p class="text-xs text-gray-500">${st.category ? st.category.name : 'N/A'}</p>
+                                                </div>
+                                                <p class="${splitAmountClass}">
+                                                    Rp ${parseFloat(st.amount).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                </p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat detail transaksi</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = '<div class="text-center py-8 text-red-500">Terjadi kesalahan saat memuat detail transaksi</div>';
+            }
+        }
+
+        function closeTransactionDetailModal() {
+            const modal = document.getElementById('transactionDetailModal');
+            modal.classList.add('hidden');
+        }
+
         // Initialize handlers
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('modal_transactionType');
@@ -1509,6 +1649,16 @@
                 categoryModal.addEventListener('click', function(e) {
                     if (e.target === categoryModal) {
                         closeCategoryModal();
+                    }
+                });
+            }
+
+            // Transaction Detail Modal events
+            const transactionDetailModal = document.getElementById('transactionDetailModal');
+            if (transactionDetailModal) {
+                transactionDetailModal.addEventListener('click', function(e) {
+                    if (e.target === transactionDetailModal) {
+                        closeTransactionDetailModal();
                     }
                 });
             }
@@ -1831,6 +1981,24 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <div id="transactionDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Detail Transaksi</h3>
+                <button onclick="closeTransactionDetailModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="transactionDetailContent" class="p-6 space-y-4">
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
