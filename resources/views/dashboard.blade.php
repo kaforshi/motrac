@@ -1042,7 +1042,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
                             @forelse($paidReceivables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer" onclick="openDebtDetailModal({{ $debt->id }})">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="font-bold text-dark">{{ $debt->contact_name }}</p>
@@ -1080,7 +1080,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
                             @forelse($paidPayables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer" onclick="openDebtDetailModal({{ $debt->id }})">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="font-bold text-dark">{{ $debt->contact_name }}</p>
@@ -1918,6 +1918,160 @@
             modal.classList.add('hidden');
         }
 
+        // 7.5. Debt Detail Modal Functions
+        async function openDebtDetailModal(debtId) {
+            const modal = document.getElementById('debtDetailModal');
+            const content = document.getElementById('debtDetailContent');
+            
+            modal.classList.remove('hidden');
+            content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
+
+            try {
+                const response = await fetch(`/debts/${debtId}/detail`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const debt = data.debt;
+                    const isReceivable = debt.type === 'receivable';
+                    const typeLabel = isReceivable ? 'Piutang' : 'Utang';
+                    const typeColor = isReceivable ? 'emerald' : 'rose';
+                    
+                    let html = `
+                        <div class="space-y-6">
+                            <!-- Header Info -->
+                            <div class="bg-${typeColor}-50 p-4 rounded-lg border border-${typeColor}-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="font-bold text-${typeColor}-800 text-lg">${typeLabel}</h4>
+                                    <span class="bg-${typeColor}-100 text-${typeColor}-700 text-xs px-3 py-1 rounded font-bold">
+                                        <i class="fa-solid fa-check-circle"></i> ${debt.is_paid ? 'Lunas' : 'Belum Lunas'}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600">Kontak: <span class="font-bold text-dark">${debt.contact_name || 'N/A'}</span></p>
+                            </div>
+
+                            <!-- Amount Info -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-xs text-gray-500 mb-1">Jumlah Awal</p>
+                                    <p class="font-bold text-lg text-dark sensitive-data">Rp ${parseFloat(debt.initial_amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-xs text-gray-500 mb-1">Sisa ${typeLabel}</p>
+                                    <p class="font-bold text-lg text-${typeColor}-600 sensitive-data">Rp ${parseFloat(debt.current_amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                                </div>
+                            </div>
+
+                            <!-- Contact Info -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 class="font-bold text-dark mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-user text-gray-400"></i> Informasi Kontak
+                                </h5>
+                                <div class="space-y-2 text-sm">
+                                    <p><span class="text-gray-500">Nama:</span> <span class="font-semibold">${debt.contact_name || 'N/A'}</span></p>
+                                    ${debt.contact_phone ? `<p><span class="text-gray-500">Telepon:</span> <span class="font-semibold">${debt.contact_phone}</span></p>` : ''}
+                                    ${debt.contact_email ? `<p><span class="text-gray-500">Email:</span> <span class="font-semibold">${debt.contact_email}</span></p>` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Dates Info -->
+                            <div class="grid grid-cols-2 gap-4">
+                                ${debt.due_date ? `
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <p class="text-xs text-gray-500 mb-1">Jatuh Tempo</p>
+                                    <p class="font-semibold text-dark">${new Date(debt.due_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                </div>
+                                ` : ''}
+                                ${debt.paid_at ? `
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <p class="text-xs text-gray-500 mb-1">Tanggal Lunas</p>
+                                    <p class="font-semibold text-emerald-600">${new Date(debt.paid_at).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Account Info -->
+                            ${debt.account ? `
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 class="font-bold text-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-wallet text-gray-400"></i> Akun Terkait
+                                </h5>
+                                <p class="text-sm">${debt.account.name}</p>
+                            </div>
+                            ` : ''}
+
+                            <!-- Description -->
+                            ${debt.description ? `
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 class="font-bold text-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-lines text-gray-400"></i> Deskripsi
+                                </h5>
+                                <p class="text-sm text-gray-700 whitespace-pre-wrap">${debt.description}</p>
+                            </div>
+                            ` : ''}
+
+                            <!-- Payment History -->
+                            ${debt.payments && debt.payments.length > 0 ? `
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 class="font-bold text-dark mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-receipt text-gray-400"></i> Riwayat Pembayaran (${debt.payments.length})
+                                </h5>
+                                <div class="space-y-3">
+                                    ${debt.payments.map((payment, index) => `
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <p class="font-semibold text-dark">Pembayaran #${index + 1}</p>
+                                                    <p class="text-xs text-gray-500">${new Date(payment.payment_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                                </div>
+                                                <p class="font-bold text-${typeColor}-600 sensitive-data">Rp ${parseFloat(payment.amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                                            </div>
+                                            ${payment.notes ? `<p class="text-xs text-gray-600 mt-2 italic">${payment.notes}</p>` : ''}
+                                            ${payment.transaction ? `
+                                                <p class="text-xs text-emerald-600 mt-2">
+                                                    <i class="fa-solid fa-check-circle"></i> Transaksi terkait: ${payment.transaction.description || 'N/A'}
+                                                </p>
+                                            ` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fa-solid fa-exclamation-circle text-red-500 text-3xl mb-3"></i>
+                            <p class="text-gray-600">Gagal memuat detail utang/piutang</p>
+                            <p class="text-sm text-gray-500 mt-1">${data.message || 'Terjadi kesalahan'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fa-solid fa-exclamation-circle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-gray-600">Terjadi kesalahan saat memuat data</p>
+                        <p class="text-sm text-gray-500 mt-1">Silakan coba lagi</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeDebtDetailModal() {
+            const modal = document.getElementById('debtDetailModal');
+            modal.classList.add('hidden');
+        }
+
         // 8. Budget Modal Functions
         function openBudgetModal() {
             const modal = document.getElementById('budgetModal');
@@ -2586,6 +2740,16 @@
                 markPaidModal.addEventListener('click', function(e) {
                     if (e.target === markPaidModal) {
                         closeMarkPaidModal();
+                    }
+                });
+            }
+
+            // Debt Detail Modal events
+            const debtDetailModal = document.getElementById('debtDetailModal');
+            if (debtDetailModal) {
+                debtDetailModal.addEventListener('click', function(e) {
+                    if (e.target === debtDetailModal) {
+                        closeDebtDetailModal();
                     }
                 });
             }
@@ -3283,6 +3447,23 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Debt Detail Modal -->
+    <div id="debtDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Detail Utang/Piutang</h3>
+                <button onclick="closeDebtDetailModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="debtDetailContent" class="p-6 space-y-4">
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </div>
         </div>
     </div>
 </body>

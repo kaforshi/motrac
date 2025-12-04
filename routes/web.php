@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/budgets/rollover', [BudgetController::class, 'processRollover'])->name('budgets.rollover');
     
     // Debts
+    Route::get('/debts/{id}/detail', [DebtController::class, 'show'])->name('debts.show');
     Route::resource('debts', DebtController::class)->except(['show', 'edit', 'update']);
     Route::post('/debts/{id}/payment', [DebtController::class, 'addPayment'])->name('debts.payment');
     Route::post('/debts/{id}/reminder', [DebtController::class, 'createReminder'])->name('debts.reminder');

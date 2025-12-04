@@ -10,6 +10,18 @@ use Illuminate\Support\Facades\DB;
 
 class DebtController extends Controller
 {
+    public function show($id)
+    {
+        $debt = Debt::where('user_id', auth()->id())
+            ->with(['account', 'payments.transaction'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'debt' => $debt
+        ]);
+    }
+
     public function index()
     {
         $debts = Debt::where('user_id', auth()->id())
