@@ -76,19 +76,23 @@ if [ -f "composer.lock" ]; then
     INSTALL_OUTPUT=$(sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction 2>&1 || true)
     
     if echo "$INSTALL_OUTPUT" | grep -q "lock file is not up to date\|does not satisfy your constraint"; then
-        echo -e "${YELLOW}⚠ Composer lock file outdated, updating...${NC}"
+        echo -e "${YELLOW}⚠ Composer lock file outdated, regenerating...${NC}"
         # Backup lock file
         cp composer.lock composer.lock.backup.$(date +%Y%m%d_%H%M%S) || true
-        # Update lock file
-        sudo -u $APP_USER composer update --no-dev --no-interaction --lock
+        # Remove outdated lock file
+        rm -f composer.lock
+        # Clear composer cache
+        sudo -u $APP_USER composer clear-cache
+        # Update to regenerate lock file
+        sudo -u $APP_USER composer update --no-dev --no-interaction
         # Install again
         sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction
-        echo -e "${GREEN}✓ Dependencies installed (lock file updated)${NC}"
+        echo -e "${GREEN}✓ Dependencies installed (lock file regenerated)${NC}"
     else
         echo -e "${GREEN}✓ Dependencies installed${NC}"
     fi
 else
-    # No lock file, install normally
+    # No lock file, install normally (will create lock file)
     sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction
     echo -e "${GREEN}✓ Dependencies installed${NC}"
 fi

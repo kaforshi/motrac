@@ -50,12 +50,19 @@ echo ""
 echo -e "${YELLOW}Step 2: Fixing Composer lock file...${NC}"
 if [ -f "composer.lock" ]; then
     echo -e "${YELLOW}Backing up composer.lock...${NC}"
-    cp composer.lock composer.lock.backup
+    cp composer.lock composer.lock.backup.$(date +%Y%m%d_%H%M%S) || true
     
-    echo -e "${YELLOW}Updating composer.lock to match composer.json...${NC}"
-    sudo -u $APP_USER composer update --no-dev --no-interaction --lock
+    echo -e "${YELLOW}Removing outdated composer.lock...${NC}"
+    rm -f composer.lock
     
-    echo -e "${GREEN}✓ Composer lock file updated${NC}"
+    echo -e "${YELLOW}Regenerating composer.lock from composer.json...${NC}"
+    # Clear composer cache first
+    sudo -u $APP_USER composer clear-cache
+    
+    # Update to regenerate lock file
+    sudo -u $APP_USER composer update --no-dev --no-interaction
+    
+    echo -e "${GREEN}✓ Composer lock file regenerated${NC}"
 else
     echo -e "${YELLOW}⚠ No composer.lock found, will be created on install${NC}"
 fi
