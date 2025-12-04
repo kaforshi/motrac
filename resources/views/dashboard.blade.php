@@ -110,8 +110,11 @@
 </head>
 <body class="font-sans text-slate-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
 
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleMobileSidebar()"></div>
+    
     <!-- ================= Sidebar ================= -->
-    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col z-10 transition-all duration-300">
+    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="h-16 flex items-center gap-2 px-6 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
@@ -169,38 +172,38 @@
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         
         <!-- Top Header (Sticky) -->
-        <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-4 sm:px-8 flex items-center justify-between z-20">
-            <div class="flex items-center gap-4">
-                <button class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
-                <div>
-                    <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">{{ __('Dashboard Overview') }}</h2>
-                    <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block">{{ __('Hello') }} {{ auth()->user()->name }}, {{ __('manage your finances wisely') }}.</p>
+        <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-3 sm:px-4 md:px-8 flex items-center justify-between z-20">
+            <div class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white flex-shrink-0"><i class="fa-solid fa-bars text-xl"></i></button>
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-base sm:text-lg font-bold text-dark dark:text-white truncate" id="page-title">{{ __('Dashboard Overview') }}</h2>
+                    <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block truncate">{{ __('Hello') }} {{ auth()->user()->name }}, {{ __('manage your finances wisely') }}.</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden sm:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary cursor-pointer">
+            <div class="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
+                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <!-- Language Toggle Switch -->
-                <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1">
-                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 sm:p-1">
+                    <button onclick="switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
                         ID
                     </button>
-                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="switchLanguage('en')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
                         EN
                     </button>
                 </div>
-                <button class="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition" title="{{ __('Privacy Mode') }}" onclick="togglePrivacy(this)">
-                    <i class="fa-regular fa-eye"></i>
+                <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition flex-shrink-0" title="{{ __('Privacy Mode') }}" onclick="togglePrivacy(this)">
+                    <i class="fa-regular fa-eye text-sm sm:text-base"></i>
                 </button>
                 <div class="relative">
-                    <button onclick="toggleNotificationDropdown()" class="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition relative">
-                        <i class="fa-regular fa-bell"></i>
+                    <button onclick="toggleNotificationDropdown()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition relative flex-shrink-0">
+                        <i class="fa-regular fa-bell text-sm sm:text-base"></i>
                         @if(isset($unreadCount) && $unreadCount > 0)
-                            <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                            <span class="absolute top-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
                         @endif
                     </button>
                     <!-- Notification Dropdown -->
-                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
+                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <h3 class="font-bold text-dark dark:text-white">{{ __('Notifications') }}</h3>
                             @if(isset($unreadCount) && $unreadCount > 0)
@@ -241,23 +244,23 @@
                         </div>
                     </div>
                 </div>
-                <a href="{{ route('profile') }}">
-                    <img src="{{ auth()->user()->photo ? \Illuminate\Support\Facades\Storage::url(auth()->user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=10B981&color=fff' }}" class="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer hover:ring-2 hover:ring-primary transition object-cover" alt="Profile Photo">
+                <a href="{{ route('profile') }}" class="flex-shrink-0">
+                    <img src="{{ auth()->user()->photo ? \Illuminate\Support\Facades\Storage::url(auth()->user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=10B981&color=fff' }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer hover:ring-2 hover:ring-primary transition object-cover" alt="Profile Photo">
                 </a>
             </div>
         </header>
 
         <!-- Scrollable Content Area -->
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8 bg-gray-50 dark:bg-gray-900 relative">
+        <div class="flex-1 overflow-y-auto p-3 sm:p-4 md:p-8 space-y-4 sm:space-y-6 md:space-y-8 bg-gray-50 dark:bg-gray-900 relative">
 
             <!-- VIEW 1: DASHBOARD (Default) -->
             <div id="view-dashboard" class="content-section animate-fade-in">
                 <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600 relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition"><i class="fa-solid fa-wallet text-6xl text-blue-500"></i></div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">{{ __('Total Balance') }}</p>
-                        <h3 class="text-2xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalBalance, 2, '.', ',') : number_format($totalBalance, 0, ',', '.') }}</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-2 sm:p-4 opacity-5 group-hover:opacity-10 transition"><i class="fa-solid fa-wallet text-4xl sm:text-6xl text-blue-500"></i></div>
+                        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">{{ __('Total Balance') }}</p>
+                        <h3 class="text-xl sm:text-2xl font-bold text-dark dark:text-white sensitive-data break-words">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalBalance, 2, '.', ',') : number_format($totalBalance, 0, ',', '.') }}</h3>
                         <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
                             @if($monthlyIncome > 0)
                                 <span class="text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">
@@ -267,21 +270,21 @@
                             {{ __('from last month') }}
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
-                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-arrow-down"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Income') }}</span></div>
-                        <h3 class="text-2xl font-bold text-emerald-600 sensitive-data income-amount" id="income-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
+                    <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4"><div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-arrow-down text-sm sm:text-base"></i></div><span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Income') }}</span></div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-emerald-600 sensitive-data income-amount break-words" id="income-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
                     </div>
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
-                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400"><i class="fa-solid fa-arrow-up"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Expense') }}</span></div>
-                        <h3 class="text-2xl font-bold text-rose-600 sensitive-data expense-amount" id="expense-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
+                    <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4"><div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400"><i class="fa-solid fa-arrow-up text-sm sm:text-base"></i></div><span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Expense') }}</span></div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-rose-600 sensitive-data expense-amount break-words" id="expense-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
                     </div>
                 </div>
 
-                <div class="grid lg:grid-cols-3 gap-8">
+                <div class="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                     <!-- Cash Flow Chart -->
-                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-bold text-lg text-dark dark:text-white" id="chart-title">
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
+                            <h3 class="font-bold text-base sm:text-lg text-dark dark:text-white" id="chart-title">
                                 @if(isset($periodType))
                                     @if($periodType === 'daily')
                                         {{ __('Daily Cash Flow') }}
@@ -296,14 +299,14 @@
                                     {{ __('Weekly Cash Flow') }}
                                 @endif
                             </h3>
-                            <select id="period-selector" onchange="changePeriod(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                            <select id="period-selector" onchange="changePeriod(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-full sm:w-auto">
                                 <option value="daily" {{ (isset($periodType) && $periodType === 'daily') ? 'selected' : '' }}>{{ __('Daily') }}</option>
                                 <option value="weekly" {{ (!isset($periodType) || $periodType === 'weekly') ? 'selected' : '' }}>{{ __('Weekly') }}</option>
                                 <option value="monthly" {{ (isset($periodType) && $periodType === 'monthly') ? 'selected' : '' }}>{{ __('Monthly') }}</option>
                                 <option value="yearly" {{ (isset($periodType) && $periodType === 'yearly') ? 'selected' : '' }}>{{ __('Yearly') }}</option>
                             </select>
                         </div>
-                        <div class="flex items-center justify-center py-6" id="cash-flow-chart" style="min-height: 280px; width: 100%;">
+                        <div class="flex items-center justify-center py-4 sm:py-6" id="cash-flow-chart" style="min-height: 240px; width: 100%;">
                             @php
                                 $chartData = isset($cashFlowData) && is_array($cashFlowData) && count($cashFlowData) > 0 ? $cashFlowData : [];
                                 
@@ -323,17 +326,17 @@
                                 $expensePercent = $totalAmount > 0 ? ($totalExpense / $totalAmount) * 100 : 0;
                             @endphp
                             @if(count($chartData) > 0 && $totalAmount > 0)
-                                <div class="flex flex-col items-center gap-8 w-full">
+                                <div class="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full">
                                     <!-- Circle Chart -->
-                                    <div class="relative" style="width: 280px; height: 280px;">
+                                    <div class="relative w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[280px] md:h-[280px]">
                                         <div class="relative w-full h-full" style="background: conic-gradient(
                                             #10B981 0deg {{ $incomePercent * 3.6 }}deg,
                                             #EF4444 {{ $incomePercent * 3.6 }}deg {{ ($incomePercent + $expensePercent) * 3.6 }}deg,
                                             #E5E7EB {{ ($incomePercent + $expensePercent) * 3.6 }}deg 360deg
                                         ); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
-                                            <div class="absolute inset-0 m-auto bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center shadow-inner" style="width: 160px; height: 160px;">
-                                                <span class="text-xs text-gray-400 font-medium mb-1">Net Cash Flow</span>
-                                                <span class="font-bold text-lg {{ $totalNet >= 0 ? 'text-emerald-500' : 'text-rose-500' }} sensitive-data">
+                                            <div class="absolute inset-0 m-auto bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center shadow-inner w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px]">
+                                                <span class="text-[10px] sm:text-xs text-gray-400 font-medium mb-0.5 sm:mb-1">Net Cash Flow</span>
+                                                <span class="font-bold text-sm sm:text-base md:text-lg {{ $totalNet >= 0 ? 'text-emerald-500' : 'text-rose-500' }} sensitive-data break-words text-center px-1">
                                                     {{ $totalNet >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($totalNet), 2, '.', ',') : number_format(abs($totalNet), 0, ',', '.') }}
                                                 </span>
                                             </div>
@@ -341,19 +344,19 @@
                                     </div>
                                     
                                     <!-- Legend -->
-                                    <div class="flex flex-wrap justify-center gap-6 w-full max-w-md">
-                                        <div class="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 min-w-[140px] cash-flow-income-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(6, 78, 59) !important; border: 1px solid rgb(5, 150, 105) !important;' : 'background-color: rgb(236, 253, 245); border: 1px solid rgb(209, 250, 229);' }}">
-                                            <div class="w-5 h-5 rounded-full bg-emerald-500 shadow-sm"></div>
-                                            <div class="flex-1">
-                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Income') }}</p>
-                                                <p class="font-bold text-sm sensitive-data cash-flow-income-amount" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncome, 2, '.', ',') : number_format($totalIncome, 0, ',', '.') }}</p>
+                                    <div class="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 w-full max-w-md px-2">
+                                        <div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl flex-1 min-w-[120px] sm:min-w-[140px] cash-flow-income-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(6, 78, 59) !important; border: 1px solid rgb(5, 150, 105) !important;' : 'background-color: rgb(236, 253, 245); border: 1px solid rgb(209, 250, 229);' }}">
+                                            <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 shadow-sm flex-shrink-0"></div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-[10px] sm:text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Income') }}</p>
+                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-income-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncome, 2, '.', ',') : number_format($totalIncome, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 min-w-[140px] cash-flow-expense-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(127, 29, 29) !important; border: 1px solid rgb(225, 29, 72) !important;' : 'background-color: rgb(255, 241, 242); border: 1px solid rgb(254, 205, 211);' }}">
-                                            <div class="w-5 h-5 rounded-full bg-rose-500 shadow-sm"></div>
-                                            <div class="flex-1">
-                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Expense') }}</p>
-                                                <p class="font-bold text-sm sensitive-data cash-flow-expense-amount" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpense, 2, '.', ',') : number_format($totalExpense, 0, ',', '.') }}</p>
+                                        <div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl flex-1 min-w-[120px] sm:min-w-[140px] cash-flow-expense-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(127, 29, 29) !important; border: 1px solid rgb(225, 29, 72) !important;' : 'background-color: rgb(255, 241, 242); border: 1px solid rgb(254, 205, 211);' }}">
+                                            <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-rose-500 shadow-sm flex-shrink-0"></div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-[10px] sm:text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Expense') }}</p>
+                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-expense-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpense, 2, '.', ',') : number_format($totalExpense, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -1217,7 +1220,7 @@
         id="add-transaction-fab"
         type="button"
         onclick="openTransactionModal()"
-        class="fixed bottom-8 right-8 bg-primary hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-2xl transition transform hover:scale-110 z-50">
+        class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary hover:bg-emerald-600 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-xl sm:text-2xl transition transform hover:scale-110 z-50">
         <i class="fa-solid fa-plus"></i>
     </button>
 
@@ -1232,6 +1235,46 @@
             relatedTransaction: @json(__('Related Transaction'))
         };
         
+        // Function to toggle mobile sidebar
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (sidebar && overlay) {
+                const isHidden = sidebar.classList.contains('-translate-x-full');
+                if (isHidden) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; // Prevent body scroll when sidebar is open
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = ''; // Restore body scroll
+                }
+            }
+        }
+        
+        // Close sidebar when clicking on menu items (mobile only)
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            const menuItems = sidebar?.querySelectorAll('.nav-item, a[href]');
+            
+            if (menuItems) {
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Only close on mobile
+                        if (window.innerWidth < 768) {
+                            if (sidebar && overlay) {
+                                sidebar.classList.add('-translate-x-full');
+                                overlay.classList.add('hidden');
+                                document.body.style.overflow = '';
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
         // Function to switch language
         function switchLanguage(locale) {
             if (locale === 'id' || locale === 'en') {
@@ -3283,16 +3326,16 @@
     </script>
 
     <!-- Transaction Modal -->
-    <div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
+    <div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
                     <button onclick="closeTransactionModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="transactionForm" class="p-6 space-y-4">
+            <form id="transactionForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 
                 <div>
@@ -3312,7 +3355,7 @@
                 </div>
 
                 <div id="transferAccountsField" style="display: none;">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dari Akun</label>
                             <select name="from_account_id" id="modal_from_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
@@ -3373,16 +3416,16 @@
     </div>
 
     <!-- Account (Wallet) Modal -->
-    <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 id="accountModalTitle" class="text-xl font-bold text-dark dark:text-white">Tambah Dompet Baru</h3>
+    <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 id="accountModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Dompet Baru</h3>
                 <button onclick="closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
 
-            <form id="accountForm" class="p-6 space-y-4">
+            <form id="accountForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
 
                 <div>
@@ -3486,9 +3529,9 @@
     </div>
 
     <!-- Category Modal -->
-    <div id="categoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+    <div id="categoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-dark dark:text-white">Tambah Kategori Baru</h3>
                 <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
@@ -3578,16 +3621,16 @@
     </div>
 
     <!-- Transaction Detail Modal -->
-    <div id="transactionDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">Detail Transaksi</h3>
+    <div id="transactionDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Detail Transaksi</h3>
                 <button onclick="closeTransactionDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <div id="transactionDetailContent" class="p-6 space-y-4">
+            <div id="transactionDetailContent" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <div class="flex items-center justify-center py-8">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
@@ -3596,16 +3639,16 @@
     </div>
 
     <!-- Budget Modal -->
-    <div id="budgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 id="budgetModalTitle" class="text-xl font-bold text-dark dark:text-white">Tambah Budget Baru</h3>
+    <div id="budgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 id="budgetModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Budget Baru</h3>
                 <button onclick="closeBudgetModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="budgetForm" class="p-6 space-y-4">
+            <form id="budgetForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" id="budget_id" name="budget_id" value="">
                 
@@ -3668,16 +3711,16 @@
     </div>
 
     <!-- Debt Modal (Piutang/Utang) -->
-    <div id="debtModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 id="debtModalTitle" class="text-xl font-bold text-dark dark:text-white">Tambah Piutang</h3>
+    <div id="debtModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 id="debtModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Piutang</h3>
                 <button onclick="closeDebtModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="debtForm" class="p-6 space-y-4">
+            <form id="debtForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" id="debt_type" name="type" value="">
                 
@@ -3741,16 +3784,16 @@
     </div>
 
     <!-- Payment Modal (Bayar Cicilan) -->
-    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 id="paymentModalTitle" class="text-xl font-bold text-dark dark:text-white">{{ __('Pay Installment') }}</h3>
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 id="paymentModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Pay Installment') }}</h3>
                 <button onclick="closePaymentModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="paymentForm" class="p-6 space-y-4">
+            <form id="paymentForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" id="payment_debt_id" value="">
                 
@@ -3815,16 +3858,16 @@
     </div>
 
     <!-- Reminder Modal (Ingatkan Piutang) -->
-    <div id="reminderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark">Buat Reminder</h3>
-                <button onclick="closeReminderModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+    <div id="reminderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Buat Reminder</h3>
+                <button onclick="closeReminderModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="reminderForm" class="p-6 space-y-4">
+            <form id="reminderForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" id="reminder_debt_id" value="">
                 
@@ -3874,16 +3917,16 @@
     </div>
 
     <!-- Mark Paid Modal (Tandai Piutang sebagai Lunas) -->
-    <div id="markPaidModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">Tandai sebagai Lunas</h3>
+    <div id="markPaidModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tandai sebagai Lunas</h3>
                 <button onclick="closeMarkPaidModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <form id="markPaidForm" class="p-6 space-y-4">
+            <form id="markPaidForm" class="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 @csrf
                 <input type="hidden" id="mark_paid_debt_id" value="">
                 <input type="hidden" name="create_transaction" value="1">
@@ -3919,10 +3962,10 @@
     </div>
 
     <!-- Debt Detail Modal -->
-    <div id="debtDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">Detail Utang/Piutang</h3>
+    <div id="debtDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Detail Utang/Piutang</h3>
                 <button onclick="closeDebtDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
