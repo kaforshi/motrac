@@ -934,7 +934,19 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-emerald-600 sensitive-data">Rp {{ number_format($debt->current_amount, 0, ',', '.') }}</p>
-                                        <button class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
+                                        <button 
+                                            type="button"
+                                            onclick="openReminderModal({{ $debt->id }}, this)"
+                                            @php
+                                                $debtReminderData = [
+                                                    'contact_name' => $debt->contact_name,
+                                                    'current_amount' => $debt->current_amount,
+                                                    'due_date' => $debt->due_date ? $debt->due_date->format('Y-m-d') : null,
+                                                    'description' => $debt->description
+                                                ];
+                                            @endphp
+                                            data-debt="{{ htmlspecialchars(json_encode($debtReminderData), ENT_QUOTES, 'UTF-8') }}"
+                                            class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
                                             {{ $debt->due_date && $debt->due_date->isPast() ? 'Tagih!' : 'Ingatkan' }}
                                         </button>
                                     </div>
@@ -1256,6 +1268,10 @@
                 'payment_date': 'payment_payment_date',
                 'notes': 'payment_notes',
                 'account_id': 'payment_account_id',
+                // Reminder modal
+                'reminder_date': 'reminder_reminder_date',
+                'reminder_time': 'reminder_reminder_time',
+                'notes': 'reminder_notes',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -2066,6 +2082,151 @@
             }
         }
 
+        // 11. Reminder Modal Functions (Ingatkan Piutang)
+        function openReminderModal(debtId, buttonElement) {
+            const modal = document.getElementById('reminderModal');
+            const form = document.getElementById('reminderForm');
+            
+            if (!modal || !form) {
+                console.error('Reminder modal elements not found');
+                return;
+            }
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Parse debt data from data attribute
+            let debtData;
+            try {
+                const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
+                if (!debtDataStr) {
+                    console.error('Debt data not found in button element');
+                    alert('Terjadi kesalahan saat memuat data piutang');
+                    return;
+                }
+                
+                // Decode HTML entities if present
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = debtDataStr;
+                const decodedStr = tempDiv.textContent || tempDiv.innerText || debtDataStr;
+                debtData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
+            } catch (e) {
+                console.error('Error parsing debt data:', e);
+                console.error('Data string:', buttonElement.getAttribute('data-debt'));
+                alert('Terjadi kesalahan saat memuat data piutang');
+                return;
+            }
+            
+            // Use setTimeout to ensure form.reset() has completed
+            setTimeout(() => {
+                // Populate form with debt data
+                document.getElementById('reminder_debt_id').value = debtId;
+                document.getElementById('reminder_contact_name').textContent = debtData.contact_name || 'N/A';
+                document.getElementById('reminder_amount').textContent = 'Rp ' + parseFloat(debtData.current_amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                
+                // Set reminder date (default to due_date or tomorrow)
+                let reminderDate = new Date();
+                if (debtData.due_date) {
+                    reminderDate = new Date(debtData.due_date);
+                    // If due date is past, set to tomorrow
+                    if (reminderDate < new Date()) {
+                        reminderDate = new Date();
+                        reminderDate.setDate(reminderDate.getDate() + 1);
+                    }
+                } else {
+                    reminderDate.setDate(reminderDate.getDate() + 1);
+                }
+                document.getElementById('reminder_reminder_date').value = reminderDate.toISOString().split('T')[0];
+                
+                // Show due date info if available
+                const dueDateInfo = document.getElementById('reminder_due_date_info');
+                if (debtData.due_date) {
+                    const dueDate = new Date(debtData.due_date);
+                    const formattedDate = dueDate.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    dueDateInfo.textContent = `Jatuh tempo: ${formattedDate}`;
+                } else {
+                    dueDateInfo.textContent = 'Jatuh tempo: Tidak ditentukan';
+                }
+            }, 0);
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+
+        function closeReminderModal() {
+            const modal = document.getElementById('reminderModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitReminderForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const debtId = document.getElementById('reminder_debt_id').value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuat...';
+
+            try {
+                const response = await fetch(`/debts/${debtId}/reminder`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    return;
+                }
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeReminderModal();
+                        // Open Google Calendar in new tab
+                        if (data.calendar_url) {
+                            window.open(data.calendar_url, '_blank');
+                        }
+                    }, 1000);
+                } else {
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                            showError(field, errorMessage);
+                        });
+                    } else {
+                        alert(data.message || 'Gagal membuat reminder');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         // Initialize handlers
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('modal_transactionType');
@@ -2159,6 +2320,21 @@
                 paymentModal.addEventListener('click', function(e) {
                     if (e.target === paymentModal) {
                         closePaymentModal();
+                    }
+                });
+            }
+
+            // Reminder modal events
+            const reminderForm = document.getElementById('reminderForm');
+            if (reminderForm) {
+                reminderForm.addEventListener('submit', submitReminderForm);
+            }
+
+            const reminderModal = document.getElementById('reminderModal');
+            if (reminderModal) {
+                reminderModal.addEventListener('click', function(e) {
+                    if (e.target === reminderModal) {
+                        closeReminderModal();
                     }
                 });
             }
@@ -2748,6 +2924,65 @@
                         <i class="fa-solid fa-save mr-2"></i> Catat Pembayaran
                     </button>
                     <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reminder Modal (Ingatkan Piutang) -->
+    <div id="reminderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Buat Reminder</h3>
+                <button onclick="closeReminderModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="reminderForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" id="reminder_debt_id" value="">
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600 mb-1">Kontak</p>
+                    <p id="reminder_contact_name" class="font-bold text-dark"></p>
+                    <p class="text-xs text-gray-500 mt-2">Jumlah Piutang: <span id="reminder_amount" class="font-bold text-emerald-600 sensitive-data"></span></p>
+                    <p id="reminder_due_date_info" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Reminder</label>
+                    <input type="date" name="reminder_date" id="reminder_reminder_date" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_reminder_date"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Reminder (Opsional)</label>
+                    <input type="time" name="reminder_time" id="reminder_reminder_time" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <span class="text-xs text-gray-500 mt-1">Kosongkan untuk menggunakan waktu default (09:00)</span>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_reminder_time"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Reminder (Opsional)</label>
+                    <textarea name="notes" id="reminder_notes" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan untuk reminder"></textarea>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_notes"></span>
+                </div>
+
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <p class="text-xs text-blue-700">
+                        <i class="fa-solid fa-info-circle mr-1"></i>
+                        Reminder akan dibuat di Google Calendar Anda. Setelah berhasil, halaman Google Calendar akan terbuka untuk konfirmasi.
+                    </p>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-calendar-plus mr-2"></i> Buat Reminder
+                    </button>
+                    <button type="button" onclick="closeReminderModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>

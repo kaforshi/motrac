@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     // Debts
     Route::resource('debts', DebtController::class)->except(['show', 'edit', 'update']);
     Route::post('/debts/{id}/payment', [DebtController::class, 'addPayment'])->name('debts.payment');
+    Route::post('/debts/{id}/reminder', [DebtController::class, 'createReminder'])->name('debts.reminder');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

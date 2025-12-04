@@ -223,6 +223,84 @@ class DebtController extends Controller
 
         return redirect()->route('debts.index')->with('success', 'Debt deleted successfully.');
     }
+
+    public function createReminder(Request $request, $id)
+    {
+        try {
+            $debt = Debt::where('user_id', auth()->id())->findOrFail($id);
+
+            $validated = $request->validate([
+                'reminder_date' => 'required|date',
+                'reminder_time' => 'nullable|string',
+                'notes' => 'nullable|string',
+            ]);
+
+            // Generate Google Calendar link
+            $reminderDate = \Carbon\Carbon::parse($validated['reminder_date']);
+            if ($validated['reminder_time']) {
+                $reminderDateTime = \Carbon\Carbon::parse($validated['reminder_date'] . ' ' . $validated['reminder_time']);
+            } else {
+                $reminderDateTime = $reminderDate->copy()->setTime(9, 0); // Default 9 AM
+            }
+
+            $endDateTime = $reminderDateTime->copy()->addHour(); // 1 hour duration
+
+            $title = "Tagih Piutang: {$debt->contact_name}";
+            $description = "Tagih piutang dari {$debt->contact_name}\n";
+            $description .= "Jumlah: Rp " . number_format($debt->current_amount, 0, ',', '.') . "\n";
+            if ($debt->due_date) {
+                $description .= "Jatuh tempo: " . $debt->due_date->format('d M Y') . "\n";
+            }
+            if ($debt->description) {
+                $description .= "Catatan: {$debt->description}\n";
+            }
+            if ($validated['notes']) {
+                $description .= "Reminder: {$validated['notes']}";
+            }
+
+            // Format dates for Google Calendar (YYYYMMDDTHHMMSS)
+            // Google Calendar will use browser's timezone
+            $startDateStr = $reminderDateTime->format('Ymd\THis');
+            $endDateStr = $endDateTime->format('Ymd\THis');
+
+            // Create Google Calendar URL
+            $googleCalendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            $googleCalendarUrl .= '&text=' . urlencode($title);
+            $googleCalendarUrl .= '&dates=' . $startDateStr . '/' . $endDateStr;
+            $googleCalendarUrl .= '&details=' . urlencode($description);
+            $googleCalendarUrl .= '&location=' . urlencode('');
+
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Reminder berhasil dibuat. Membuka Google Calendar...',
+                    'calendar_url' => $googleCalendarUrl
+                ]);
+            }
+
+            return redirect($googleCalendarUrl);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat reminder: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['error' => 'Failed to create reminder: ' . $e->getMessage()]);
+        }
+    }
 }
 
 
