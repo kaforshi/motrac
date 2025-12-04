@@ -1161,8 +1161,8 @@
             // Tampilkan / sembunyikan tombol FAB tambah transaksi
             const fab = document.getElementById('add-transaction-fab');
             if (fab) {
-                // Sembunyikan pada view Dompet, Kategori, dan Budget
-                if (viewId === 'wallets' || viewId === 'categories' || viewId === 'budget') {
+                // Sembunyikan pada view Dompet, Kategori, Budget, dan Debts
+                if (viewId === 'wallets' || viewId === 'categories' || viewId === 'budget' || viewId === 'debts') {
                     fab.classList.add('hidden');
                 } else {
                     fab.classList.remove('hidden');
