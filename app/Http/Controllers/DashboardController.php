@@ -191,6 +191,23 @@ class DashboardController extends Controller
             ->orderBy('due_date', 'asc')
             ->get();
 
+        // Paid debts history
+        $paidReceivables = Debt::where('user_id', $user->id)
+            ->where('type', Debt::TYPE_RECEIVABLE)
+            ->where('is_paid', true)
+            ->with(['account', 'payments'])
+            ->orderBy('paid_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        $paidPayables = Debt::where('user_id', $user->id)
+            ->where('type', Debt::TYPE_PAYABLE)
+            ->where('is_paid', true)
+            ->with(['account', 'payments'])
+            ->orderBy('paid_at', 'desc')
+            ->limit(10)
+            ->get();
+
         // Calculate total remaining budget
         $totalRemainingBudget = $budgets->sum(function($budget) {
             return max(0, $budget->amount - $budget->spent);
@@ -351,6 +368,8 @@ class DashboardController extends Controller
             'totalDetailedExpense',
             'receivables',
             'payables',
+            'paidReceivables',
+            'paidPayables',
             'totalRemainingBudget',
             'totalTransfer',
             'cashFlowData',

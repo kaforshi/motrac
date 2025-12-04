@@ -1029,6 +1029,90 @@
                         <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm text-gray-500 hover:text-rose-600 border-t border-gray-100 transition text-center">+ Catat Utang Baru</button>
                     </div>
                 </div>
+
+                <!-- History Section -->
+                <div class="mt-6 grid md:grid-cols-2 gap-6">
+                    <!-- History: Piutang yang sudah dibayar -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-gray-50 p-4 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-700">History Piutang (Sudah Lunas)</h3>
+                            <span class="bg-white text-gray-600 text-xs px-2 py-1 rounded font-bold">
+                                {{ $paidReceivables->count() }} item
+                            </span>
+                        </div>
+                        <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                            @forelse($paidReceivables as $debt)
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-bold text-dark">{{ $debt->contact_name }}</p>
+                                            <span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">
+                                                <i class="fa-solid fa-check-circle"></i> Lunas
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            Jumlah: <span class="font-semibold text-emerald-600 sensitive-data">Rp {{ number_format($debt->initial_amount, 0, ',', '.') }}</span>
+                                        </p>
+                                        <p class="text-xs text-gray-400">
+                                            Dibayar: {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
+                                        </p>
+                                        @if($debt->description)
+                                            <p class="text-xs text-gray-500 mt-1 italic">{{ \Illuminate\Support\Str::limit($debt->description, 50) }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-8 text-center text-gray-400">
+                                    <i class="fa-solid fa-history text-3xl mb-2"></i>
+                                    <p>Belum ada history piutang yang sudah lunas</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- History: Utang yang sudah dibayar -->
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-gray-50 p-4 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-700">History Utang (Sudah Lunas)</h3>
+                            <span class="bg-white text-gray-600 text-xs px-2 py-1 rounded font-bold">
+                                {{ $paidPayables->count() }} item
+                            </span>
+                        </div>
+                        <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                            @forelse($paidPayables as $debt)
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-bold text-dark">{{ $debt->contact_name }}</p>
+                                            <span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">
+                                                <i class="fa-solid fa-check-circle"></i> Lunas
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            Jumlah: <span class="font-semibold text-rose-600 sensitive-data">Rp {{ number_format($debt->initial_amount, 0, ',', '.') }}</span>
+                                        </p>
+                                        <p class="text-xs text-gray-400">
+                                            Dibayar: {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
+                                        </p>
+                                        @if($debt->description)
+                                            <p class="text-xs text-gray-500 mt-1 italic">{{ \Illuminate\Support\Str::limit($debt->description, 50) }}</p>
+                                        @endif
+                                        @if($debt->payments->count() > 0)
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                <i class="fa-solid fa-receipt"></i> {{ $debt->payments->count() }} pembayaran
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-8 text-center text-gray-400">
+                                    <i class="fa-solid fa-history text-3xl mb-2"></i>
+                                    <p>Belum ada history utang yang sudah lunas</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
