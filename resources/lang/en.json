@@ -168,5 +168,13 @@
     "Enter password to confirm": "Enter password to confirm",
     "Type \"DELETE\" to confirm": "Type \"DELETE\" to confirm",
     "DELETE": "DELETE",
-    "Security & Login": "Security & Login"
+    "Security & Login": "Security & Login",
+    "Verify Your Email": "Verify Your Email",
+    "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.": "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.",
+    "Resend Verification Email": "Resend Verification Email",
+    "Already verified?": "Already verified?",
+    "Go to Dashboard": "Go to Dashboard",
+    "Email verified successfully!": "Email verified successfully!",
+    "Email verified successfully! Please login to continue.": "Email verified successfully! Please login to continue.",
+    "Verification link sent!": "Verification link sent!"
 }

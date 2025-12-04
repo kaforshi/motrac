@@ -68,6 +68,13 @@
                     <p class="text-gray-500 mt-2">Masukkan detail akun Anda untuk melanjutkan.</p>
                 </div>
 
+                @if (session('success'))
+                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">
+                        <i class="fa-solid fa-circle-check mr-2"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
                         <ul class="list-disc list-inside">
