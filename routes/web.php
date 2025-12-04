@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionTemplateController;
 use App\Http\Controllers\UserSettingsController;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
@@ -63,5 +64,8 @@ Route::middleware('auth')->group(function () {
     
     // Settings
     Route::post('/settings', [UserSettingsController::class, 'updateSettings'])->name('settings.update');
+    
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 });
 

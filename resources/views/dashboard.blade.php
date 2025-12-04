@@ -149,7 +149,9 @@
                     </button>
                     <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
                 </div>
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=10B981&color=fff" class="w-9 h-9 rounded-full border border-gray-200 cursor-pointer">
+                <a href="{{ route('profile') }}">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=10B981&color=fff" class="w-9 h-9 rounded-full border border-gray-200 cursor-pointer hover:ring-2 hover:ring-primary transition">
+                </a>
             </div>
         </header>
 
