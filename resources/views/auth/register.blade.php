@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Daftar Akun - Motrac Money Tracker</title>
+    <title>{{ __('Register') }} - Motrac</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -30,29 +30,40 @@
             <div class="absolute bottom-0 right-0 -mr-20 -mb-20 w-96 h-96 rounded-full bg-white opacity-5 blur-3xl"></div>
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
-            <!-- Logo -->
-            <div class="flex items-center gap-2 z-10">
-                <div class="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-wallet"></i>
+            <!-- Logo and Language Switch -->
+            <div class="flex items-center justify-between w-full z-10">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Motrac</span>
                 </div>
-                <span class="text-xl font-bold tracking-tight">Motrac</span>
+                <!-- Language Toggle Switch -->
+                <div class="flex items-center bg-white/20 backdrop-blur border border-white/30 rounded-full p-1">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-white/30 text-white' : 'text-white/70' }}">
+                        ID
+                    </button>
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-white/30 text-white' : 'text-white/70' }}">
+                        EN
+                    </button>
+                </div>
             </div>
 
             <!-- Value Proposition -->
             <div class="z-10 max-w-lg">
-                <h2 class="text-4xl font-bold mb-4 leading-tight">Mulai Perjalanan Finansial Anda.</h2>
+                <h2 class="text-4xl font-bold mb-4 leading-tight">{{ __('Start Your Financial Journey.') }}</h2>
                 <ul class="space-y-4 text-blue-100 mt-6">
                     <li class="flex items-center gap-3">
                         <div class="w-6 h-6 rounded-full bg-green-400/20 flex items-center justify-center text-green-400"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span>Tracking pengeluaran tanpa batas</span>
+                        <span>{{ __('Unlimited expense tracking') }}</span>
                     </li>
                     <li class="flex items-center gap-3">
                         <div class="w-6 h-6 rounded-full bg-green-400/20 flex items-center justify-center text-green-400"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span>Analisa grafik keuangan</span>
+                        <span>{{ __('Financial chart analysis') }}</span>
                     </li>
                     <li class="flex items-center gap-3">
                         <div class="w-6 h-6 rounded-full bg-green-400/20 flex items-center justify-center text-green-400"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span>Keamanan data terenkripsi</span>
+                        <span>{{ __('Encrypted data security') }}</span>
                     </li>
                 </ul>
             </div>
@@ -75,8 +86,8 @@
                 </div>
 
                 <div class="text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-dark">Buat Akun Baru</h2>
-                    <p class="text-gray-500 mt-2">Gratis selamanya, tidak perlu kartu kredit.</p>
+                    <h2 class="text-3xl font-bold text-dark">{{ __('Create New Account') }}</h2>
+                    <p class="text-gray-500 mt-2">{{ __('Free forever, no credit card required.') }}</p>
                 </div>
 
                 @if ($errors->any())
@@ -94,7 +105,7 @@
                     
                     <!-- Name Input -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Full Name') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-regular fa-user"></i>
@@ -105,7 +116,7 @@
 
                     <!-- Email Input -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Email Address') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-regular fa-envelope"></i>
@@ -116,7 +127,7 @@
 
                     <!-- Password Input -->
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Buat Password</label>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Create Password') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-solid fa-lock"></i>
@@ -130,7 +141,7 @@
 
                     <!-- Password Confirmation Input -->
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Confirm Password') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-solid fa-lock"></i>
@@ -148,20 +159,20 @@
                             <input id="terms" type="checkbox" required class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary/30 text-primary">
                         </div>
                         <label for="terms" class="text-sm text-gray-500">
-                            Saya setuju dengan <a href="#" class="text-primary hover:underline">Syarat & Ketentuan</a> serta <a href="#" class="text-primary hover:underline">Kebijakan Privasi</a>.
+                            {{ __('I agree to the') }} <a href="#" class="text-primary hover:underline">{{ __('Terms & Conditions') }}</a> {{ __('and') }} <a href="#" class="text-primary hover:underline">{{ __('Privacy Policy') }}</a>.
                         </label>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="w-full bg-dark hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg transform active:scale-95">
-                        Daftar Akun
+                        {{ __('Register Account') }}
                     </button>
                 </form>
 
                 <!-- Footer -->
                 <p class="text-center text-sm text-gray-600">
-                    Sudah punya akun? 
-                    <a href="{{ route('login') }}" class="font-bold text-primary hover:text-emerald-700 transition">Masuk di sini</a>
+                    {{ __('Already have an account?') }} 
+                    <a href="{{ route('login') }}" class="font-bold text-primary hover:text-emerald-700 transition">{{ __('Login here') }}</a>
                 </p>
             </div>
         </div>
@@ -179,6 +190,16 @@
                 input.type = "password";
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
+            }
+        }
+
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '/language/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
             }
         }
     </script>

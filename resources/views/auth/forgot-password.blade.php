@@ -31,12 +31,23 @@
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-white opacity-10 blur-3xl"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-emerald-400 opacity-10 blur-3xl"></div>
 
-            <!-- Logo -->
-            <div class="flex items-center gap-2 z-10">
-                <div class="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-wallet"></i>
+            <!-- Logo and Language Switch -->
+            <div class="flex items-center justify-between w-full z-10">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Motrac</span>
                 </div>
-                <span class="text-xl font-bold tracking-tight">Motrac</span>
+                <!-- Language Toggle Switch -->
+                <div class="flex items-center bg-white/20 backdrop-blur border border-white/30 rounded-full p-1">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-white/30 text-white' : 'text-white/70' }}">
+                        ID
+                    </button>
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-white/30 text-white' : 'text-white/70' }}">
+                        EN
+                    </button>
+                </div>
             </div>
 
             <!-- Quote/Text -->
@@ -121,5 +132,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '/language/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
+            }
+        }
+    </script>
 </body>
 </html>

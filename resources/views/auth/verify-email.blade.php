@@ -26,10 +26,19 @@
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-            <!-- Logo -->
-            <div class="flex justify-center mb-6">
+            <!-- Logo and Language Switch -->
+            <div class="flex items-center justify-between mb-6">
                 <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center text-white text-2xl">
                     <i class="fa-solid fa-wallet"></i>
+                </div>
+                <!-- Language Toggle Switch -->
+                <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full p-1">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-600 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        ID
+                    </button>
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-600 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        EN
+                    </button>
                 </div>
             </div>
 
@@ -84,6 +93,18 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '/language/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
+            }
+        }
+    </script>
 </body>
 </html>
 
