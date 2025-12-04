@@ -98,16 +98,66 @@ class BudgetController extends Controller
 
     public function update(Request $request, $id)
     {
-        $budget = Budget::where('user_id', auth()->id())->findOrFail($id);
+        try {
+            $budget = Budget::where('user_id', auth()->id())->findOrFail($id);
 
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'rollover_enabled' => 'boolean',
-        ]);
+            $validated = $request->validate([
+                'category_id' => [
+                    'required',
+                    'exists:categories,id',
+                    function ($attribute, $value, $fail) {
+                        $category = Category::find($value);
+                        if ($category && $category->user_id !== auth()->id()) {
+                            $fail('The selected category is invalid.');
+                        }
+                    },
+                ],
+                'amount' => 'required|numeric|min:0.01',
+                'month' => 'required|integer|min:1|max:12',
+                'year' => 'required|integer|min:2020',
+                'rollover_enabled' => 'boolean',
+            ]);
 
-        $budget->update($validated);
+            $budget->update([
+                'category_id' => $validated['category_id'],
+                'amount' => $validated['amount'],
+                'month' => $validated['month'],
+                'year' => $validated['year'],
+                'rollover_enabled' => $request->boolean('rollover_enabled'),
+            ]);
 
-        return redirect()->route('budgets.index')->with('success', 'Budget updated successfully.');
+            $budget->load('category');
+
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Budget berhasil diperbarui.',
+                    'budget' => $budget
+                ]);
+            }
+
+            return redirect()->route('budgets.index')->with('success', 'Budget updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui budget: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['error' => 'Failed to update budget: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy($id)

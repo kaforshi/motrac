@@ -868,9 +868,28 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-xs text-gray-400">Sisa</p>
-                                    <p class="font-bold text-dark sensitive-data">Rp {{ number_format($remaining, 0, ',', '.') }}</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-400">Sisa</p>
+                                        <p class="font-bold text-dark sensitive-data">Rp {{ number_format($remaining, 0, ',', '.') }}</p>
+                                    </div>
+                                    @php
+                                        $budgetData = [
+                                            'category_id' => $budget->category_id,
+                                            'amount' => $budget->amount,
+                                            'month' => $budget->month,
+                                            'year' => $budget->year,
+                                            'rollover_enabled' => (bool)$budget->rollover_enabled
+                                        ];
+                                    @endphp
+                                    <button 
+                                        type="button" 
+                                        onclick="openBudgetEditModal({{ $budget->id }}, this)"
+                                        data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
+                                        class="text-gray-400 hover:text-gray-600 transition p-2"
+                                        title="Edit Budget">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-3 mt-2 relative z-10">
@@ -1627,12 +1646,88 @@
         function openBudgetModal() {
             const modal = document.getElementById('budgetModal');
             const form = document.getElementById('budgetForm');
-            modal.classList.remove('hidden');
+            const modalTitle = document.getElementById('budgetModalTitle');
+            
+            // Reset form first
             form.reset();
             clearErrors();
-            // Set default month and year
-            document.getElementById('budget_month').value = new Date().getMonth() + 1;
-            document.getElementById('budget_year').value = new Date().getFullYear();
+            
+            // Reset budget_id for new budget
+            setTimeout(() => {
+                document.getElementById('budget_id').value = '';
+                modalTitle.textContent = 'Tambah Budget Baru';
+                // Set default month and year
+                document.getElementById('budget_month').value = new Date().getMonth() + 1;
+                document.getElementById('budget_year').value = new Date().getFullYear();
+            }, 0);
+            
+            modal.classList.remove('hidden');
+        }
+
+        function openBudgetEditModal(budgetId, buttonElement) {
+            const modal = document.getElementById('budgetModal');
+            const form = document.getElementById('budgetForm');
+            const modalTitle = document.getElementById('budgetModalTitle');
+            
+            if (!modal || !form || !modalTitle) {
+                console.error('Modal elements not found');
+                return;
+            }
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Parse budget data from data attribute
+            let budgetData;
+            try {
+                // Try dataset first, then getAttribute as fallback
+                let budgetDataStr = buttonElement.dataset.budget || buttonElement.getAttribute('data-budget');
+                if (!budgetDataStr) {
+                    console.error('Budget data not found in button element');
+                    alert('Terjadi kesalahan saat memuat data budget');
+                    return;
+                }
+                
+                // Decode HTML entities if present
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = budgetDataStr;
+                budgetDataStr = tempDiv.textContent || tempDiv.innerText || budgetDataStr;
+                
+                // Remove any whitespace and line breaks
+                budgetDataStr = budgetDataStr.trim().replace(/\s+/g, ' ');
+                
+                budgetData = JSON.parse(budgetDataStr);
+            } catch (e) {
+                console.error('Error parsing budget data:', e);
+                console.error('Data string:', buttonElement.getAttribute('data-budget'));
+                alert('Terjadi kesalahan saat memuat data budget');
+                return;
+            }
+            
+            // Set modal title
+            modalTitle.textContent = 'Edit Budget';
+            
+            // Use setTimeout to ensure form.reset() has completed
+            setTimeout(() => {
+                // Populate form with budget data AFTER reset
+                const budgetIdInput = document.getElementById('budget_id');
+                const categorySelect = document.getElementById('budget_category_id');
+                const amountInput = document.getElementById('budget_amount');
+                const monthSelect = document.getElementById('budget_month');
+                const yearInput = document.getElementById('budget_year');
+                const rolloverCheckbox = document.getElementById('budget_rollover_enabled');
+                
+                if (budgetIdInput) budgetIdInput.value = budgetId || '';
+                if (categorySelect) categorySelect.value = budgetData.category_id || '';
+                if (amountInput) amountInput.value = budgetData.amount || '';
+                if (monthSelect) monthSelect.value = budgetData.month || new Date().getMonth() + 1;
+                if (yearInput) yearInput.value = budgetData.year || new Date().getFullYear();
+                if (rolloverCheckbox) rolloverCheckbox.checked = budgetData.rollover_enabled || false;
+            }, 0);
+            
+            // Show modal
+            modal.classList.remove('hidden');
         }
 
         function closeBudgetModal() {
@@ -1654,7 +1749,18 @@
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                const response = await fetch('{{ route("budgets.store") }}', {
+                const budgetId = document.getElementById('budget_id').value;
+                const isEdit = budgetId && budgetId !== '';
+                const url = isEdit 
+                    ? `/budgets/${budgetId}`
+                    : '{{ route("budgets.store") }}';
+                
+                // For PUT method, Laravel expects _method in form data
+                if (isEdit) {
+                    formData.append('_method', 'PUT');
+                }
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -1669,7 +1775,7 @@
                 if (response.ok && data.success) {
                     const notification = document.createElement('div');
                     notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Budget berhasil dibuat!';
+                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> Budget berhasil ${isEdit ? 'diperbarui' : 'dibuat'}!`;
                     document.body.appendChild(notification);
 
                     setTimeout(() => {
@@ -2129,7 +2235,7 @@
     <div id="budgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark">Tambah Budget Baru</h3>
+                <h3 id="budgetModalTitle" class="text-xl font-bold text-dark">Tambah Budget Baru</h3>
                 <button onclick="closeBudgetModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
@@ -2137,6 +2243,7 @@
             
             <form id="budgetForm" class="p-6 space-y-4">
                 @csrf
+                <input type="hidden" id="budget_id" name="budget_id" value="">
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
