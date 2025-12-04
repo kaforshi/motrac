@@ -81,8 +81,8 @@ class AccountController extends Controller
                 'name' => 'required|string|max:255',
                 'type' => 'required|in:cash,bank,ewallet,liability,investment',
                 'currency' => 'nullable|string|max:3',
-                'is_hidden' => 'sometimes|boolean',
-                'is_active' => 'sometimes|boolean',
+                'is_hidden' => 'nullable',
+                'is_active' => 'nullable',
                 'notes' => 'nullable|string',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -97,8 +97,9 @@ class AccountController extends Controller
         }
 
         // Normalisasi checkbox (jika tidak dikirim dianggap false)
-        $validated['is_hidden'] = $request->has('is_hidden');
-        $validated['is_active'] = $request->has('is_active');
+        // Checkbox yang dicentang akan mengirim "on" atau "1", yang tidak dicentang tidak dikirim sama sekali
+        $validated['is_hidden'] = $request->has('is_hidden') && ($request->input('is_hidden') === 'on' || $request->input('is_hidden') === '1' || $request->input('is_hidden') === true || $request->input('is_hidden') === 1);
+        $validated['is_active'] = $request->has('is_active') && ($request->input('is_active') === 'on' || $request->input('is_active') === '1' || $request->input('is_active') === true || $request->input('is_active') === 1);
 
         $account->update($validated);
 

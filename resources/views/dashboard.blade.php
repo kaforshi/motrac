@@ -2087,6 +2087,19 @@
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
 
+            // Ensure checkbox values are sent correctly
+            // If checkbox is checked, it sends "on", if unchecked, we need to send "0"
+            const isHiddenCheckbox = document.getElementById('account_is_hidden');
+            const isActiveCheckbox = document.getElementById('account_is_active');
+            
+            // Remove existing values
+            formData.delete('is_hidden');
+            formData.delete('is_active');
+            
+            // Add correct boolean values
+            formData.append('is_hidden', isHiddenCheckbox && isHiddenCheckbox.checked ? '1' : '0');
+            formData.append('is_active', isActiveCheckbox && isActiveCheckbox.checked ? '1' : '0');
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
