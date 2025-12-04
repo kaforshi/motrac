@@ -703,10 +703,12 @@
                                     $totalIncomeCat = $incomeByCategory->sum('total');
                                 @endphp
                                 <div class="flex flex-col sm:flex-row items-center gap-8 w-full justify-center">
-                                    <div class="relative w-40 h-40 conic-income shadow-lg flex-shrink-0">
-                                        <div class="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center">
-                                            <span class="text-[10px] text-gray-400">Total</span>
-                                            <span class="font-bold text-sm text-dark sensitive-data">{{ number_format($totalIncomeCat / 1000000, 1) }} Jt</span>
+                                    <div class="relative w-56 h-56 conic-income shadow-lg flex-shrink-0">
+                                        <div class="absolute inset-0 m-auto w-36 h-36 bg-white rounded-full flex flex-col items-center justify-center px-4 py-3">
+                                            <span class="text-xs text-gray-400 mb-1">Total</span>
+                                            <span class="font-bold text-base text-dark sensitive-data text-center leading-tight">
+                                                Rp {{ number_format($totalIncomeCat, 0, ',', '.') }}
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-1 gap-3 text-sm w-full max-w-xs">
@@ -719,7 +721,9 @@
                                                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                                                     <span class="text-gray-600">{{ $item->category->name ?? 'N/A' }} ({{ number_format($percentage, 0) }}%)</span>
                                                 </div>
-                                                <span class="font-bold text-dark sensitive-data">{{ number_format($item->total / 1000000, 1) }}jt</span>
+                                                <span class="font-bold text-dark sensitive-data">
+                                                    Rp {{ number_format($item->total, 0, ',', '.') }}
+                                                </span>
                                             </div>
                                         @endforeach
                                     </div>
@@ -737,10 +741,12 @@
                                     $totalExpenseCat = $expenseByCategory->sum('total');
                                 @endphp
                                 <div class="flex flex-col sm:flex-row items-center gap-8 w-full justify-center">
-                                    <div class="relative w-40 h-40 conic-expense shadow-lg flex-shrink-0">
-                                        <div class="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center">
-                                            <span class="text-[10px] text-gray-400">Total</span>
-                                            <span class="font-bold text-sm text-dark sensitive-data">{{ number_format($totalExpenseCat / 1000000, 1) }} Jt</span>
+                                    <div class="relative w-56 h-56 conic-expense shadow-lg flex-shrink-0">
+                                        <div class="absolute inset-0 m-auto w-36 h-36 bg-white rounded-full flex flex-col items-center justify-center px-4 py-3">
+                                            <span class="text-xs text-gray-400 mb-1">Total</span>
+                                            <span class="font-bold text-base text-dark sensitive-data text-center leading-tight">
+                                                Rp {{ number_format($totalExpenseCat, 0, ',', '.') }}
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-1 gap-3 text-sm w-full max-w-xs">
@@ -753,7 +759,9 @@
                                                     <span class="w-3 h-3 rounded-full bg-rose-500"></span>
                                                     <span class="text-gray-600">{{ $item->category->name ?? 'N/A' }} ({{ number_format($percentage, 0) }}%)</span>
                                                 </div>
-                                                <span class="font-bold text-dark sensitive-data">{{ number_format($item->total / 1000000, 1) }}jt</span>
+                                                <span class="font-bold text-dark sensitive-data">
+                                                    Rp {{ number_format($item->total, 0, ',', '.') }}
+                                                </span>
                                             </div>
                                         @endforeach
                                     </div>
