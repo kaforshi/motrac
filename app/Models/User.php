@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -79,6 +80,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
 }
 

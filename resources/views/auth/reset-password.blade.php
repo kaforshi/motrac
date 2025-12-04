@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ auth()->user() && auth()->user()->dark_mode ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Masuk - Motrac Money Tracker</title>
+    <title>{{ __('Reset Password') }} - Motrac</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
@@ -20,7 +21,7 @@
         }
     </script>
 </head>
-<body class="h-screen bg-white font-sans text-slate-800">
+<body class="h-screen bg-white dark:bg-gray-900 font-sans text-slate-800 dark:text-gray-100">
 
     <div class="flex h-full w-full">
         
@@ -40,9 +41,9 @@
 
             <!-- Quote/Text -->
             <div class="z-10 max-w-md">
-                <h2 class="text-4xl font-bold mb-6 leading-tight">Selamat Datang Kembali!</h2>
+                <h2 class="text-4xl font-bold mb-6 leading-tight">{{ __('Reset Your Password') }}</h2>
                 <p class="text-emerald-100 text-lg leading-relaxed">
-                    "Jangan menabung apa yang tersisa setelah belanja, tapi belanjalah apa yang tersisa setelah menabung."
+                    {{ __('Enter your new password below. Make sure it\'s strong and secure.') }}
                 </p>
             </div>
 
@@ -53,7 +54,7 @@
         </div>
 
         <!-- Right Side: Form -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-800">
             <div class="w-full max-w-md space-y-8">
                 
                 <!-- Mobile Logo (Only visible on mobile) -->
@@ -64,19 +65,19 @@
                 </div>
 
                 <div class="text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-dark">Masuk ke Akun</h2>
-                    <p class="text-gray-500 mt-2">Masukkan detail akun Anda untuk melanjutkan.</p>
+                    <h2 class="text-3xl font-bold text-dark dark:text-white">{{ __('Reset Password') }}</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">{{ __('Enter your new password below.') }}</p>
                 </div>
 
-                @if (session('success'))
-                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">
+                @if (session('status'))
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-4 py-3 rounded-xl text-sm">
                         <i class="fa-solid fa-circle-check mr-2"></i>
-                        {{ session('success') }}
+                        {{ session('status') }}
                     </div>
                 @endif
 
                 @if ($errors->any())
-                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm">
                         <ul class="list-disc list-inside">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -85,54 +86,63 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="token" value="{{ $token }}">
                     
                     <!-- Email Input -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Email Address') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-regular fa-envelope"></i>
                             </div>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="nama@email.com" class="pl-10 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition text-sm">
+                            <input type="email" id="email" name="email" value="{{ $email }}" required readonly class="pl-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition text-sm cursor-not-allowed">
                         </div>
                     </div>
 
                     <!-- Password Input -->
                     <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary hover:text-emerald-700">{{ __('Forgot Password?') }}</a>
-                        </div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('New Password') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
-                            <input type="password" id="password" name="password" required placeholder="••••••••" class="pl-10 pr-10 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition text-sm">
-                            <button type="button" onclick="togglePassword('password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <input type="password" id="password" name="password" required placeholder="••••••••" class="pl-10 pr-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition text-sm">
+                            <button type="button" onclick="togglePassword('password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Remember Me -->
-                    <div class="flex items-center">
-                        <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-primary bg-gray-50 border-gray-200 rounded focus:ring-primary focus:ring-2">
-                        <label for="remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
+                    <!-- Confirm Password Input -->
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Confirm New Password') }}</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="••••••••" class="pl-10 pr-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition text-sm">
+                            <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="w-full bg-primary hover:bg-emerald-600 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-200 transform active:scale-95">
-                        Masuk Sekarang
+                        <i class="fa-solid fa-key mr-2"></i>
+                        {{ __('Reset Password') }}
                     </button>
                 </form>
 
                 <!-- Footer -->
-                <p class="text-center text-sm text-gray-600">
-                    Belum punya akun? 
-                    <a href="{{ route('register') }}" class="font-bold text-primary hover:text-emerald-700 transition">Daftar Gratis</a>
-                </p>
+                <div class="text-center">
+                    <a href="{{ route('login') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-emerald-400 transition">
+                        <i class="fa-solid fa-arrow-left mr-2"></i>
+                        {{ __('Back to Login') }}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -154,3 +164,4 @@
     </script>
 </body>
 </html>
+

@@ -176,5 +176,18 @@
     "Go to Dashboard": "Ke Dashboard",
     "Email verified successfully!": "Email berhasil diverifikasi!",
     "Email verified successfully! Please login to continue.": "Email berhasil diverifikasi! Silakan login untuk melanjutkan.",
-    "Verification link sent!": "Tautan verifikasi telah dikirim!"
+    "Verification link sent!": "Tautan verifikasi telah dikirim!",
+    "Forgot Password": "Lupa Password",
+    "Reset Your Password": "Reset Password Anda",
+    "Enter your email address and we will send you a link to reset your password.": "Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mereset password Anda.",
+    "Send Password Reset Link": "Kirim Tautan Reset Password",
+    "Back to Login": "Kembali ke Login",
+    "Remember your password?": "Ingat password Anda?",
+    "Reset Password": "Reset Password",
+    "Enter your new password below. Make sure it's strong and secure.": "Masukkan password baru Anda di bawah. Pastikan password kuat dan aman.",
+    "Enter your new password below.": "Masukkan password baru Anda di bawah.",
+    "New Password": "Password Baru",
+    "Confirm New Password": "Konfirmasi Password Baru",
+    "We have emailed your password reset link.": "Kami telah mengirimkan tautan reset password ke email Anda.",
+    "Your password has been reset.": "Password Anda telah direset."
 }
