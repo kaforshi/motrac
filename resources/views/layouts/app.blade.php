@@ -93,6 +93,18 @@
             filter: blur(8px);
         }
     </style>
+    
+    <script>
+        // Ensure dark mode is applied on page load
+        (function() {
+            const isDarkMode = {{ auth()->user() && auth()->user()->dark_mode ? 'true' : 'false' }};
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </body>
 </html>
 

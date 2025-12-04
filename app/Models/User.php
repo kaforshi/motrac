@@ -17,6 +17,12 @@ class User extends Authenticatable
         'password',
         'privacy_mode',
         'dark_mode',
+        'photo',
+        'bio',
+        'currency',
+        'notify_security',
+        'notify_budget',
+        'notify_weekly_report',
     ];
 
     protected $hidden = [
@@ -29,6 +35,9 @@ class User extends Authenticatable
         'password' => 'hashed',
         'privacy_mode' => 'boolean',
         'dark_mode' => 'boolean',
+        'notify_security' => 'boolean',
+        'notify_budget' => 'boolean',
+        'notify_weekly_report' => 'boolean',
     ];
 
     public function accounts()
@@ -59,6 +68,16 @@ class User extends Authenticatable
     public function templates()
     {
         return $this->hasMany(TransactionTemplate::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
     }
 }
 

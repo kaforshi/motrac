@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\Budget;
 use App\Models\Debt;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -349,6 +350,21 @@ class DashboardController extends Controller
             );
         }
 
+        $userCurrency = $user->currency ?? 'IDR';
+        $currencySymbol = $userCurrency === 'USD' ? '$' : 'Rp';
+        
+        // Check and create notifications based on user preferences
+        $this->checkAndCreateNotifications($user, $budgets, $monthlyExpense);
+        
+        // Get unread notifications
+        $unreadNotifications = Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        $unreadCount = $unreadNotifications->count();
+        
         return view('dashboard', compact(
             'totalBalance',
             'monthlyIncome',
@@ -378,8 +394,103 @@ class DashboardController extends Controller
             'filterCategories',
             'reportFrom',
             'reportTo',
-            'reportType'
+            'reportType',
+            'userCurrency',
+            'currencySymbol',
+            'unreadNotifications',
+            'unreadCount',
         ));
+    }
+
+    private function checkAndCreateNotifications($user, $budgets, $monthlyExpense)
+    {
+        // Check budget notifications (if user has enabled budget notifications)
+        if ($user->notify_budget ?? true) {
+            foreach ($budgets as $budget) {
+                if (!$budget->category) {
+                    continue; // Skip if category is missing
+                }
+                
+                $usagePercent = $budget->amount > 0 ? ($budget->spent / $budget->amount) * 100 : 0;
+                
+                // Check if budget exceeds 80%
+                if ($usagePercent >= 80) {
+                    // Check if notification already exists for this budget this month
+                    $existingNotification = Notification::where('user_id', $user->id)
+                        ->where('type', 'budget')
+                        ->whereJsonContains('data->budget_id', $budget->id)
+                        ->whereMonth('created_at', Carbon::now()->month)
+                        ->whereYear('created_at', Carbon::now()->year)
+                        ->first();
+                    
+                    if (!$existingNotification) {
+                        Notification::create([
+                            'user_id' => $user->id,
+                            'type' => 'budget',
+                            'title' => 'Peringatan Budget',
+                            'message' => "Budget untuk kategori {$budget->category->name} telah mencapai " . number_format($usagePercent, 1) . "% dari total budget.",
+                            'data' => [
+                                'budget_id' => $budget->id,
+                                'category_name' => $budget->category->name,
+                                'usage_percent' => $usagePercent,
+                                'spent' => $budget->spent,
+                                'amount' => $budget->amount,
+                            ],
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function getNotifications(Request $request)
+    {
+        $user = auth()->user();
+        
+        $notifications = Notification::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get();
+        
+        $unreadCount = Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+        
+        return response()->json([
+            'success' => true,
+            'notifications' => $notifications,
+            'unread_count' => $unreadCount,
+        ]);
+    }
+
+    public function markAsRead(Request $request, $id)
+    {
+        $user = auth()->user();
+        
+        $notification = Notification::where('user_id', $user->id)
+            ->findOrFail($id);
+        
+        $notification->read_at = now();
+        $notification->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi ditandai sebagai sudah dibaca',
+        ]);
+    }
+
+    public function markAllAsRead(Request $request)
+    {
+        $user = auth()->user();
+        
+        Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Semua notifikasi ditandai sebagai sudah dibaca',
+        ]);
     }
 }
 
