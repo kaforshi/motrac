@@ -124,34 +124,34 @@
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Menu Utama</p>
             
             <button id="nav-dashboard" onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
-                <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+                <i class="fa-solid fa-house w-5 text-center"></i> {{ __('Dashboard') }}
             </button>
             
             <button id="nav-transactions" onclick="switchView('transactions', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> Transaksi
+                <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> {{ __('Transactions') }}
             </button>
             
             <button onclick="switchView('wallets', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-wallet w-5 text-center group-hover:text-primary"></i> Dompet
+                <i class="fa-solid fa-wallet w-5 text-center group-hover:text-primary"></i> {{ __('Wallets') }}
             </button>
 
             <!-- Menu Kategori Baru -->
             <button onclick="switchView('categories', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> Kategori
+                <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> {{ __('Categories') }}
             </button>
             
             <button id="nav-reports" onclick="switchView('reports', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> Laporan
+                <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> {{ __('Reports') }}
             </button>
 
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-6 mb-2">Planning</p>
             
             <button onclick="switchView('budget', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-bullseye w-5 text-center group-hover:text-primary"></i> Budget
+                <i class="fa-solid fa-bullseye w-5 text-center group-hover:text-primary"></i> {{ __('Budget') }}
             </button>
             
             <button onclick="switchView('debts', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-hand-holding-dollar w-5 text-center group-hover:text-primary"></i> Utang & Piutang
+                <i class="fa-solid fa-hand-holding-dollar w-5 text-center group-hover:text-primary"></i> {{ __('Debts & Receivables') }}
             </button>
         </div>
 
@@ -160,7 +160,7 @@
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <button type="submit" class="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 font-medium w-full px-2 py-2 rounded hover:bg-red-50 transition">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> {{ __('Logout') }}
                 </button>
             </form>
         </div>
@@ -174,14 +174,23 @@
             <div class="flex items-center gap-4">
                 <button class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
                 <div>
-                    <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">Dashboard Overview</h2>
-                    <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block">Halo {{ auth()->user()->name }}, kelola keuanganmu dengan bijak.</p>
+                    <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">{{ __('Dashboard Overview') }}</h2>
+                    <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block">{{ __('Hello') }} {{ auth()->user()->name }}, {{ __('manage your finances wisely') }}.</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
                 <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden sm:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary cursor-pointer">
-                <button class="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition" title="Privacy Mode" onclick="togglePrivacy(this)">
+                <!-- Language Toggle Switch -->
+                <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        ID
+                    </button>
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        EN
+                    </button>
+                </div>
+                <button class="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition" title="{{ __('Privacy Mode') }}" onclick="togglePrivacy(this)">
                     <i class="fa-regular fa-eye"></i>
                 </button>
                 <div class="relative">
@@ -194,9 +203,9 @@
                     <!-- Notification Dropdown -->
                     <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <h3 class="font-bold text-dark dark:text-white">Notifikasi</h3>
+                            <h3 class="font-bold text-dark dark:text-white">{{ __('Notifications') }}</h3>
                             @if(isset($unreadCount) && $unreadCount > 0)
-                                <button onclick="markAllNotificationsAsRead()" class="text-xs text-primary hover:underline">Tandai semua sudah dibaca</button>
+                                <button onclick="markAllNotificationsAsRead()" class="text-xs text-primary hover:underline">{{ __('Mark all as read') }}</button>
                             @endif
                         </div>
                         <div id="notificationList" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -227,7 +236,7 @@
                             @else
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
                                     <i class="fa-regular fa-bell text-3xl mb-2"></i>
-                                    <p class="text-sm">Tidak ada notifikasi</p>
+                                    <p class="text-sm">{{ __('No notifications') }}</p>
                                 </div>
                             @endif
                         </div>
@@ -248,7 +257,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600 relative overflow-hidden group">
                         <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition"><i class="fa-solid fa-wallet text-6xl text-blue-500"></i></div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Total Saldo</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">{{ __('Total Balance') }}</p>
                         <h3 class="text-2xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalBalance, 2, '.', ',') : number_format($totalBalance, 0, ',', '.') }}</h3>
                         <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
                             @if($monthlyIncome > 0)
@@ -256,15 +265,15 @@
                                     +{{ number_format((($monthlyIncome - $monthlyExpense) / max($monthlyIncome, 1)) * 100, 1) }}%
                                 </span>
                             @endif
-                            dari bulan lalu
+                            {{ __('from last month') }}
                         </div>
                     </div>
                     <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
-                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-arrow-down"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">Pemasukan</span></div>
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-arrow-down"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Income') }}</span></div>
                         <h3 class="text-2xl font-bold text-emerald-600 sensitive-data income-amount" id="income-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
                     </div>
                     <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
-                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400"><i class="fa-solid fa-arrow-up"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">Pengeluaran</span></div>
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400"><i class="fa-solid fa-arrow-up"></i></div><span class="text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Expense') }}</span></div>
                         <h3 class="text-2xl font-bold text-rose-600 sensitive-data expense-amount" id="expense-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
                     </div>
                 </div>
@@ -276,23 +285,23 @@
                             <h3 class="font-bold text-lg text-dark dark:text-white" id="chart-title">
                                 @if(isset($periodType))
                                     @if($periodType === 'daily')
-                                        Arus Kas Harian
+                                        {{ __('Daily Cash Flow') }}
                                     @elseif($periodType === 'monthly')
-                                        Arus Kas Bulanan
+                                        {{ __('Monthly Cash Flow') }}
                                     @elseif($periodType === 'yearly')
-                                        Arus Kas Tahunan
+                                        {{ __('Yearly Cash Flow') }}
                                     @else
-                                        Arus Kas Mingguan
+                                        {{ __('Weekly Cash Flow') }}
                                     @endif
                                 @else
-                                    Arus Kas Mingguan
+                                    {{ __('Weekly Cash Flow') }}
                                 @endif
                             </h3>
                             <select id="period-selector" onchange="changePeriod(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-                                <option value="daily" {{ (isset($periodType) && $periodType === 'daily') ? 'selected' : '' }}>Harian</option>
-                                <option value="weekly" {{ (!isset($periodType) || $periodType === 'weekly') ? 'selected' : '' }}>Mingguan</option>
-                                <option value="monthly" {{ (isset($periodType) && $periodType === 'monthly') ? 'selected' : '' }}>Bulanan</option>
-                                <option value="yearly" {{ (isset($periodType) && $periodType === 'yearly') ? 'selected' : '' }}>Tahunan</option>
+                                <option value="daily" {{ (isset($periodType) && $periodType === 'daily') ? 'selected' : '' }}>{{ __('Daily') }}</option>
+                                <option value="weekly" {{ (!isset($periodType) || $periodType === 'weekly') ? 'selected' : '' }}>{{ __('Weekly') }}</option>
+                                <option value="monthly" {{ (isset($periodType) && $periodType === 'monthly') ? 'selected' : '' }}>{{ __('Monthly') }}</option>
+                                <option value="yearly" {{ (isset($periodType) && $periodType === 'yearly') ? 'selected' : '' }}>{{ __('Yearly') }}</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-center py-6" id="cash-flow-chart" style="min-height: 280px; width: 100%;">
@@ -337,14 +346,14 @@
                                         <div class="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 min-w-[140px] cash-flow-income-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(6, 78, 59) !important; border: 1px solid rgb(5, 150, 105) !important;' : 'background-color: rgb(236, 253, 245); border: 1px solid rgb(209, 250, 229);' }}">
                                             <div class="w-5 h-5 rounded-full bg-emerald-500 shadow-sm"></div>
                                             <div class="flex-1">
-                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">Pemasukan</p>
+                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Income') }}</p>
                                                 <p class="font-bold text-sm sensitive-data cash-flow-income-amount" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncome, 2, '.', ',') : number_format($totalIncome, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 min-w-[140px] cash-flow-expense-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(127, 29, 29) !important; border: 1px solid rgb(225, 29, 72) !important;' : 'background-color: rgb(255, 241, 242); border: 1px solid rgb(254, 205, 211);' }}">
                                             <div class="w-5 h-5 rounded-full bg-rose-500 shadow-sm"></div>
                                             <div class="flex-1">
-                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">Pengeluaran</p>
+                                                <p class="text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Expense') }}</p>
                                                 <p class="font-bold text-sm sensitive-data cash-flow-expense-amount" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpense, 2, '.', ',') : number_format($totalExpense, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
@@ -368,7 +377,7 @@
                     </div>
                     <!-- Quick Budget -->
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h3 class="font-bold text-dark dark:text-white mb-4">Pantauan Budget</h3>
+                        <h3 class="font-bold text-dark dark:text-white mb-4">{{ __('Budget Monitoring') }}</h3>
                         <div class="space-y-6">
                             @forelse($budgets->take(2) as $budget)
                                 @php
@@ -388,11 +397,11 @@
                                     </div>
                                     <div class="flex justify-between items-center text-xs">
                                         <div class="flex flex-col">
-                                            <span class="text-gray-400 dark:text-gray-500 mb-0.5">Digunakan</span>
+                                            <span class="text-gray-400 dark:text-gray-500 mb-0.5">{{ __('Used') }}</span>
                                             <span class="font-semibold text-gray-700 dark:text-gray-300 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($spent, 2, '.', ',') : number_format($spent, 0, ',', '.') }}</span>
                                         </div>
                                         <div class="flex flex-col text-right">
-                                            <span class="text-gray-400 dark:text-gray-500 mb-0.5">Sisa</span>
+                                            <span class="text-gray-400 dark:text-gray-500 mb-0.5">{{ __('Remaining') }}</span>
                                             <span class="font-semibold {{ $remaining >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} sensitive-data">
                                                 {{ $remaining >= 0 ? '' : '-' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($remaining), 2, '.', ',') : number_format(abs($remaining), 0, ',', '.') }}
                                             </span>
@@ -400,7 +409,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-sm text-gray-400 dark:text-gray-500 text-center">Belum ada budget</p>
+                                <p class="text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('No budget yet') }}</p>
                             @endforelse
                         </div>
                     </div>
@@ -409,7 +418,7 @@
                 <!-- Transaksi Harian -->
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-dark dark:text-white">Transaksi Hari Ini</h3>
+                        <h3 class="font-bold text-dark dark:text-white">{{ __("Today's Transactions") }}</h3>
                         <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
                     </div>
                     @if($todayTransactions->count() > 0)
@@ -471,7 +480,7 @@
                             });
                         @endphp
                         <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Hari Ini</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Total Today') }}</span>
                             <span class="font-bold text-base {{ $todayTotal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} sensitive-data">
                                 {{ $todayTotal >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($todayTotal), 2, '.', ',') : number_format(abs($todayTotal), 0, ',', '.') }}
                             </span>
@@ -479,9 +488,9 @@
                     @else
                         <div class="text-center py-8">
                             <i class="fa-solid fa-receipt text-gray-300 text-3xl mb-3"></i>
-                            <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">Belum ada transaksi hari ini</p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">{{ __('No transactions today') }}</p>
                             <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline text-xs mt-2 inline-block">
-                                Tambah transaksi
+                                {{ __('Add transaction') }}
                             </button>
                         </div>
                     @endif
@@ -506,7 +515,7 @@
                             name="transaction_category_id"
                             class="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm"
                         >
-                            <option value="">Semua Kategori</option>
+                            <option value="">{{ __('All Categories') }}</option>
                             @foreach($filterCategories as $category)
                                 <option value="{{ $category->id }}" @selected(request('transaction_category_id') == $category->id)>
                                     {{ $category->name }}
@@ -543,7 +552,7 @@
                                         </div>
                                         <div>
                                             <p class="font-medium text-dark dark:text-white text-sm">{{ $transaction->description }}</p>
-                                            <p class="text-xs text-gray-400 dark:text-gray-500">Dompet: {{ $transaction->account->name ?? 'N/A' }}</p>
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ __('Wallet') }}: {{ $transaction->account->name ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                     <span class="font-bold {{ $transaction->type === 'income' ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400' }} text-sm sensitive-data">
@@ -556,7 +565,7 @@
                         <div class="p-8 text-center text-gray-400">
                             <p>Belum ada transaksi</p>
                             <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline mt-2 inline-block">
-                                Tambah transaksi pertama
+                                {{ __('Add first transaction') }}
                             </button>
                         </div>
                     @endforelse
@@ -569,7 +578,7 @@
                     <!-- Add Wallet Button -->
                     <button type="button" onclick="openAccountModal()" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:border-primary hover:text-primary transition h-48 bg-gray-50 dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-600">
                         <i class="fa-solid fa-plus text-3xl mb-2"></i>
-                        <span class="font-medium">Tambah Dompet Baru</span>
+                        <span class="font-medium">{{ __('Add New Wallet') }}</span>
                     </button>
 
                     @php
@@ -630,11 +639,11 @@
             <div id="view-categories" class="content-section hidden">
                 <div class="flex justify-between items-end mb-6">
                     <div>
-                        <h3 class="text-xl font-bold text-dark dark:text-white">Atur Kategori</h3>
+                        <h3 class="text-xl font-bold text-dark dark:text-white">{{ __('Manage Categories') }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Sesuaikan label pengeluaran dan pemasukan Anda.</p>
                     </div>
                     <button type="button" onclick="openCategoryModal()" class="bg-primary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Kategori Baru
+                        <i class="fa-solid fa-plus"></i> {{ __('New Category') }}
                     </button>
                 </div>
 
@@ -647,7 +656,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                         <div class="bg-rose-50 p-4 border-b border-rose-100 flex items-center justify-between">
                             <h4 class="font-bold text-rose-700 flex items-center gap-2"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</h4>
-                            <span class="text-xs bg-white dark:bg-gray-800 text-rose-500 dark:text-rose-400 px-2 py-1 rounded font-bold">{{ $expenseCategories->count() }} Kategori</span>
+                            <span class="text-xs bg-white dark:bg-gray-800 text-rose-500 dark:text-rose-400 px-2 py-1 rounded font-bold">{{ $expenseCategories->count() }} {{ __('categories') }}</span>
                         </div>
                         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                             @forelse($expenseCategories->take(6) as $category)
@@ -671,7 +680,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                         <div class="bg-emerald-50 p-4 border-b border-emerald-100 flex items-center justify-between">
                             <h4 class="font-bold text-emerald-700 flex items-center gap-2"><i class="fa-solid fa-arrow-down"></i> Pemasukan</h4>
-                            <span class="text-xs bg-white dark:bg-gray-800 text-emerald-500 dark:text-emerald-400 px-2 py-1 rounded font-bold">{{ $incomeCategories->count() }} Kategori</span>
+                            <span class="text-xs bg-white dark:bg-gray-800 text-emerald-500 dark:text-emerald-400 px-2 py-1 rounded font-bold">{{ $incomeCategories->count() }} {{ __('categories') }}</span>
                         </div>
                         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                             @forelse($incomeCategories->take(6) as $category)
@@ -696,7 +705,7 @@
                     <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 shadow-sm">
                         <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap gap-4 w-full lg:w-auto items-end">
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Dari Tanggal</label>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('From Date') }}</label>
                                 <input
                                     type="date"
                                     name="report_from"
@@ -705,7 +714,7 @@
                                 >
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sampai Tanggal</label>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('To Date') }}</label>
                                 <input
                                     type="date"
                                     name="report_to"
@@ -714,22 +723,22 @@
                                 >
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Tipe Transaksi</label>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Transaction Type') }}</label>
                                 <select
                                     name="report_type"
                                     class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                 >
                                     @php $rt = $reportType ?? request('report_type', 'all'); @endphp
-                                    <option value="all" {{ $rt === 'all' ? 'selected' : '' }}>Semua Tipe</option>
-                                    <option value="income" {{ $rt === 'income' ? 'selected' : '' }}>Pemasukan</option>
-                                    <option value="expense" {{ $rt === 'expense' ? 'selected' : '' }}>Pengeluaran</option>
-                                    <option value="transfer" {{ $rt === 'transfer' ? 'selected' : '' }}>Transfer</option>
+                                    <option value="all" {{ $rt === 'all' ? 'selected' : '' }}>{{ __('All') }}</option>
+                                    <option value="income" {{ $rt === 'income' ? 'selected' : '' }}>{{ __('Income') }}</option>
+                                    <option value="expense" {{ $rt === 'expense' ? 'selected' : '' }}>{{ __('Expense') }}</option>
+                                    <option value="transfer" {{ $rt === 'transfer' ? 'selected' : '' }}>{{ __('Transfer') }}</option>
                                 </select>
                             </div>
                             <div class="flex items-end gap-2">
                                 <button type="submit" class="bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
                                     <i class="fa-solid fa-filter"></i>
-                                    <span>Filter</span>
+                                    <span>{{ __('Filter') }}</span>
                                 </button>
                                 <a href="{{ route('dashboard', ['view' => 'reports']) }}" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                     Clear
@@ -757,17 +766,17 @@
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                             <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Income</p>
                             <h3 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
-                            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> Current Month</span>
+                            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> {{ __('Current Month') }}</span>
                         </div>
                         <!-- Total Expense -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Expense</p>
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">{{ __('Total Expense') }}</p>
                             <h3 class="text-xl font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
-                            <span class="text-[10px] text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-down"></i> Current Month</span>
+                            <span class="text-[10px] text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-down"></i> {{ __('Current Month') }}</span>
                         </div>
                         <!-- Total Transfer -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Transfer</p>
+                            <p class="text-xs text-gray-500 font-medium uppercase mb-1">{{ __('Total Transfer') }}</p>
                             <h3 class="text-xl font-bold text-blue-600 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalTransfer ?? 0, 2, '.', ',') : number_format($totalTransfer ?? 0, 0, ',', '.') }}</h3>
                             <span class="text-[10px] text-gray-400 mt-1 inline-block">Internal mutations</span>
                         </div>
@@ -783,7 +792,7 @@
                     <div class="grid lg:grid-cols-2 gap-6">
                         <!-- Income by Category -->
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-                            <h3 class="font-bold text-dark dark:text-white self-start mb-6 border-l-4 border-emerald-500 dark:border-emerald-400 pl-3">Income by Category</h3>
+                            <h3 class="font-bold text-dark dark:text-white self-start mb-6 border-l-4 border-emerald-500 dark:border-emerald-400 pl-3">{{ __('Income by Category') }}</h3>
                             @if($incomeByCategory->count() > 0)
                                 @php
                                     $totalIncomeCat = $incomeByCategory->sum('total');
@@ -821,7 +830,7 @@
 
                         <!-- Expense by Category -->
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-                            <h3 class="font-bold text-dark dark:text-white self-start mb-6 border-l-4 border-rose-500 dark:border-rose-400 pl-3">Expense by Category</h3>
+                            <h3 class="font-bold text-dark dark:text-white self-start mb-6 border-l-4 border-rose-500 dark:border-rose-400 pl-3">{{ __('Expense by Category') }}</h3>
                             @if($expenseByCategory->count() > 0)
                                 @php
                                     $totalExpenseCat = $expenseByCategory->sum('total');
@@ -861,17 +870,17 @@
                     <!-- Detailed Transactions Table -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                         <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                            <h3 class="font-bold text-dark dark:text-white">Detailed Transactions</h3>
+                            <h3 class="font-bold text-dark dark:text-white">{{ __('Detailed Transactions') }}</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400 uppercase">
-                                        <th class="px-6 py-3 font-medium">Tanggal</th>
-                                        <th class="px-6 py-3 font-medium">Deskripsi</th>
-                                        <th class="px-6 py-3 font-medium">Kategori</th>
-                                        <th class="px-6 py-3 font-medium">Tipe</th>
-                                        <th class="px-6 py-3 font-medium text-right">Nominal</th>
+                                        <th class="px-6 py-3 font-medium">{{ __('Date') }}</th>
+                                        <th class="px-6 py-3 font-medium">{{ __('Description') }}</th>
+                                        <th class="px-6 py-3 font-medium">{{ __('Category') }}</th>
+                                        <th class="px-6 py-3 font-medium">{{ __('Type') }}</th>
+                                        <th class="px-6 py-3 font-medium text-right">{{ __('Amount') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
@@ -893,7 +902,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">Belum ada transaksi</td>
+                                            <td colspan="5" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">{{ __('No transactions yet') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -901,18 +910,18 @@
                         </div>
                         <div class="p-4 border-t border-gray-100 dark:border-gray-700 space-y-3 bg-white dark:bg-gray-800">
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">Total Transaksi: <span class="font-bold text-dark dark:text-white">{{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }}</span></span>
-                                <span class="text-xs text-gray-400 dark:text-gray-500">Menampilkan {{ min(10, $allTransactions->count()) }} dari {{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }} transaksi</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Total Transactions') }}: <span class="font-bold text-dark dark:text-white">{{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }}</span></span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ __('Showing') }} {{ min(10, $allTransactions->count()) }} {{ __('of') }} {{ number_format($totalTransactionsCount ?? $allTransactions->count(), 0, ',', '.') }} {{ __('transactions') }}</span>
                             </div>
                             <div class="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
                                 <div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 uppercase block mb-1">Total Pemasukan</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 uppercase block mb-1">{{ __('Total Income') }}</span>
                                     <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">
                                         +{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalDetailedIncome ?? 0, 2, '.', ',') : number_format($totalDetailedIncome ?? 0, 0, ',', '.') }}
                                     </span>
                                 </div>
                                 <div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 uppercase block mb-1">Total Pengeluaran</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 uppercase block mb-1">{{ __('Total Expense') }}</span>
                                     <span class="text-lg font-bold text-rose-600 dark:text-rose-400 sensitive-data">
                                         -{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalDetailedExpense ?? 0, 2, '.', ',') : number_format($totalDetailedExpense ?? 0, 0, ',', '.') }}
                                     </span>
@@ -930,7 +939,7 @@
                         <h3 class="text-xl font-bold text-dark dark:text-white">Budget Planner</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Sisa budget total: <span class="text-emerald-600 dark:text-emerald-400 font-bold sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalRemainingBudget ?? 0, 2, '.', ',') : number_format($totalRemainingBudget ?? 0, 0, ',', '.') }}</span></p>
                     </div>
-                    <button type="button" onclick="openBudgetModal()" class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ Buat Baru</button>
+                    <button type="button" onclick="openBudgetModal()" class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ {{ __('Add New Budget') }}</button>
                 </div>
 
                 <div class="space-y-4">
@@ -1035,8 +1044,8 @@
                                                     @endphp
                                                     data-receivable="{{ htmlspecialchars(json_encode($receivablePaidData), ENT_QUOTES, 'UTF-8') }}"
                                                     class="text-[10px] text-emerald-600 hover:underline font-bold"
-                                                    title="Tandai sebagai Lunas">
-                                                    <i class="fa-solid fa-check-circle"></i> Telah Lunas
+                                                    title="{{ __('Mark as Paid') }}">
+                                                    <i class="fa-solid fa-check-circle"></i> {{ __('Mark as Paid') }}
                                                 </button>
                                             @else
                                                 <span class="text-[10px] text-emerald-600 font-bold">
@@ -1056,24 +1065,24 @@
                                                 @endphp
                                                 data-debt="{{ htmlspecialchars(json_encode($debtReminderData), ENT_QUOTES, 'UTF-8') }}"
                                                 class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
-                                                {{ $debt->due_date && $debt->due_date->isPast() ? 'Tagih!' : 'Ingatkan' }}
+                                                {{ $debt->due_date && $debt->due_date->isPast() ? __('Remind') . '!' : __('Remind') }}
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             @empty
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
-                                    <p>Belum ada piutang</p>
+                                    <p>{{ __('No data available') }}</p>
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ Tambah Piutang</button>
+                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ {{ __('Add Receivable') }}</button>
                     </div>
 
                     <!-- Column: Utang (Saya berutang ke orang) -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="bg-rose-50 dark:bg-rose-900/20 p-4 border-b border-rose-100 dark:border-rose-800 flex justify-between items-center">
-                            <h3 class="font-bold text-rose-800 dark:text-rose-400">Utang Saya</h3>
+                            <h3 class="font-bold text-rose-800 dark:text-rose-400">{{ __('My Debts') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 text-xs px-2 py-1 rounded font-bold sensitive-data">
                                 Total: {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($payables->sum('current_amount'), 2, '.', ',') : number_format($payables->sum('current_amount'), 0, ',', '.') }}
                             </span>
@@ -1103,7 +1112,7 @@
                                                 ];
                                             @endphp
                                             data-debt="{{ htmlspecialchars(json_encode($debtData), ENT_QUOTES, 'UTF-8') }}"
-                                            class="text-[10px] text-gray-500 dark:text-gray-400 hover:underline">Bayar Cicilan</button>
+                                            class="text-[10px] text-gray-500 dark:text-gray-400 hover:underline">{{ __('Pay Installment') }}</button>
                                     </div>
                                 </div>
                             @empty
@@ -1112,7 +1121,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ Catat Utang Baru</button>
+                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ {{ __('Add Payable') }}</button>
                     </div>
                 </div>
 
@@ -1121,7 +1130,7 @@
                     <!-- History: Piutang yang sudah dibayar -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 border-b border-gray-100 dark:border-gray-600 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-700 dark:text-white">History Piutang (Sudah Lunas)</h3>
+                            <h3 class="font-bold text-gray-700 dark:text-white">{{ __('Paid Receivables') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded font-bold">
                                 {{ $paidReceivables->count() }} item
                             </span>
@@ -1159,7 +1168,7 @@
                     <!-- History: Utang yang sudah dibayar -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 border-b border-gray-100 dark:border-gray-600 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-700 dark:text-white">History Utang (Sudah Lunas)</h3>
+                            <h3 class="font-bold text-gray-700 dark:text-white">{{ __('Paid Debts') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded font-bold">
                                 {{ $paidPayables->count() }} item
                             </span>
@@ -1215,6 +1224,25 @@
 
     <!-- JavaScript Interactions -->
     <script>
+        // Translation strings for JavaScript
+        const translations = {
+            addReceivable: @json(__('Add Receivable')),
+            addPayable: @json(__('Add Payable')),
+            payInstallment: @json(__('Pay Installment')),
+            paymentHistory: @json(__('History')),
+            relatedTransaction: @json(__('Related Transaction'))
+        };
+        
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '{{ url("/language") }}/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
+            }
+        }
+
         // Function to change month and year
         function changeMonthYear(monthYear) {
             if (!monthYear) return;
@@ -1590,11 +1618,11 @@
                                 </div>
                             `;
                             }).join('');
-                        } else {
+                            } else {
                             notificationList.innerHTML = `
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
                                     <i class="fa-regular fa-bell text-3xl mb-2"></i>
-                                    <p class="text-sm">Tidak ada notifikasi</p>
+                                    <p class="text-sm">{{ __('No notifications') }}</p>
                                 </div>
                             `;
                         }
@@ -2621,9 +2649,9 @@
             // Set type and title based on type
             typeInput.value = type;
             if (type === 'receivable') {
-                modalTitle.textContent = 'Tambah Piutang';
+                modalTitle.textContent = translations.addReceivable;
             } else {
-                modalTitle.textContent = 'Catat Utang Baru';
+                modalTitle.textContent = translations.addPayable;
             }
         }
 
@@ -2671,7 +2699,7 @@
             }
             
             // Set modal title
-            modalTitle.textContent = 'Bayar Cicilan';
+            modalTitle.textContent = translations.payInstallment;
             
             // Use setTimeout to ensure form.reset() has completed
             setTimeout(() => {
@@ -3717,7 +3745,7 @@
     <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h3 id="paymentModalTitle" class="text-xl font-bold text-dark dark:text-white">Bayar Cicilan</h3>
+                <h3 id="paymentModalTitle" class="text-xl font-bold text-dark dark:text-white">{{ __('Pay Installment') }}</h3>
                 <button onclick="closePaymentModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>

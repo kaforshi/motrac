@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ auth()->user() && auth()->user()->dark_mode ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pengaturan Akun - Motrac</title>
+    <title>{{ __('Account Settings') }} - Motrac</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,21 +62,21 @@
         <!-- Menu -->
         <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group">
-                <i class="fa-solid fa-arrow-left w-5 text-center group-hover:text-primary"></i> Kembali ke Dashboard
+                <i class="fa-solid fa-arrow-left w-5 text-center group-hover:text-primary"></i> {{ __('Back to Dashboard') }}
             </a>
             
             <div class="my-4 border-t border-gray-100 dark:border-gray-700"></div>
 
-            <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Pengaturan</p>
+            <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ __('Settings') }}</p>
             
             <button onclick="switchSettings('profile', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left">
-                <i class="fa-regular fa-user w-5 text-center"></i> Profil Saya
+                <i class="fa-regular fa-user w-5 text-center"></i> {{ __('My Profile') }}
             </button>
             <button onclick="switchSettings('security', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-solid fa-shield-halved w-5 text-center group-hover:text-primary"></i> Keamanan
+                <i class="fa-solid fa-shield-halved w-5 text-center group-hover:text-primary"></i> {{ __('Security') }}
             </button>
             <button onclick="switchSettings('notifications', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
-                <i class="fa-regular fa-bell w-5 text-center group-hover:text-primary"></i> Notifikasi
+                <i class="fa-regular fa-bell w-5 text-center group-hover:text-primary"></i> {{ __('Notifications') }}
             </button>
         </div>
     </aside>
@@ -88,11 +88,20 @@
         <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-4 sm:px-8 flex items-center justify-between z-20">
             <div class="flex items-center gap-4">
                 <button class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
-                <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">Profil Saya</h2>
+                <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">{{ __('My Profile') }}</h2>
             </div>
             
             <!-- User Menu -->
             <div class="flex items-center gap-3">
+                <!-- Language Toggle Switch -->
+                <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        ID
+                    </button>
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                        EN
+                    </button>
+                </div>
                 <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=10B981&color=fff" class="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-600">
             </div>
         </header>
@@ -123,11 +132,11 @@
                         <div class="grid grid-cols-2 w-full gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
                             <div>
                                 <p class="text-2xl font-bold text-dark dark:text-white">{{ $transactionCount }}</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 uppercase font-medium">Transaksi</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 uppercase font-medium">{{ __('Transactions') }}</p>
                             </div>
                             <div>
                                 <p class="text-2xl font-bold text-dark dark:text-white">{{ $accountCount }}</p>
-                                <p class="text-xs text-gray-400 uppercase font-medium">Dompet</p>
+                                <p class="text-xs text-gray-400 uppercase font-medium">{{ __('Wallets') }}</p>
                             </div>
                         </div>
                     </div>
@@ -141,7 +150,7 @@
                         <!-- Personal Info -->
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm mb-6">
                             <div class="flex justify-between items-center mb-6">
-                                <h3 class="font-bold text-lg text-dark dark:text-white">Informasi Pribadi</h3>
+                                <h3 class="font-bold text-lg text-dark dark:text-white">{{ __('Personal Information') }}</h3>
                             </div>
                             
                             <form id="profileForm" class="space-y-4">
@@ -153,18 +162,18 @@
                                 @endphp
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Nama Depan</label>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('First Name') }}</label>
                                         <input type="text" name="first_name" id="first_name" value="{{ $firstName }}" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
                                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_first_name"></span>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Nama Belakang</label>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Last Name') }}</label>
                                         <input type="text" name="last_name" id="last_name" value="{{ $lastName }}" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
                                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_last_name"></span>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Email') }}</label>
                                     <div class="relative">
                                         <i class="fa-regular fa-envelope absolute left-3 top-2.5 text-gray-400 text-xs"></i>
                                         <input type="email" name="email" id="email" value="{{ $user->email }}" required class="pl-9 w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
@@ -172,23 +181,23 @@
                                     <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_email"></span>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Bio Singkat</label>
-                                    <textarea name="bio" id="bio" rows="3" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary" placeholder="Tulis bio singkat tentang Anda...">{{ $user->bio ?? '' }}</textarea>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Short Bio') }}</label>
+                                    <textarea name="bio" id="bio" rows="3" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary" placeholder="{{ __('Write a short bio about yourself...') }}">{{ $user->bio ?? '' }}</textarea>
                                     <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_bio"></span>
                                 </div>
                                 <div class="flex justify-end pt-2">
-                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">Simpan Perubahan</button>
+                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save Changes') }}</button>
                                 </div>
                             </form>
                         </div>
                         
                         <!-- Preferences -->
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm mb-6">
-                            <h3 class="font-bold text-lg text-dark dark:text-white mb-6">Preferensi Aplikasi</h3>
+                            <h3 class="font-bold text-lg text-dark dark:text-white mb-6">{{ __('Application Preferences') }}</h3>
                             <form id="preferencesForm" class="space-y-5">
                                 @csrf
                                 <div class="flex items-center justify-between">
-                                    <div><p class="font-medium text-sm text-dark dark:text-white">Mata Uang Utama</p><p class="text-xs text-gray-400 dark:text-gray-500">Mata uang default laporan.</p></div>
+                                    <div><p class="font-medium text-sm text-dark dark:text-white">{{ __('Primary Currency') }}</p><p class="text-xs text-gray-400 dark:text-gray-500">{{ __('Default currency for reports.') }}</p></div>
                                     <select name="currency" id="currency" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none">
                                         <option value="IDR" {{ ($user->currency ?? 'IDR') === 'IDR' ? 'selected' : '' }}>IDR (Rupiah)</option>
                                         <option value="USD" {{ ($user->currency ?? 'IDR') === 'USD' ? 'selected' : '' }}>USD (Dollar)</option>
@@ -196,7 +205,7 @@
                                 </div>
                                 <hr class="border-gray-100 dark:border-gray-700">
                                 <div class="flex items-center justify-between">
-                                    <div><p class="font-medium text-sm text-dark dark:text-white">Mode Gelap</p><p class="text-xs text-gray-400 dark:text-gray-500">Ganti tampilan tema.</p></div>
+                                    <div><p class="font-medium text-sm text-dark dark:text-white">{{ __('Dark Mode') }}</p><p class="text-xs text-gray-400 dark:text-gray-500">{{ __('Change theme appearance.') }}</p></div>
                                     <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                         <input type="checkbox" name="dark_mode" id="toggle-dark" {{ ($user->dark_mode ?? false) ? 'checked' : '' }} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300" onchange="updatePreferences()"/>
                                         <label for="toggle-dark" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
@@ -207,9 +216,9 @@
 
                         <!-- Danger Zone -->
                         <div class="bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-800 p-6">
-                            <h3 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">Hapus Akun</h3>
-                            <p class="text-sm text-red-600 mb-6">Tindakan ini permanen. Semua data akan hilang.</p>
-                            <button onclick="openDeleteAccountModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Hapus Akun Saya</button>
+                            <h3 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">{{ __('Delete Account') }}</h3>
+                            <p class="text-sm text-red-600 mb-6">{{ __('This action is permanent. All data will be lost.') }}</p>
+                            <button onclick="openDeleteAccountModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Delete My Account') }}</button>
                         </div>
                     </div>
 
@@ -217,28 +226,28 @@
                     <div id="view-security" class="content-section hidden">
                         <!-- Change Password -->
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm mb-6">
-                            <h3 class="font-bold text-lg text-dark dark:text-white mb-6">Ganti Password</h3>
+                            <h3 class="font-bold text-lg text-dark dark:text-white mb-6">{{ __('Change Password') }}</h3>
                             <form id="passwordForm" class="space-y-4">
                                 @csrf
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Password Saat Ini</label>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Current Password') }}</label>
                                     <input type="password" name="current_password" id="current_password" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
                                     <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_current_password"></span>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Password Baru</label>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('New Password') }}</label>
                                         <input type="password" name="password" id="password" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
                                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_password"></span>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Konfirmasi Password Baru</label>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Confirm New Password') }}</label>
                                         <input type="password" name="password_confirmation" id="password_confirmation" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-primary">
                                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_password_confirmation"></span>
                                     </div>
                                 </div>
                                 <div class="flex justify-end pt-2">
-                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">Update Password</button>
+                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Update Password') }}</button>
                                 </div>
                             </form>
                         </div>
@@ -247,8 +256,8 @@
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm mb-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h3 class="font-bold text-lg text-dark dark:text-white">Autentikasi Dua Faktor (2FA)</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan lapisan keamanan ekstra dengan kode OTP.</p>
+                                    <h3 class="font-bold text-lg text-dark dark:text-white">{{ __('Two-Factor Authentication (2FA)') }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('Add an extra layer of security with OTP code.') }}</p>
                                 </div>
                                 <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                     <input type="checkbox" name="toggle" id="toggle-2fa" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300"/>
@@ -259,7 +268,7 @@
 
                         <!-- Login Activity -->
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                            <h3 class="font-bold text-lg text-dark dark:text-white mb-4">Riwayat Login</h3>
+                            <h3 class="font-bold text-lg text-dark dark:text-white mb-4">{{ __('Login History') }}</h3>
                             <div class="space-y-4">
                                 <!-- Item 1 -->
                                 <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -268,11 +277,11 @@
                                             <i class="fa-solid fa-laptop"></i>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-bold text-dark dark:text-white">Perangkat Ini</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Aktif Sekarang</p>
+                                            <p class="text-sm font-bold text-dark dark:text-white">{{ __('This Device') }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Active Now') }}</p>
                                         </div>
                                     </div>
-                                    <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-bold">Online</span>
+                                    <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-bold">{{ __('Online') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -282,18 +291,18 @@
                     <div id="view-notifications" class="content-section hidden">
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4 mb-4">
-                                <h3 class="font-bold text-lg text-dark dark:text-white">Pengaturan Notifikasi</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Pilih bagaimana kami menghubungi Anda.</p>
+                                <h3 class="font-bold text-lg text-dark dark:text-white">{{ __('Notification Settings') }}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Choose how we contact you.') }}</p>
                             </div>
 
                             <!-- Section: Account Activity -->
                             <div class="mb-6">
-                                <h4 class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Aktivitas Akun</h4>
+                                <h4 class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">{{ __('Account Activity') }}</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <p class="text-sm font-medium text-dark dark:text-white">Peringatan Keamanan</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Notifikasi login baru atau perubahan password.</p>
+                                            <p class="text-sm font-medium text-dark dark:text-white">{{ __('Security Alert') }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('New login or password change notifications.') }}</p>
                                         </div>
                                         <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                             <input type="checkbox" id="notify_security" name="notify_security" value="1" {{ ($user->notify_security ?? true) ? 'checked' : '' }} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-800 border-4 appearance-none cursor-pointer border-gray-300 dark:border-gray-600"/>
@@ -302,8 +311,8 @@
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <p class="text-sm font-medium text-dark dark:text-white">Peringatan Budget</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jika pengeluaran melebihi 80% dari budget.</p>
+                                            <p class="text-sm font-medium text-dark dark:text-white">{{ __('Budget Alert') }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('If expenses exceed 80% of budget.') }}</p>
                                         </div>
                                         <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                             <input type="checkbox" id="notify_budget" name="notify_budget" value="1" {{ ($user->notify_budget ?? true) ? 'checked' : '' }} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-800 border-4 appearance-none cursor-pointer border-gray-300 dark:border-gray-600"/>
@@ -315,12 +324,12 @@
 
                             <!-- Section: Marketing -->
                             <div>
-                                <h4 class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Berita & Update</h4>
+                                <h4 class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">{{ __('News & Updates') }}</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <p class="text-sm font-medium text-dark dark:text-white">Laporan Mingguan</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Ringkasan pengeluaran dikirim ke email.</p>
+                                            <p class="text-sm font-medium text-dark dark:text-white">{{ __('Weekly Report') }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Expense summary sent to email.') }}</p>
                                         </div>
                                         <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                             <input type="checkbox" id="notify_weekly_report" name="notify_weekly_report" value="1" {{ ($user->notify_weekly_report ?? false) ? 'checked' : '' }} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-800 border-4 appearance-none cursor-pointer border-gray-300 dark:border-gray-600"/>
@@ -331,7 +340,7 @@
                             </div>
 
                             <div class="flex justify-end pt-6 mt-6 border-t border-gray-100 dark:border-gray-700">
-                                <button type="button" onclick="updateNotificationPreferences()" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium transition">Simpan</button>
+                                <button type="button" onclick="updateNotificationPreferences()" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save') }}</button>
                             </div>
                         </div>
                     </div>
@@ -351,28 +360,28 @@
     <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md">
             <div class="p-6">
-                <h3 class="text-xl font-bold text-red-700 mb-2">Hapus Akun</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Tindakan ini tidak dapat dibatalkan. Semua data Anda akan dihapus secara permanen.</p>
+                <h3 class="text-xl font-bold text-red-700 mb-2">{{ __('Delete Account') }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">{{ __('This action cannot be undone. All your data will be permanently deleted.') }}</p>
                 
                 <form id="deleteAccountForm" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Masukkan password untuk konfirmasi</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Enter password to confirm') }}</label>
                         <input type="password" name="password" id="delete_password" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-red-500">
                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_delete_password"></span>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Ketik "HAPUS" untuk konfirmasi</label>
-                        <input type="text" name="confirm_text" id="confirm_text" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-red-500" placeholder="HAPUS">
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Type "DELETE" to confirm') }}</label>
+                        <input type="text" name="confirm_text" id="confirm_text" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg text-sm focus:outline-none focus:border-red-500" placeholder="{{ __('DELETE') }}">
                         <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_confirm_text"></span>
                     </div>
                     
                     <div class="flex gap-3 pt-4">
                         <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
-                            Hapus Akun
+                            {{ __('Delete Account') }}
                         </button>
                         <button type="button" onclick="closeDeleteAccountModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                            Batal
+                            {{ __('Cancel') }}
                         </button>
                     </div>
                 </form>
@@ -382,6 +391,16 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '/language/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
+            }
+        }
+
         // Switch Settings View
         function switchSettings(viewId, btnElement) {
             // 1. Hide all content sections

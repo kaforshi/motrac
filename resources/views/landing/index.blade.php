@@ -48,15 +48,24 @@
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-500">
-                    <a href="#features" class="hover:text-primary transition">Fitur</a>
-                    <a href="#faq" class="hover:text-primary transition">FAQ</a>
+                    <a href="#features" class="hover:text-primary transition">{{ __('Features') }}</a>
+                    <a href="#faq" class="hover:text-primary transition">{{ __('FAQ') }}</a>
                 </div>
 
-                <!-- Auth Buttons -->
+                <!-- Language Toggle & Auth Buttons -->
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-primary transition">Masuk</a>
+                    <!-- Language Toggle Switch -->
+                    <div class="flex items-center bg-white border border-gray-200 rounded-full p-1">
+                        <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark text-white' : 'text-gray-500' }}">
+                            ID
+                        </button>
+                        <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark text-white' : 'text-gray-500' }}">
+                            EN
+                        </button>
+                    </div>
+                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-primary transition">{{ __('Login') }}</a>
                     <a href="{{ route('register') }}" class="bg-primary hover:bg-emerald-600 text-white text-sm font-medium px-5 py-2.5 rounded-full transition shadow-lg shadow-emerald-200">
-                        Daftar Gratis
+                        {{ __('Register Free') }}
                     </a>
                 </div>
             </div>
@@ -69,21 +78,21 @@
             <!-- Text Content -->
             <div class="space-y-6">
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-dark leading-tight">
-                    Atur Keuangan <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Tanpa Pusing.</span>
+                    {{ __('Manage Your Finances') }} <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">{{ __('Without Hassle') }}.</span>
                 </h1>
                 <p class="text-lg text-gray-500 max-w-lg mx-auto lg:mx-0">
-                    Lupakan catatan manual yang membosankan. Monitor arus kas, dompet digital, dan investasi Anda dalam satu dashboard pintar.
+                    {{ __('Forget boring manual records. Monitor your cash flow, digital wallets, and investments in one smart dashboard.') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                     <a href="{{ route('register') }}" class="inline-block bg-dark hover:bg-gray-800 text-white px-8 py-3.5 rounded-xl font-medium shadow-xl transition transform hover:-translate-y-1">
-                        Mulai Tracking Sekarang
+                        {{ __('Start Tracking Now') }}
                     </a>
                     <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
-                        Masuk Sekarang
+                        {{ __('Login Now') }}
                     </a>
                 </div>
-                <p class="text-sm text-gray-400">Gratis selamanya untuk fitur dasar. Tanpa kartu kredit.</p>
+                <p class="text-sm text-gray-400">{{ __('Free forever for basic features. No credit card required.') }}</p>
             </div>
 
             <!-- Visual Content (Mockup) -->
@@ -123,8 +132,8 @@
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold text-dark mb-4">Semua yang Anda butuhkan</h2>
-                <p class="text-gray-500">Kami membuat fitur canggih menjadi sederhana, agar Anda bisa fokus pada tujuan finansial Anda.</p>
+                <h2 class="text-3xl font-bold text-dark mb-4">{{ __('Everything You Need') }}</h2>
+                <p class="text-gray-500">{{ __('We make advanced features simple, so you can focus on your financial goals.') }}</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-8">
@@ -133,8 +142,8 @@
                     <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 mb-6 text-xl">
                         <i class="fa-solid fa-layer-group"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-dark mb-3">Multi-Wallet Sync</h3>
-                    <p class="text-gray-500 leading-relaxed">Kelola Tunai, BCA, Gopay, dan OVO dalam satu layar. Tidak perlu buka banyak aplikasi.</p>
+                    <h3 class="text-xl font-bold text-dark mb-3">{{ __('Multi-Wallet Sync') }}</h3>
+                    <p class="text-gray-500 leading-relaxed">{{ __('Manage Cash, BCA, Gopay, and OVO in one screen. No need to open multiple apps.') }}</p>
                 </div>
 
                 <!-- Feature 2 -->
@@ -142,8 +151,8 @@
                     <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-primary mb-6 text-xl">
                         <i class="fa-solid fa-chart-pie"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-dark mb-3">Smart Budgeting</h3>
-                    <p class="text-gray-500 leading-relaxed">Pasang alarm batas belanja per kategori. Kami akan ingatkan sebelum dompet Anda jebol.</p>
+                    <h3 class="text-xl font-bold text-dark mb-3">{{ __('Smart Budgeting') }}</h3>
+                    <p class="text-gray-500 leading-relaxed">{{ __("Set spending limit alerts per category. We'll remind you before your wallet breaks.") }}</p>
                 </div>
 
                 <!-- Feature 3 -->
@@ -151,8 +160,8 @@
                     <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 mb-6 text-xl">
                         <i class="fa-solid fa-file-invoice"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-dark mb-3">Visual Reports</h3>
-                    <p class="text-gray-500 leading-relaxed">Pahami ke mana uang Anda pergi lewat grafik intuitif dan ekspor data ke Excel/PDF.</p>
+                    <h3 class="text-xl font-bold text-dark mb-3">{{ __('Visual Reports') }}</h3>
+                    <p class="text-gray-500 leading-relaxed">{{ __('Understand where your money goes through intuitive charts and export data to Excel/PDF.') }}</p>
                 </div>
             </div>
         </div>
@@ -162,74 +171,74 @@
     <section id="faq" class="py-20 bg-white">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-dark mb-4">Pertanyaan yang Sering Diajukan</h2>
-                <p class="text-gray-500">Temukan jawaban untuk pertanyaan umum tentang Motrac</p>
+                <h2 class="text-3xl font-bold text-dark mb-4">{{ __('Frequently Asked Questions') }}</h2>
+                <p class="text-gray-500">{{ __('Find answers to common questions about Motrac') }}</p>
             </div>
             
             <div class="space-y-4">
                 <!-- FAQ Item 1 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Apakah Motrac benar-benar gratis?</span>
+                        <span class="font-semibold text-dark">{{ __('Is Motrac really free?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Ya, Motrac menawarkan fitur dasar secara gratis selamanya. Anda dapat mencatat transaksi, mengelola dompet, membuat kategori, dan melihat laporan dasar tanpa biaya apapun. Tidak diperlukan kartu kredit untuk memulai.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('Yes, Motrac offers basic features for free forever. You can record transactions, manage wallets, create categories, and view basic reports at no cost. No credit card required to get started.') }}</p>
                     </div>
                 </div>
 
                 <!-- FAQ Item 2 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Bagaimana cara mengimpor data dari aplikasi lain?</span>
+                        <span class="font-semibold text-dark">{{ __('How do I import data from other applications?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Saat ini, Anda dapat mengimpor data secara manual melalui fitur Export/Import CSV. Kami sedang mengembangkan integrasi langsung dengan aplikasi keuangan populer. Untuk bantuan lebih lanjut, silakan hubungi tim support kami.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('Currently, you can import data manually through the Export/Import CSV feature. We are developing direct integration with popular financial applications. For further assistance, please contact our support team.') }}</p>
                     </div>
                 </div>
 
                 <!-- FAQ Item 3 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Apakah data saya aman dan terenkripsi?</span>
+                        <span class="font-semibold text-dark">{{ __('Is my data safe and encrypted?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Keamanan data adalah prioritas utama kami. Semua data Anda dienkripsi menggunakan teknologi SSL/TLS dan disimpan dengan aman. Kami tidak pernah membagikan informasi pribadi Anda kepada pihak ketiga tanpa izin.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('Data security is our top priority. All your data is encrypted using SSL/TLS technology and stored securely. We never share your personal information with third parties without permission.') }}</p>
                     </div>
                 </div>
 
                 <!-- FAQ Item 4 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Bisakah saya menggunakan Motrac di beberapa perangkat?</span>
+                        <span class="font-semibold text-dark">{{ __('Can I use Motrac on multiple devices?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Tentu saja! Motrac adalah aplikasi berbasis web yang responsif, sehingga dapat diakses dari desktop, tablet, atau smartphone. Data Anda akan tersinkronisasi secara real-time di semua perangkat yang Anda gunakan untuk login.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('Of course! Motrac is a responsive web-based application, so it can be accessed from desktop, tablet, or smartphone. Your data will be synchronized in real-time across all devices you use to log in.') }}</p>
                     </div>
                 </div>
 
                 <!-- FAQ Item 5 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Apakah ada batasan jumlah transaksi yang bisa dicatat?</span>
+                        <span class="font-semibold text-dark">{{ __('Is there a limit on the number of transactions I can record?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Tidak ada batasan jumlah transaksi untuk akun gratis. Anda dapat mencatat sebanyak mungkin transaksi yang Anda butuhkan. Semua fitur pencatatan, pelaporan, dan analisis tersedia tanpa batas.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('There is no limit on the number of transactions for free accounts. You can record as many transactions as you need. All recording, reporting, and analysis features are available without limits.') }}</p>
                     </div>
                 </div>
 
                 <!-- FAQ Item 6 -->
                 <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full px-6 py-5 flex justify-between items-center text-left hover:bg-gray-100 transition" onclick="toggleFaq(this)">
-                        <span class="font-semibold text-dark">Bagaimana cara menghapus akun saya?</span>
+                        <span class="font-semibold text-dark">{{ __('How do I delete my account?') }}</span>
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden px-6 pb-5">
-                        <p class="text-gray-600 leading-relaxed">Anda dapat menghapus akun kapan saja melalui halaman Pengaturan. Setelah menghapus akun, semua data Anda akan dihapus secara permanen dan tidak dapat dipulihkan. Pastikan untuk mengekspor data penting terlebih dahulu jika diperlukan.</p>
+                        <p class="text-gray-600 leading-relaxed">{{ __('You can delete your account at any time through the Settings page. After deleting your account, all your data will be permanently deleted and cannot be recovered. Make sure to export important data first if needed.') }}</p>
                     </div>
                 </div>
             </div>
@@ -284,6 +293,16 @@
                 }
             });
         });
+
+        // Function to switch language
+        function switchLanguage(locale) {
+            if (locale === 'id' || locale === 'en') {
+                // Preserve current URL parameters
+                const currentUrl = new URL(window.location.href);
+                const newUrl = '/language/' + locale + '?redirect=' + encodeURIComponent(currentUrl.pathname + currentUrl.search);
+                window.location.href = newUrl;
+            }
+        }
     </script>
 
 </body>

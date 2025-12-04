@@ -16,6 +16,36 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+Route::get('/language/{locale}', function ($locale, \Illuminate\Http\Request $request) {
+    if (in_array($locale, ['id', 'en'])) {
+        // Set locale in session using Session facade to ensure it's saved
+        \Illuminate\Support\Facades\Session::put('locale', $locale);
+        \Illuminate\Support\Facades\Session::save();
+        
+        // Set locale for current request
+        app()->setLocale($locale);
+        config(['app.locale' => $locale]);
+        
+        // Check if redirect parameter exists
+        $redirect = $request->get('redirect');
+        if ($redirect) {
+            return redirect($redirect);
+        }
+        
+        // Redirect back to previous page or dashboard/landing
+        $previousUrl = url()->previous();
+        if ($previousUrl && $previousUrl !== url()->current() && !str_contains($previousUrl, '/language/')) {
+            return redirect($previousUrl);
+        }
+        
+        // If no previous URL or same page, redirect to dashboard if authenticated, else landing
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+        return redirect()->route('landing');
+    }
+    return back();
+})->name('language.switch');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
