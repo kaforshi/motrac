@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>@yield('title', 'Motrac') - Money Tracker</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -14,7 +15,10 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ route('dashboard') }}" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Motrac</a>
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                            <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
+                            <span class="text-xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400" style="font-family: 'Inter', sans-serif; font-weight: 800;">Motrac</span>
+                        </a>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                         <a href="{{ route('dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 {{ request()->routeIs('dashboard') ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : '' }}">

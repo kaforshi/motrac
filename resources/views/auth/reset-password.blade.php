@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>{{ __('Reset Password') }} - Motrac</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -34,10 +35,8 @@
             <!-- Logo and Language Switch -->
             <div class="flex items-center justify-between w-full z-20 relative">
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight">Motrac</span>
+                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
+                    <span class="text-xl font-extrabold tracking-tight text-white" style="font-family: 'Inter', sans-serif; font-weight: 800;">Motrac</span>
                 </div>
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white/20 backdrop-blur border border-white/30 rounded-full p-1 relative z-20">
@@ -69,10 +68,9 @@
             <div class="w-full max-w-md space-y-8">
                 
                 <!-- Mobile Logo (Only visible on mobile) -->
-                <div class="lg:hidden flex justify-center mb-6">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
+                <div class="lg:hidden flex items-center justify-center gap-2 mb-6">
+                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-10 w-auto">
+                    <span class="text-2xl font-extrabold tracking-tight text-dark dark:text-white" style="font-family: 'Inter', sans-serif; font-weight: 800;">Motrac</span>
                 </div>
 
                 <div class="text-center lg:text-left">

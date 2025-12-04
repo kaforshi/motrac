@@ -7,10 +7,9 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <div style="background: white; width: 60px; height: 60px; border-radius: 10px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-            <span style="font-size: 30px; color: #10B981;">💰</span>
+        <div style="margin: 0 auto; display: flex; align-items: center; justify-center;">
+            <img src="{{ url(asset('logo.png')) }}" alt="Motrac" style="height: 60px; width: auto; max-width: 200px;">
         </div>
-        <h1 style="color: white; margin: 20px 0 0 0; font-size: 24px;">Motrac</h1>
     </div>
     
     <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb; border-top: none;">
@@ -53,4 +52,3 @@
     </div>
 </body>
 </html>
-

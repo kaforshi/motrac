@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>{{ __('Verify Your Email') }} - Motrac</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         primary: '#10B981',
                         dark: '#1F2937'
@@ -28,8 +31,9 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
             <!-- Logo and Language Switch -->
             <div class="flex items-center justify-between mb-6">
-                <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center text-white text-2xl">
-                    <i class="fa-solid fa-wallet"></i>
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-16 w-auto">
+                    <span class="text-2xl font-extrabold tracking-tight text-dark dark:text-white" style="font-family: 'Inter', sans-serif; font-weight: 800;">Motrac</span>
                 </div>
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full p-1">

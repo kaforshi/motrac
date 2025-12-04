@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>Motrac - Smart Money Tracker</title>
     
     <!-- Tailwind CSS -->
@@ -13,7 +14,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -40,10 +41,8 @@
             <div class="flex justify-between h-16 items-center">
                 <!-- Logo -->
                 <a href="{{ route('landing') }}" class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <span class="text-xl font-bold text-dark tracking-tight">Motrac</span>
+                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
+                    <span class="text-xl font-extrabold tracking-tight text-dark" style="font-family: 'Inter', sans-serif; font-weight: 800;">Motrac</span>
                 </a>
 
                 <!-- Desktop Menu -->
