@@ -59,12 +59,42 @@ fi
 
 cd $APP_DIR
 
-echo -e "${YELLOW}Step 2: Installing/Updating dependencies...${NC}"
-sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction
-echo -e "${GREEN}✓ Dependencies installed${NC}"
+echo -e "${YELLOW}Step 2: Fixing Git ownership...${NC}"
+# Fix git ownership issue
+if [ -d ".git" ]; then
+    git config --global --add safe.directory $APP_DIR
+    chown -R $APP_USER:$APP_USER .git
+    echo -e "${GREEN}✓ Git ownership fixed${NC}"
+fi
 echo ""
 
-echo -e "${YELLOW}Step 3: Building assets...${NC}"
+echo -e "${YELLOW}Step 3: Installing/Updating dependencies...${NC}"
+# Check if composer.lock exists and is outdated
+if [ -f "composer.lock" ]; then
+    echo -e "${YELLOW}Checking composer.lock compatibility...${NC}"
+    # Try to install and check for lock file mismatch
+    INSTALL_OUTPUT=$(sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction 2>&1 || true)
+    
+    if echo "$INSTALL_OUTPUT" | grep -q "lock file is not up to date\|does not satisfy your constraint"; then
+        echo -e "${YELLOW}⚠ Composer lock file outdated, updating...${NC}"
+        # Backup lock file
+        cp composer.lock composer.lock.backup.$(date +%Y%m%d_%H%M%S) || true
+        # Update lock file
+        sudo -u $APP_USER composer update --no-dev --no-interaction --lock
+        # Install again
+        sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction
+        echo -e "${GREEN}✓ Dependencies installed (lock file updated)${NC}"
+    else
+        echo -e "${GREEN}✓ Dependencies installed${NC}"
+    fi
+else
+    # No lock file, install normally
+    sudo -u $APP_USER composer install --optimize-autoloader --no-dev --no-interaction
+    echo -e "${GREEN}✓ Dependencies installed${NC}"
+fi
+echo ""
+
+echo -e "${YELLOW}Step 4: Building assets...${NC}"
 if [ -f "package.json" ]; then
     sudo -u $APP_USER npm install --production
     sudo -u $APP_USER npm run build
@@ -74,7 +104,7 @@ else
 fi
 echo ""
 
-echo -e "${YELLOW}Step 4: Setting up environment...${NC}"
+echo -e "${YELLOW}Step 5: Setting up environment...${NC}"
 if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp .env.example .env
@@ -93,7 +123,7 @@ if ! grep -q "APP_KEY=base64:" .env; then
 fi
 echo ""
 
-echo -e "${YELLOW}Step 5: Running migrations...${NC}"
+echo -e "${YELLOW}Step 6: Running migrations...${NC}"
 read -p "Run database migrations? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -104,12 +134,12 @@ else
 fi
 echo ""
 
-echo -e "${YELLOW}Step 6: Creating storage link...${NC}"
+echo -e "${YELLOW}Step 7: Creating storage link...${NC}"
 sudo -u $APP_USER php artisan storage:link
 echo -e "${GREEN}✓ Storage link created${NC}"
 echo ""
 
-echo -e "${YELLOW}Step 7: Setting permissions...${NC}"
+echo -e "${YELLOW}Step 8: Setting permissions...${NC}"
 chown -R $APP_USER:$APP_USER $APP_DIR
 chmod -R 755 $APP_DIR
 chmod -R 775 $APP_DIR/storage
@@ -117,14 +147,14 @@ chmod -R 775 $APP_DIR/bootstrap/cache
 echo -e "${GREEN}✓ Permissions set${NC}"
 echo ""
 
-echo -e "${YELLOW}Step 8: Optimizing application...${NC}"
+echo -e "${YELLOW}Step 9: Optimizing application...${NC}"
 sudo -u $APP_USER php artisan config:cache
 sudo -u $APP_USER php artisan route:cache
 sudo -u $APP_USER php artisan view:cache
 echo -e "${GREEN}✓ Application optimized${NC}"
 echo ""
 
-echo -e "${YELLOW}Step 9: Restarting services...${NC}"
+echo -e "${YELLOW}Step 10: Restarting services...${NC}"
 systemctl restart php${PHP_VERSION}-fpm
 systemctl restart nginx
 echo -e "${GREEN}✓ Services restarted${NC}"
