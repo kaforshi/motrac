@@ -26,8 +26,16 @@ echo "Last error in Laravel log:"
 echo "========================================="
 echo ""
 
-# Get last error block (from last [timestamp] to next [timestamp] or end)
-tail -200 storage/logs/laravel.log | grep -B 200 "\[$(date +%Y-%m-%d)" | tail -100 | head -80
+# Get last error block - show more context
+echo "Last 100 lines of log:"
+echo ""
+tail -100 storage/logs/laravel.log
+
+echo ""
+echo "========================================="
+echo "Searching for errors/exceptions:"
+echo ""
+tail -200 storage/logs/laravel.log | grep -A 10 -B 5 -i "error\|exception\|fatal\|invalid" | tail -50
 
 echo ""
 echo "========================================="
