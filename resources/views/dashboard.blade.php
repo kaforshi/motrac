@@ -970,7 +970,18 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-rose-600 sensitive-data">Rp {{ number_format($debt->current_amount, 0, ',', '.') }}</p>
-                                        <a href="{{ route('debts.index') }}" class="text-[10px] text-gray-500 hover:underline">Bayar Cicilan</a>
+                                        <button 
+                                            type="button" 
+                                            onclick="openPaymentModal({{ $debt->id }}, this)"
+                                            @php
+                                                $debtData = [
+                                                    'contact_name' => $debt->contact_name,
+                                                    'current_amount' => $debt->current_amount,
+                                                    'type' => $debt->type
+                                                ];
+                                            @endphp
+                                            data-debt="{{ htmlspecialchars(json_encode($debtData), ENT_QUOTES, 'UTF-8') }}"
+                                            class="text-[10px] text-gray-500 hover:underline">Bayar Cicilan</button>
                                     </div>
                                 </div>
                             @empty
@@ -1240,6 +1251,11 @@
                 'due_date': 'debt_due_date',
                 'account_id': 'debt_account_id',
                 'description': 'debt_description',
+                // Payment modal
+                'amount': 'payment_amount',
+                'payment_date': 'payment_payment_date',
+                'notes': 'payment_notes',
+                'account_id': 'payment_account_id',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -1770,6 +1786,163 @@
             clearErrors();
         }
 
+        // 10. Payment Modal Functions (Bayar Cicilan)
+        function openPaymentModal(debtId, buttonElement) {
+            const modal = document.getElementById('paymentModal');
+            const form = document.getElementById('paymentForm');
+            const modalTitle = document.getElementById('paymentModalTitle');
+            
+            if (!modal || !form || !modalTitle) {
+                console.error('Payment modal elements not found');
+                return;
+            }
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Parse debt data from data attribute
+            let debtData;
+            try {
+                const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
+                if (!debtDataStr) {
+                    console.error('Debt data not found in button element');
+                    alert('Terjadi kesalahan saat memuat data utang');
+                    return;
+                }
+                
+                // Decode HTML entities if present
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = debtDataStr;
+                const decodedStr = tempDiv.textContent || tempDiv.innerText || debtDataStr;
+                debtData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
+            } catch (e) {
+                console.error('Error parsing debt data:', e);
+                console.error('Data string:', buttonElement.getAttribute('data-debt'));
+                alert('Terjadi kesalahan saat memuat data utang');
+                return;
+            }
+            
+            // Set modal title
+            modalTitle.textContent = 'Bayar Cicilan';
+            
+            // Use setTimeout to ensure form.reset() has completed
+            setTimeout(() => {
+                // Populate form with debt data
+                document.getElementById('payment_debt_id').value = debtId;
+                document.getElementById('payment_contact_name').textContent = debtData.contact_name || 'N/A';
+                document.getElementById('payment_remaining_amount').textContent = 'Rp ' + parseFloat(debtData.current_amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                document.getElementById('payment_amount').max = debtData.current_amount || 0;
+                document.getElementById('payment_payment_date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('payment_create_transaction').checked = false;
+                document.getElementById('payment_account_field').style.display = 'none';
+            }, 0);
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            const modal = document.getElementById('paymentModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        function togglePaymentAccountField() {
+            const checkbox = document.getElementById('payment_create_transaction');
+            const accountField = document.getElementById('payment_account_field');
+            const accountSelect = document.getElementById('payment_account_id');
+            
+            if (checkbox.checked) {
+                accountField.style.display = 'block';
+                accountSelect.required = true;
+            } else {
+                accountField.style.display = 'none';
+                accountSelect.required = false;
+                accountSelect.value = '';
+            }
+        }
+
+        async function submitPaymentForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const debtId = document.getElementById('payment_debt_id').value;
+            
+            // Remove debt_id from formData as it's not needed (already in URL)
+            formData.delete('debt_id');
+            
+            // Handle create_transaction checkbox - if not checked, don't send it
+            const createTransaction = document.getElementById('payment_create_transaction').checked;
+            if (!createTransaction) {
+                formData.delete('create_transaction');
+                formData.delete('account_id'); // Remove account_id if checkbox not checked
+            } else {
+                formData.append('create_transaction', '1');
+            }
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch(`/debts/${debtId}/payment`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    return;
+                }
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closePaymentModal();
+                        // Reload dengan parameter view=debts agar tetap di halaman utang/piutang
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('view', 'debts');
+                        window.location.href = currentUrl.toString();
+                    }, 1500);
+                } else {
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                            showError(field, errorMessage);
+                        });
+                    } else {
+                        alert(data.message || 'Gagal mencatat pembayaran');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         async function submitDebtForm(e) {
             e.preventDefault();
             clearErrors();
@@ -1971,6 +2144,21 @@
                 debtModal.addEventListener('click', function(e) {
                     if (e.target === debtModal) {
                         closeDebtModal();
+                    }
+                });
+            }
+
+            // Payment modal events
+            const paymentForm = document.getElementById('paymentForm');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', submitPaymentForm);
+            }
+
+            const paymentModal = document.getElementById('paymentModal');
+            if (paymentModal) {
+                paymentModal.addEventListener('click', function(e) {
+                    if (e.target === paymentModal) {
+                        closePaymentModal();
                     }
                 });
             }
@@ -2486,6 +2674,80 @@
                         <i class="fa-solid fa-save mr-2"></i> Simpan
                     </button>
                     <button type="button" onclick="closeDebtModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal (Bayar Cicilan) -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 id="paymentModalTitle" class="text-xl font-bold text-dark">Bayar Cicilan</h3>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="paymentForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" id="payment_debt_id" value="">
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600 mb-1">Kontak</p>
+                    <p id="payment_contact_name" class="font-bold text-dark"></p>
+                    <p class="text-xs text-gray-500 mt-2">Sisa Utang: <span id="payment_remaining_amount" class="font-bold text-rose-600 sensitive-data"></span></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Pembayaran</label>
+                    <input type="number" name="amount" id="payment_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_amount"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pembayaran</label>
+                    <input type="date" name="payment_date" id="payment_payment_date" value="{{ date('Y-m-d') }}" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_payment_date"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan (Opsional)</label>
+                    <textarea name="notes" id="payment_notes" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan pembayaran"></textarea>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_notes"></span>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                        <input
+                            type="checkbox"
+                            name="create_transaction"
+                            id="payment_create_transaction"
+                            class="rounded border-gray-300"
+                            onchange="togglePaymentAccountField()"
+                        >
+                        <span>Buat transaksi untuk pembayaran ini</span>
+                    </label>
+                </div>
+
+                <div id="payment_account_field" style="display: none;">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Akun</label>
+                    <select name="account_id" id="payment_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih akun</option>
+                        @foreach($accounts as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_account_id"></span>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Catat Pembayaran
+                    </button>
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>

@@ -103,62 +103,115 @@ class DebtController extends Controller
 
     public function addPayment(Request $request, $id)
     {
-        $debt = Debt::where('user_id', auth()->id())->findOrFail($id);
-
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0.01|max:' . $debt->current_amount,
-            'payment_date' => 'required|date',
-            'notes' => 'nullable|string',
-            'create_transaction' => 'boolean',
-            'account_id' => 'required_if:create_transaction,1|exists:accounts,id',
-        ]);
-
-        DB::beginTransaction();
         try {
-            $payment = DebtPayment::create([
-                'debt_id' => $debt->id,
-                'amount' => $validated['amount'],
-                'payment_date' => $validated['payment_date'],
-                'notes' => $validated['notes'] ?? null,
-            ]);
+            $debt = Debt::where('user_id', auth()->id())->findOrFail($id);
 
-            $debt->current_amount -= $validated['amount'];
-            if ($debt->current_amount <= 0) {
-                $debt->is_paid = true;
-                $debt->paid_at = now();
-                $debt->current_amount = 0;
+            $maxAmount = $debt->current_amount > 0 ? $debt->current_amount : 999999999;
+            
+            $rules = [
+                'amount' => ['required', 'numeric', 'min:0.01', 'max:' . $maxAmount],
+                'payment_date' => 'required|date',
+                'notes' => 'nullable|string',
+            ];
+            
+            // Only validate account_id if create_transaction is checked
+            if ($request->has('create_transaction') && $request->boolean('create_transaction')) {
+                $rules['account_id'] = [
+                    'required',
+                    'exists:accounts,id',
+                    function ($attribute, $value, $fail) {
+                        if ($value) {
+                            $account = Account::find($value);
+                            if ($account && $account->user_id !== auth()->id()) {
+                                $fail('The selected account is invalid.');
+                            }
+                        }
+                    },
+                ];
             }
-            $debt->save();
+            
+            $validated = $request->validate($rules);
 
-            // Create transaction if requested
-            if ($request->boolean('create_transaction')) {
-                $transaction = \App\Models\Transaction::create([
-                    'user_id' => auth()->id(),
-                    'account_id' => $validated['account_id'],
-                    'type' => $debt->type === Debt::TYPE_PAYABLE ? 'expense' : 'income',
+            DB::beginTransaction();
+            try {
+                $payment = DebtPayment::create([
+                    'debt_id' => $debt->id,
                     'amount' => $validated['amount'],
-                    'description' => "Payment for debt: {$debt->contact_name}",
-                    'date' => $validated['payment_date'],
+                    'payment_date' => $validated['payment_date'],
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
-                $payment->transaction_id = $transaction->id;
-                $payment->save();
-
-                // Update account balance
-                $account = Account::find($validated['account_id']);
-                if ($debt->type === Debt::TYPE_PAYABLE) {
-                    $account->balance -= $validated['amount'];
-                } else {
-                    $account->balance += $validated['amount'];
+                $debt->current_amount -= $validated['amount'];
+                if ($debt->current_amount <= 0) {
+                    $debt->is_paid = true;
+                    $debt->paid_at = now();
+                    $debt->current_amount = 0;
                 }
-                $account->save();
-            }
+                $debt->save();
 
-            DB::commit();
-            return redirect()->route('debts.index')->with('success', 'Payment recorded successfully.');
+                // Create transaction if requested
+                if ($request->boolean('create_transaction')) {
+                    $transaction = \App\Models\Transaction::create([
+                        'user_id' => auth()->id(),
+                        'account_id' => $validated['account_id'],
+                        'type' => $debt->type === Debt::TYPE_PAYABLE ? 'expense' : 'income',
+                        'amount' => $validated['amount'],
+                        'description' => "Payment for debt: {$debt->contact_name}",
+                        'date' => $validated['payment_date'],
+                        'notes' => $validated['notes'] ?? null,
+                    ]);
+
+                    $payment->transaction_id = $transaction->id;
+                    $payment->save();
+
+                    // Update account balance
+                    $account = Account::find($validated['account_id']);
+                    if ($debt->type === Debt::TYPE_PAYABLE) {
+                        $account->balance -= $validated['amount'];
+                    } else {
+                        $account->balance += $validated['amount'];
+                    }
+                    $account->save();
+                }
+
+                DB::commit();
+
+                $payment->load('transaction');
+                $debt->refresh();
+
+                // Return JSON response for AJAX requests
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pembayaran berhasil dicatat.',
+                        'payment' => $payment,
+                        'debt' => $debt
+                    ]);
+                }
+
+                return redirect()->route('debts.index')->with('success', 'Payment recorded successfully.');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
         } catch (\Exception $e) {
-            DB::rollBack();
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mencatat pembayaran: ' . $e->getMessage()
+                ], 500);
+            }
             return back()->withErrors(['error' => 'Failed to record payment: ' . $e->getMessage()])->withInput();
         }
     }
