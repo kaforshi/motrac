@@ -216,6 +216,103 @@ class DebtController extends Controller
         }
     }
 
+    public function markAsPaid(Request $request, $id)
+    {
+        try {
+            $debt = Debt::where('user_id', auth()->id())
+                ->where('type', Debt::TYPE_RECEIVABLE)
+                ->findOrFail($id);
+
+            if ($debt->is_paid) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Piutang ini sudah ditandai sebagai lunas.'
+                    ], 400);
+                }
+                return back()->withErrors(['error' => 'Piutang ini sudah ditandai sebagai lunas.']);
+            }
+
+            $validated = $request->validate([
+                'account_id' => [
+                    'required',
+                    'exists:accounts,id',
+                    function ($attribute, $value, $fail) {
+                        $account = Account::find($value);
+                        if ($account && $account->user_id !== auth()->id()) {
+                            $fail('The selected account is invalid.');
+                        }
+                    },
+                ],
+                'create_transaction' => 'sometimes|boolean',
+            ]);
+
+            DB::beginTransaction();
+            try {
+                // Mark debt as paid
+                $debt->is_paid = true;
+                $debt->paid_at = now();
+                $debt->current_amount = 0;
+                $debt->save();
+
+                // Create transaction if requested (default: true)
+                $createTransaction = $request->has('create_transaction') ? $request->boolean('create_transaction') : true;
+                
+                if ($createTransaction) {
+                    $transaction = \App\Models\Transaction::create([
+                        'user_id' => auth()->id(),
+                        'account_id' => $validated['account_id'],
+                        'type' => 'income',
+                        'amount' => $debt->initial_amount, // Use initial amount for full payment
+                        'description' => "Pembayaran piutang dari {$debt->contact_name}",
+                        'date' => now(),
+                        'notes' => $debt->description,
+                    ]);
+
+                    // Update account balance
+                    $account = Account::find($validated['account_id']);
+                    $account->balance += $debt->initial_amount;
+                    $account->save();
+                }
+
+                DB::commit();
+
+                // Return JSON response for AJAX requests
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Piutang berhasil ditandai sebagai lunas' . ($createTransaction ? ' dan transaksi berhasil dibuat.' : '.'),
+                        'debt' => $debt
+                    ]);
+                }
+
+                return redirect()->route('debts.index')->with('success', 'Piutang berhasil ditandai sebagai lunas.');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menandai piutang sebagai lunas: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['error' => 'Failed to mark as paid: ' . $e->getMessage()]);
+        }
+    }
+
     public function destroy($id)
     {
         $debt = Debt::where('user_id', auth()->id())->findOrFail($id);

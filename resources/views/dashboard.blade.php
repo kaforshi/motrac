@@ -934,21 +934,45 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-emerald-600 sensitive-data">Rp {{ number_format($debt->current_amount, 0, ',', '.') }}</p>
-                                        <button 
-                                            type="button"
-                                            onclick="openReminderModal({{ $debt->id }}, this)"
-                                            @php
-                                                $debtReminderData = [
-                                                    'contact_name' => $debt->contact_name,
-                                                    'current_amount' => $debt->current_amount,
-                                                    'due_date' => $debt->due_date ? $debt->due_date->format('Y-m-d') : null,
-                                                    'description' => $debt->description
-                                                ];
-                                            @endphp
-                                            data-debt="{{ htmlspecialchars(json_encode($debtReminderData), ENT_QUOTES, 'UTF-8') }}"
-                                            class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
-                                            {{ $debt->due_date && $debt->due_date->isPast() ? 'Tagih!' : 'Ingatkan' }}
-                                        </button>
+                                        <div class="flex gap-2 items-center justify-end">
+                                            @if(!$debt->is_paid)
+                                                <button 
+                                                    type="button"
+                                                    onclick="openMarkPaidModal({{ $debt->id }}, this)"
+                                                    @php
+                                                        $receivablePaidData = [
+                                                            'contact_name' => $debt->contact_name,
+                                                            'initial_amount' => $debt->initial_amount,
+                                                            'account_id' => $debt->account_id,
+                                                            'description' => $debt->description
+                                                        ];
+                                                    @endphp
+                                                    data-receivable="{{ htmlspecialchars(json_encode($receivablePaidData), ENT_QUOTES, 'UTF-8') }}"
+                                                    class="text-[10px] text-emerald-600 hover:underline font-bold"
+                                                    title="Tandai sebagai Lunas">
+                                                    <i class="fa-solid fa-check-circle"></i> Telah Lunas
+                                                </button>
+                                            @else
+                                                <span class="text-[10px] text-emerald-600 font-bold">
+                                                    <i class="fa-solid fa-check-circle"></i> Lunas
+                                                </span>
+                                            @endif
+                                            <button 
+                                                type="button"
+                                                onclick="openReminderModal({{ $debt->id }}, this)"
+                                                @php
+                                                    $debtReminderData = [
+                                                        'contact_name' => $debt->contact_name,
+                                                        'current_amount' => $debt->current_amount,
+                                                        'due_date' => $debt->due_date ? $debt->due_date->format('Y-m-d') : null,
+                                                        'description' => $debt->description
+                                                    ];
+                                                @endphp
+                                                data-debt="{{ htmlspecialchars(json_encode($debtReminderData), ENT_QUOTES, 'UTF-8') }}"
+                                                class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
+                                                {{ $debt->due_date && $debt->due_date->isPast() ? 'Tagih!' : 'Ingatkan' }}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
@@ -1163,6 +1187,132 @@
             clearErrors();
         }
 
+        // 12. Mark Paid Modal Functions (Tandai Piutang sebagai Lunas)
+        function openMarkPaidModal(receivableId, buttonElement) {
+            const modal = document.getElementById('markPaidModal');
+            const form = document.getElementById('markPaidForm');
+            
+            if (!modal || !form) {
+                console.error('Mark paid modal elements not found');
+                return;
+            }
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Parse receivable data from data attribute
+            let receivableData;
+            try {
+                const receivableDataStr = buttonElement.dataset.receivable || buttonElement.getAttribute('data-receivable');
+                if (!receivableDataStr) {
+                    console.error('Receivable data not found in button element');
+                    alert('Terjadi kesalahan saat memuat data piutang');
+                    return;
+                }
+                
+                // Decode HTML entities if present
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = receivableDataStr;
+                const decodedStr = tempDiv.textContent || tempDiv.innerText || receivableDataStr;
+                receivableData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
+            } catch (e) {
+                console.error('Error parsing receivable data:', e);
+                alert('Terjadi kesalahan saat memuat data piutang');
+                return;
+            }
+            
+            // Use setTimeout to ensure form.reset() has completed
+            setTimeout(() => {
+                // Populate form with receivable data
+                document.getElementById('mark_paid_debt_id').value = receivableId;
+                document.getElementById('mark_paid_contact_name').textContent = receivableData.contact_name || 'N/A';
+                document.getElementById('mark_paid_amount').textContent = 'Rp ' + parseFloat(receivableData.initial_amount || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                
+                // Set account if available
+                if (receivableData.account_id) {
+                    document.getElementById('mark_paid_account_id').value = receivableData.account_id;
+                }
+            }, 0);
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+
+        function closeMarkPaidModal() {
+            const modal = document.getElementById('markPaidModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitMarkPaidForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const debtId = document.getElementById('mark_paid_debt_id').value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                const response = await fetch(`/debts/${debtId}/mark-paid`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    return;
+                }
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeMarkPaidModal();
+                        // Reload dengan parameter view=debts agar tetap di halaman utang/piutang
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('view', 'debts');
+                        window.location.href = currentUrl.toString();
+                    }, 1500);
+                } else {
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                            showError(field, errorMessage);
+                        });
+                    } else {
+                        alert(data.message || 'Gagal menandai piutang sebagai lunas');
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         function populateFormSelects() {
             // Populate accounts
             const accountSelect = document.getElementById('modal_account_id');
@@ -1272,6 +1422,8 @@
                 'reminder_date': 'reminder_reminder_date',
                 'reminder_time': 'reminder_reminder_time',
                 'notes': 'reminder_notes',
+                // Mark Paid modal
+                'account_id': 'mark_paid_account_id',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -2339,6 +2491,21 @@
                 });
             }
 
+            // Mark Paid modal events
+            const markPaidForm = document.getElementById('markPaidForm');
+            if (markPaidForm) {
+                markPaidForm.addEventListener('submit', submitMarkPaidForm);
+            }
+
+            const markPaidModal = document.getElementById('markPaidModal');
+            if (markPaidModal) {
+                markPaidModal.addEventListener('click', function(e) {
+                    if (e.target === markPaidModal) {
+                        closeMarkPaidModal();
+                    }
+                });
+            }
+
             // Transaction Detail Modal events
             const transactionDetailModal = document.getElementById('transactionDetailModal');
             if (transactionDetailModal) {
@@ -2983,6 +3150,51 @@
                         <i class="fa-solid fa-calendar-plus mr-2"></i> Buat Reminder
                     </button>
                     <button type="button" onclick="closeReminderModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mark Paid Modal (Tandai Piutang sebagai Lunas) -->
+    <div id="markPaidModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Tandai sebagai Lunas</h3>
+                <button onclick="closeMarkPaidModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="markPaidForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" id="mark_paid_debt_id" value="">
+                <input type="hidden" name="create_transaction" value="1">
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600 mb-1">Kontak</p>
+                    <p id="mark_paid_contact_name" class="font-bold text-dark"></p>
+                    <p class="text-xs text-gray-500 mt-2">Jumlah Piutang: <span id="mark_paid_amount" class="font-bold text-emerald-600 sensitive-data"></span></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Akun untuk Transaksi</label>
+                    <select name="account_id" id="mark_paid_account_id" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih akun</option>
+                        @foreach($accounts as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_account_id"></span>
+                    <p class="text-xs text-gray-500 mt-1">Transaksi income akan dibuat otomatis saat piutang ditandai sebagai lunas.</p>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-check-circle mr-2"></i> Tandai sebagai Lunas
+                    </button>
+                    <button type="button" onclick="closeMarkPaidModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>
