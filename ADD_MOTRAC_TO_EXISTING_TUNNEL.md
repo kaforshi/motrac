@@ -69,7 +69,7 @@ ingress:
   
   # Opsi 2: Via SSH Tunnel (lebih aman, recommended)
   # - hostname: motrac.yourdomain.com
-  #   service: http://localhost:8001
+  #   service: http://127.0.0.1:8001  # Gunakan 127.0.0.1, BUKAN 127.0.0.0
   #   originRequest:
   #     httpHostHeader: motrac.yourdomain.com
   #     connectTimeout: 10s
