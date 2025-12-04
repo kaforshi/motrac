@@ -945,7 +945,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <a href="{{ route('debts.create') }}" class="block w-full py-3 text-sm text-gray-500 hover:text-emerald-600 border-t border-gray-100 transition text-center">+ Tambah Piutang</a>
+                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm text-gray-500 hover:text-emerald-600 border-t border-gray-100 transition text-center">+ Tambah Piutang</button>
                     </div>
 
                     <!-- Column: Utang (Saya berutang ke orang) -->
@@ -979,7 +979,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <a href="{{ route('debts.create') }}" class="block w-full py-3 text-sm text-gray-500 hover:text-rose-600 border-t border-gray-100 transition text-center">+ Catat Utang Baru</a>
+                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm text-gray-500 hover:text-rose-600 border-t border-gray-100 transition text-center">+ Catat Utang Baru</button>
                     </div>
                 </div>
             </div>
@@ -1232,6 +1232,14 @@
                 'icon': 'category_icon',
                 'color': 'category_color',
                 'parent_id': 'category_parent_id',
+                // Debt modal
+                'contact_name': 'debt_contact_name',
+                'contact_phone': 'debt_contact_phone',
+                'contact_email': 'debt_contact_email',
+                'initial_amount': 'debt_initial_amount',
+                'due_date': 'debt_due_date',
+                'account_id': 'debt_account_id',
+                'description': 'debt_description',
             };
             
             const actualFieldId = fieldMap[field] || field;
@@ -1736,6 +1744,88 @@
             clearErrors();
         }
 
+        // 9. Debt Modal Functions (Piutang/Utang)
+        function openDebtModal(type) {
+            const modal = document.getElementById('debtModal');
+            const form = document.getElementById('debtForm');
+            const modalTitle = document.getElementById('debtModalTitle');
+            const typeInput = document.getElementById('debt_type');
+            
+            modal.classList.remove('hidden');
+            form.reset();
+            clearErrors();
+            
+            // Set type and title based on type
+            typeInput.value = type;
+            if (type === 'receivable') {
+                modalTitle.textContent = 'Tambah Piutang';
+            } else {
+                modalTitle.textContent = 'Catat Utang Baru';
+            }
+        }
+
+        function closeDebtModal() {
+            const modal = document.getElementById('debtModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitDebtForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("debts.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeDebtModal();
+                        // Reload dengan parameter view=debts agar tetap di halaman utang/piutang
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('view', 'debts');
+                        window.location.href = currentUrl.toString();
+                    }, 1500);
+                } else if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                        showError(field, errorMessage);
+                    });
+                } else {
+                    alert(data.message || 'Gagal menyimpan data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         async function submitBudgetForm(e) {
             e.preventDefault();
             clearErrors();
@@ -1870,6 +1960,21 @@
                 });
             }
 
+            // Debt modal events
+            const debtForm = document.getElementById('debtForm');
+            if (debtForm) {
+                debtForm.addEventListener('submit', submitDebtForm);
+            }
+
+            const debtModal = document.getElementById('debtModal');
+            if (debtModal) {
+                debtModal.addEventListener('click', function(e) {
+                    if (e.target === debtModal) {
+                        closeDebtModal();
+                    }
+                });
+            }
+
             // Transaction Detail Modal events
             const transactionDetailModal = document.getElementById('transactionDetailModal');
             if (transactionDetailModal) {
@@ -1907,6 +2012,18 @@
                 });
                 if (budgetBtn) {
                     switchView('budget', budgetBtn);
+                }
+            } else if (viewParam === 'debts') {
+                // Find debts button by looking for the one that contains "Utang" text
+                const navItems = document.querySelectorAll('.nav-item');
+                let debtsBtn = null;
+                navItems.forEach(btn => {
+                    if (btn.textContent.trim().includes('Utang')) {
+                        debtsBtn = btn;
+                    }
+                });
+                if (debtsBtn) {
+                    switchView('debts', debtsBtn);
                 }
             } else {
                 // Default view is Dashboard
@@ -2296,6 +2413,79 @@
                         <i class="fa-solid fa-save mr-2"></i> Simpan Budget
                     </button>
                     <button type="button" onclick="closeBudgetModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Debt Modal (Piutang/Utang) -->
+    <div id="debtModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 id="debtModalTitle" class="text-xl font-bold text-dark">Tambah Piutang</h3>
+                <button onclick="closeDebtModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="debtForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" id="debt_type" name="type" value="">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kontak</label>
+                    <input type="text" name="contact_name" id="debt_contact_name" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Nama orang/kontak">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_contact_name"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon (Opsional)</label>
+                    <input type="text" name="contact_phone" id="debt_contact_phone" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="08xxxxxxxxxx">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_contact_phone"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (Opsional)</label>
+                    <input type="email" name="contact_email" id="debt_contact_email" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="email@example.com">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_contact_email"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+                    <input type="number" name="initial_amount" id="debt_initial_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_initial_amount"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Jatuh Tempo (Opsional)</label>
+                    <input type="date" name="due_date" id="debt_due_date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_due_date"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Akun Terkait (Opsional)</label>
+                    <select name="account_id" id="debt_account_id" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih akun (opsional)</option>
+                        @foreach($accounts as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_account_id"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi (Opsional)</label>
+                    <textarea name="description" id="debt_description" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan"></textarea>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_description"></span>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan
+                    </button>
+                    <button type="button" onclick="closeDebtModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
                         Batal
                     </button>
                 </div>
