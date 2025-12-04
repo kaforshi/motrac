@@ -22,18 +22,33 @@ class DashboardController extends Controller
             ->where('is_hidden', false)
             ->sum('balance');
 
-        // Report filters (date range & type)
+        // Month and Year filter (from month picker in navbar)
+        $monthYear = $request->get('month_year');
+        $selectedMonth = Carbon::now()->month;
+        $selectedYear = Carbon::now()->year;
+        
+        if ($monthYear) {
+            $selectedDate = Carbon::parse($monthYear . '-01');
+            $selectedMonth = $selectedDate->month;
+            $selectedYear = $selectedDate->year;
+            $fromDate = $selectedDate->copy()->startOfMonth();
+            $toDate = $selectedDate->copy()->endOfMonth();
+        } else {
+            $fromDate = Carbon::now()->startOfMonth();
+            $toDate = Carbon::now()->endOfMonth();
+        }
+
+        // Report filters (date range & type) - these override month_year if provided
         $reportFrom = $request->get('report_from');
         $reportTo = $request->get('report_to');
         $reportType = $request->get('report_type', 'all'); // all, income, expense, transfer
 
-        $fromDate = $reportFrom
-            ? Carbon::parse($reportFrom)->startOfDay()
-            : Carbon::now()->startOfMonth();
-
-        $toDate = $reportTo
-            ? Carbon::parse($reportTo)->endOfDay()
-            : Carbon::now()->endOfDay();
+        if ($reportFrom) {
+            $fromDate = Carbon::parse($reportFrom)->startOfDay();
+        }
+        if ($reportTo) {
+            $toDate = Carbon::parse($reportTo)->endOfDay();
+        }
 
         // Monthly income and expense (respect filters)
         if ($reportType !== 'all' && $reportType !== Transaction::TYPE_INCOME) {
@@ -54,26 +69,30 @@ class DashboardController extends Controller
                 ->sum('amount');
         }
 
-        // Recent transactions
+        // Recent transactions - filter by selected month/year
         $recentTransactions = Transaction::where('user_id', $user->id)
+            ->whereBetween('date', [$fromDate, $toDate])
             ->with(['account', 'category'])
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
-        // Today's transactions
+        // Today's transactions - only show if selected month is current month
         $today = Carbon::today();
-        $todayTransactions = Transaction::where('user_id', $user->id)
-            ->whereDate('date', $today)
-            ->with(['account', 'category', 'fromAccount', 'toAccount'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $todayTransactions = collect();
+        if (!$monthYear || ($selectedMonth == Carbon::now()->month && $selectedYear == Carbon::now()->year)) {
+            $todayTransactions = Transaction::where('user_id', $user->id)
+                ->whereDate('date', $today)
+                ->with(['account', 'category', 'fromAccount', 'toAccount'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
-        // Budget status
+        // Budget status - filter by selected month/year
         $budgets = Budget::where('user_id', $user->id)
-            ->where('month', Carbon::now()->month)
-            ->where('year', Carbon::now()->year)
+            ->where('month', $selectedMonth)
+            ->where('year', $selectedYear)
             ->with('category')
             ->get();
 
@@ -224,17 +243,21 @@ class DashboardController extends Controller
                 ->sum('amount');
         }
 
-        // Cash flow data based on period type
+        // Cash flow data based on period type - filtered by selected month/year
         $periodType = $request->get('period', 'weekly'); // daily, weekly, monthly, yearly
         
         $cashFlowData = [];
         $maxCashFlow = 1;
         
+        // Use selected month/year for cash flow calculations
+        $selectedDate = $monthYear ? Carbon::parse($monthYear . '-01') : Carbon::now();
+        
         switch ($periodType) {
             case 'daily':
-                // Last 7 days
-                for ($i = 6; $i >= 0; $i--) {
-                    $date = Carbon::now()->subDays($i);
+                // All days in selected month
+                $daysInMonth = $selectedDate->daysInMonth;
+                for ($i = 1; $i <= $daysInMonth; $i++) {
+                    $date = $selectedDate->copy()->day($i);
                     $dayStart = $date->copy()->startOfDay();
                     $dayEnd = $date->copy()->endOfDay();
                     
@@ -260,10 +283,14 @@ class DashboardController extends Controller
                 break;
                 
             case 'weekly':
-                // Last 7 weeks
-                for ($i = 6; $i >= 0; $i--) {
-                    $weekStart = Carbon::now()->subWeeks($i)->startOfWeek();
-                    $weekEnd = Carbon::now()->subWeeks($i)->endOfWeek();
+                // All weeks in selected month
+                $startOfMonth = $selectedDate->copy()->startOfMonth();
+                $endOfMonth = $selectedDate->copy()->endOfMonth();
+                $currentWeek = $startOfMonth->copy()->startOfWeek();
+                
+                while ($currentWeek->lte($endOfMonth)) {
+                    $weekStart = $currentWeek->copy();
+                    $weekEnd = min($currentWeek->copy()->endOfWeek(), $endOfMonth);
                     
                     $weekIncome = Transaction::where('user_id', $user->id)
                         ->where('type', Transaction::TYPE_INCOME)
@@ -283,14 +310,16 @@ class DashboardController extends Controller
                         'expense' => $weekExpense,
                         'net' => $weekNet,
                     ];
+                    
+                    $currentWeek->addWeek();
                 }
                 break;
                 
             case 'monthly':
-                // Last 7 months
+                // Show selected month and 6 months before
                 for ($i = 6; $i >= 0; $i--) {
-                    $monthStart = Carbon::now()->subMonths($i)->startOfMonth();
-                    $monthEnd = Carbon::now()->subMonths($i)->endOfMonth();
+                    $monthStart = $selectedDate->copy()->subMonths($i)->startOfMonth();
+                    $monthEnd = $selectedDate->copy()->subMonths($i)->endOfMonth();
                     
                     $monthIncome = Transaction::where('user_id', $user->id)
                         ->where('type', Transaction::TYPE_INCOME)
@@ -314,10 +343,11 @@ class DashboardController extends Controller
                 break;
                 
             case 'yearly':
-                // Last 7 years
+                // Show selected year and 6 years before
+                $selectedYear = $selectedDate->year;
                 for ($i = 6; $i >= 0; $i--) {
-                    $yearStart = Carbon::now()->subYears($i)->startOfYear();
-                    $yearEnd = Carbon::now()->subYears($i)->endOfYear();
+                    $yearStart = Carbon::create($selectedYear - $i, 1, 1)->startOfYear();
+                    $yearEnd = Carbon::create($selectedYear - $i, 12, 31)->endOfYear();
                     
                     $yearIncome = Transaction::where('user_id', $user->id)
                         ->where('type', Transaction::TYPE_INCOME)
@@ -399,6 +429,9 @@ class DashboardController extends Controller
             'currencySymbol',
             'unreadNotifications',
             'unreadCount',
+            'selectedMonth',
+            'selectedYear',
+            'monthYear',
         ));
     }
 

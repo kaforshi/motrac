@@ -180,10 +180,7 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <select class="hidden sm:block bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm dark:text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary">
-                    <option>{{ \Carbon\Carbon::now()->format('F Y') }}</option>
-                    <option>{{ \Carbon\Carbon::now()->subMonth()->format('F Y') }}</option>
-                </select>
+                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden sm:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <button class="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition" title="Privacy Mode" onclick="togglePrivacy(this)">
                     <i class="fa-regular fa-eye"></i>
                 </button>
@@ -237,7 +234,7 @@
                     </div>
                 </div>
                 <a href="{{ route('profile') }}">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=10B981&color=fff" class="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer hover:ring-2 hover:ring-primary transition">
+                    <img src="{{ auth()->user()->photo ? \Illuminate\Support\Facades\Storage::url(auth()->user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=10B981&color=fff' }}" class="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer hover:ring-2 hover:ring-primary transition object-cover" alt="Profile Photo">
                 </a>
             </div>
         </header>
@@ -1218,6 +1215,22 @@
 
     <!-- JavaScript Interactions -->
     <script>
+        // Function to change month and year
+        function changeMonthYear(monthYear) {
+            if (!monthYear) return;
+            
+            // Get current URL and parameters
+            const url = new URL(window.location.href);
+            url.searchParams.set('month_year', monthYear);
+            
+            // Remove report filters if they exist (month_year takes precedence)
+            url.searchParams.delete('report_from');
+            url.searchParams.delete('report_to');
+            
+            // Reload page with new month_year parameter
+            window.location.href = url.toString();
+        }
+
         // 1. Navigation Logic (SPA Switcher)
         function switchView(viewId, btnElement) {
             // Hide all sections
