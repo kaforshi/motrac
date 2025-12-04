@@ -31,28 +31,69 @@ class BudgetController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'amount' => 'required|numeric|min:0.01',
-            'month' => 'required|integer|min:1|max:12',
-            'year' => 'required|integer|min:2020',
-            'rollover_enabled' => 'boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'category_id' => [
+                    'required',
+                    'exists:categories,id',
+                    function ($attribute, $value, $fail) {
+                        $category = Category::find($value);
+                        if ($category && $category->user_id !== auth()->id()) {
+                            $fail('The selected category is invalid.');
+                        }
+                    },
+                ],
+                'amount' => 'required|numeric|min:0.01',
+                'month' => 'required|integer|min:1|max:12',
+                'year' => 'required|integer|min:2020',
+                'rollover_enabled' => 'boolean',
+            ]);
 
-        $budget = Budget::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'category_id' => $validated['category_id'],
-                'month' => $validated['month'],
-                'year' => $validated['year'],
-            ],
-            [
-                'amount' => $validated['amount'],
-                'rollover_enabled' => $request->boolean('rollover_enabled'),
-            ]
-        );
+            $budget = Budget::updateOrCreate(
+                [
+                    'user_id' => auth()->id(),
+                    'category_id' => $validated['category_id'],
+                    'month' => $validated['month'],
+                    'year' => $validated['year'],
+                ],
+                [
+                    'amount' => $validated['amount'],
+                    'rollover_enabled' => $request->boolean('rollover_enabled'),
+                ]
+            );
 
-        return redirect()->route('budgets.index')->with('success', 'Budget created successfully.');
+            $budget->load('category');
+
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Budget berhasil dibuat.',
+                    'budget' => $budget
+                ]);
+            }
+
+            return redirect()->route('budgets.index')->with('success', 'Budget created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat budget: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['error' => 'Failed to create budget: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function update(Request $request, $id)

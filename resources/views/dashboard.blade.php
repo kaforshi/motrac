@@ -844,7 +844,7 @@
                         <h3 class="text-xl font-bold text-dark">Budget Planner</h3>
                         <p class="text-sm text-gray-500">Sisa budget total: <span class="text-emerald-600 font-bold sensitive-data">Rp {{ number_format($totalRemainingBudget ?? 0, 0, ',', '.') }}</span></p>
                     </div>
-                    <a href="{{ route('budgets.index') }}" class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ Buat Baru</a>
+                    <button type="button" onclick="openBudgetModal()" class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ Buat Baru</button>
                 </div>
 
                 <div class="space-y-4">
@@ -884,7 +884,7 @@
                     @empty
                         <div class="bg-white p-8 rounded-xl border border-gray-200 text-center">
                             <p class="text-gray-400 mb-4">Belum ada budget yang dibuat</p>
-                            <a href="{{ route('budgets.index') }}" class="text-primary hover:underline">Buat budget pertama</a>
+                            <button type="button" onclick="openBudgetModal()" class="text-primary hover:underline">Buat budget pertama</button>
                         </div>
                     @endforelse
                 </div>
@@ -1191,6 +1191,11 @@
                 'modal_amount': 'modal_amount',
                 'modal_description': 'modal_description',
                 'modal_date': 'modal_date',
+                // Budget modal
+                'category_id': 'budget_category_id',
+                'amount': 'budget_amount',
+                'month': 'budget_month',
+                'year': 'budget_year',
                 'modal_notes': 'modal_notes',
                 'modal_receipt': 'modal_receipt',
                 'modal_type': 'modal_transactionType',
@@ -1618,6 +1623,80 @@
             modal.classList.add('hidden');
         }
 
+        // 8. Budget Modal Functions
+        function openBudgetModal() {
+            const modal = document.getElementById('budgetModal');
+            const form = document.getElementById('budgetForm');
+            modal.classList.remove('hidden');
+            form.reset();
+            clearErrors();
+            // Set default month and year
+            document.getElementById('budget_month').value = new Date().getMonth() + 1;
+            document.getElementById('budget_year').value = new Date().getFullYear();
+        }
+
+        function closeBudgetModal() {
+            const modal = document.getElementById('budgetModal');
+            modal.classList.add('hidden');
+            clearErrors();
+        }
+
+        async function submitBudgetForm(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("budgets.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Budget berhasil dibuat!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                        closeBudgetModal();
+                        // Reload dengan parameter view=budget agar tetap di halaman budget
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('view', 'budget');
+                        window.location.href = currentUrl.toString();
+                    }, 1500);
+                } else if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        const errorMessage = Array.isArray(data.errors[field]) ? data.errors[field][0] : data.errors[field];
+                        showError(field, errorMessage);
+                    });
+                } else {
+                    alert(data.message || 'Gagal menyimpan budget');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         // Initialize handlers
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('modal_transactionType');
@@ -1670,6 +1749,21 @@
                 });
             }
 
+            // Budget modal events
+            const budgetForm = document.getElementById('budgetForm');
+            if (budgetForm) {
+                budgetForm.addEventListener('submit', submitBudgetForm);
+            }
+
+            const budgetModal = document.getElementById('budgetModal');
+            if (budgetModal) {
+                budgetModal.addEventListener('click', function(e) {
+                    if (e.target === budgetModal) {
+                        closeBudgetModal();
+                    }
+                });
+            }
+
             // Transaction Detail Modal events
             const transactionDetailModal = document.getElementById('transactionDetailModal');
             if (transactionDetailModal) {
@@ -1695,6 +1789,18 @@
                 const reportsBtn = document.getElementById('nav-reports');
                 if (reportsBtn) {
                     switchView('reports', reportsBtn);
+                }
+            } else if (viewParam === 'budget') {
+                // Find budget button by looking for the one that contains "Budget" text
+                const navItems = document.querySelectorAll('.nav-item');
+                let budgetBtn = null;
+                navItems.forEach(btn => {
+                    if (btn.textContent.trim().includes('Budget')) {
+                        budgetBtn = btn;
+                    }
+                });
+                if (budgetBtn) {
+                    switchView('budget', budgetBtn);
                 }
             } else {
                 // Default view is Dashboard
@@ -2016,6 +2122,77 @@
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div id="budgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-dark">Tambah Budget Baru</h3>
+                <button onclick="closeBudgetModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="budgetForm" class="p-6 space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                    <select name="category_id" id="budget_category_id" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <option value="">Pilih kategori</option>
+                        @foreach($expenseCategories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_category_id"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Budget</label>
+                    <input type="number" name="amount" id="budget_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_amount"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                        <select name="month" id="budget_month" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ $i == date('n') ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i, 1)->locale('id')->monthName }}</option>
+                            @endfor
+                        </select>
+                        <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_month"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                        <input type="number" name="year" id="budget_year" value="{{ date('Y') }}" min="2020" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                        <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_year"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                        <input
+                            type="checkbox"
+                            name="rollover_enabled"
+                            id="budget_rollover_enabled"
+                            class="rounded border-gray-300"
+                        >
+                        <span>Aktifkan rollover (sisa budget bulan ini akan ditambahkan ke bulan berikutnya)</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan Budget
+                    </button>
+                    <button type="button" onclick="closeBudgetModal()" class="px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </body>
