@@ -2316,6 +2316,93 @@
         }
 
         // 6. Category Modal Functions (Add Category via AJAX)
+        // Popular Font Awesome icons for categories
+        const categoryIcons = [
+            // Food & Dining
+            'utensils', 'hamburger', 'pizza-slice', 'coffee', 'wine-glass', 'beer', 'ice-cream', 'cake',
+            // Shopping
+            'shopping-bag', 'shopping-cart', 'store', 'tags', 'gift', 'box',
+            // Transport
+            'car', 'motorcycle', 'bicycle', 'plane', 'train', 'bus', 'taxi', 'gas-pump',
+            // Home & Utilities
+            'home', 'wrench', 'lightbulb', 'plug', 'wifi', 'tv', 'couch', 'bed',
+            // Health & Fitness
+            'heart', 'dumbbell', 'running', 'basketball', 'football', 'swimming-pool',
+            // Entertainment
+            'film', 'music', 'gamepad', 'book', 'theater-masks', 'camera',
+            // Education
+            'graduation-cap', 'book-open', 'pencil', 'chalkboard', 'university',
+            // Work & Business
+            'briefcase', 'laptop', 'desktop', 'calculator', 'chart-line', 'building',
+            // Personal Care
+            'spa', 'cut', 'soap', 'shirt', 'shoe-prints',
+            // Bills & Services
+            'credit-card', 'money-bill', 'wallet', 'receipt', 'file-invoice',
+            // Travel
+            'map-marked-alt', 'hotel', 'umbrella-beach', 'passport', 'suitcase',
+            // General
+            'tag', 'star', 'heart', 'fire', 'gem', 'trophy', 'medal', 'award'
+        ];
+
+        function toggleIconPicker() {
+            const modal = document.getElementById('iconPickerModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                populateIconGrid();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function populateIconGrid() {
+            const grid = document.getElementById('iconGrid');
+            const searchTerm = document.getElementById('iconSearch')?.value.toLowerCase() || '';
+            
+            grid.innerHTML = '';
+            
+            categoryIcons.forEach(iconName => {
+                if (searchTerm && !iconName.toLowerCase().includes(searchTerm)) {
+                    return;
+                }
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'w-full aspect-square flex items-center justify-center bg-gray-50 dark:bg-gray-700 hover:bg-primary hover:text-white rounded-lg cursor-pointer transition border border-gray-200 dark:border-gray-600 hover:border-primary';
+                iconDiv.onclick = () => selectIcon(iconName);
+                iconDiv.title = iconName;
+                
+                const icon = document.createElement('i');
+                icon.className = `fa-solid fa-${iconName} text-xl`;
+                iconDiv.appendChild(icon);
+                
+                grid.appendChild(iconDiv);
+            });
+            
+            if (grid.children.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">Tidak ada icon ditemukan</div>';
+            }
+        }
+
+        function filterIcons() {
+            populateIconGrid();
+        }
+
+        function selectIcon(iconName) {
+            const iconInput = document.getElementById('category_icon');
+            const iconPreview = document.getElementById('category_icon_preview');
+            
+            if (iconInput) {
+                iconInput.value = iconName;
+            }
+            
+            if (iconPreview) {
+                iconPreview.innerHTML = `<i class="fa-solid fa-${iconName} text-primary text-xl"></i>`;
+                iconPreview.classList.remove('border-gray-200', 'dark:border-gray-600');
+                iconPreview.classList.add('border-primary');
+            }
+            
+            toggleIconPicker();
+        }
+
         function openCategoryModal() {
             const modal = document.getElementById('categoryModal');
             const form = document.getElementById('categoryForm');
@@ -2323,12 +2410,26 @@
             form.reset();
             clearErrors();
             document.getElementById('category_type').value = 'expense';
+            
+            // Reset icon preview
+            const iconPreview = document.getElementById('category_icon_preview');
+            if (iconPreview) {
+                iconPreview.innerHTML = '<i class="fa-solid fa-tag text-gray-400 text-xl"></i>';
+                iconPreview.classList.remove('border-primary');
+                iconPreview.classList.add('border-gray-200', 'dark:border-gray-600');
+            }
         }
 
         function closeCategoryModal() {
             const modal = document.getElementById('categoryModal');
             modal.classList.add('hidden');
             clearErrors();
+            
+            // Close icon picker if open
+            const iconPicker = document.getElementById('iconPickerModal');
+            if (iconPicker) {
+                iconPicker.classList.add('hidden');
+            }
         }
 
         async function submitCategoryForm(e) {
@@ -3287,6 +3388,37 @@
                 });
             }
 
+            // Icon input change event - update preview when user types manually
+            const categoryIconInput = document.getElementById('category_icon');
+            if (categoryIconInput) {
+                categoryIconInput.addEventListener('input', function() {
+                    const iconName = this.value.trim();
+                    const iconPreview = document.getElementById('category_icon_preview');
+                    
+                    if (iconPreview) {
+                        if (iconName) {
+                            iconPreview.innerHTML = `<i class="fa-solid fa-${iconName} text-primary text-xl"></i>`;
+                            iconPreview.classList.remove('border-gray-200', 'dark:border-gray-600');
+                            iconPreview.classList.add('border-primary');
+                        } else {
+                            iconPreview.innerHTML = '<i class="fa-solid fa-tag text-gray-400 text-xl"></i>';
+                            iconPreview.classList.remove('border-primary');
+                            iconPreview.classList.add('border-gray-200', 'dark:border-gray-600');
+                        }
+                    }
+                });
+            }
+
+            // Icon picker modal click outside to close
+            const iconPickerModal = document.getElementById('iconPickerModal');
+            if (iconPickerModal) {
+                iconPickerModal.addEventListener('click', function(e) {
+                    if (e.target === iconPickerModal) {
+                        toggleIconPicker();
+                    }
+                });
+            }
+
             // Budget modal events
             const budgetForm = document.getElementById('budgetForm');
             if (budgetForm) {
@@ -3675,14 +3807,55 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Icon (opsional)</label>
-                    <input
-                        type="text"
-                        name="icon"
-                        id="category_icon"
-                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                        placeholder="Contoh: utensils, car, shopping-bag"
-                    >
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Icon') }} ({{ __('Optional') }})</label>
+                    <!-- Icon Preview -->
+                    <div class="mb-2 flex items-center gap-3">
+                        <div id="category_icon_preview" class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                            <i class="fa-solid fa-tag text-gray-400 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <input
+                                type="text"
+                                name="icon"
+                                id="category_icon"
+                                class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                                placeholder="Pilih icon atau ketik nama icon"
+                            >
+                        </div>
+                        <button type="button" onclick="toggleIconPicker()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
+                            <i class="fa-solid fa-icons mr-1"></i> Pilih
+                        </button>
+                    </div>
+                    
+                    <!-- Icon Picker Modal -->
+                    <div id="iconPickerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h4 class="text-lg font-bold text-dark dark:text-white">Pilih Icon</h4>
+                                <button onclick="toggleIconPicker()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <i class="fa-solid fa-times text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Search -->
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                <input
+                                    type="text"
+                                    id="iconSearch"
+                                    placeholder="Cari icon..."
+                                    class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-dark dark:text-white focus:outline-none focus:border-primary"
+                                    onkeyup="filterIcons()"
+                                >
+                            </div>
+                            
+                            <!-- Icon Grid -->
+                            <div class="flex-1 overflow-y-auto p-4">
+                                <div id="iconGrid" class="grid grid-cols-6 sm:grid-cols-8 gap-3">
+                                    <!-- Icons will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div>

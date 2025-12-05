@@ -339,5 +339,7 @@
     "An error occurred": "An error occurred",
     "No data": "No data",
     "Failed to mark all notifications as read": "Failed to mark all notifications as read",
-    "Failed to mark receivable as paid": "Failed to mark receivable as paid"
+    "Failed to mark receivable as paid": "Failed to mark receivable as paid",
+    "Icon": "Icon",
+    "Optional": "Optional"
 }
