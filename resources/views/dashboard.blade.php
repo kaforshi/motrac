@@ -87,7 +87,15 @@
             </div>
 
             <div class="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
-                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now(getValidTimezone($userTimezone ?? null))->format('Y-m')) }}" onchange="window.changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
+                @php
+                    $tz = $userTimezone ?? config('app.timezone', 'Asia/Jakarta');
+                    try {
+                        $tzObj = new DateTimeZone($tz);
+                    } catch (Exception $e) {
+                        $tz = config('app.timezone', 'Asia/Jakarta');
+                    }
+                @endphp
+                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now($tz)->format('Y-m')) }}" onchange="window.changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 sm:p-1">
                     <button onclick="window.switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
@@ -339,7 +347,15 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-4 sm:mt-6 md:mt-8">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-dark dark:text-white">{{ __("Today's Transactions") }}</h3>
-                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now(getValidTimezone($userTimezone ?? null))->format('d M Y') }}</span>
+                        @php
+                            $tz = $userTimezone ?? config('app.timezone', 'Asia/Jakarta');
+                            try {
+                                $tzObj = new DateTimeZone($tz);
+                            } catch (Exception $e) {
+                                $tz = config('app.timezone', 'Asia/Jakarta');
+                            }
+                        @endphp
+                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now($tz)->format('d M Y') }}</span>
                     </div>
                     @if($todayTransactions->count() > 0)
                         <div class="space-y-3">
@@ -637,7 +653,15 @@
                                 <input
                                     type="date"
                                     name="report_from"
-                                    value="{{ $reportFrom ?? request('report_from', \Carbon\Carbon::now(getValidTimezone($userTimezone ?? null))->startOfMonth()->format('Y-m-d')) }}"
+                                    @php
+                                        $tz = $userTimezone ?? config('app.timezone', 'Asia/Jakarta');
+                                        try {
+                                            $tzObj = new DateTimeZone($tz);
+                                        } catch (Exception $e) {
+                                            $tz = config('app.timezone', 'Asia/Jakarta');
+                                        }
+                                    @endphp
+                                    value="{{ $reportFrom ?? request('report_from', \Carbon\Carbon::now($tz)->startOfMonth()->format('Y-m-d')) }}"
                                     class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                 >
                             </div>
@@ -646,7 +670,7 @@
                                 <input
                                     type="date"
                                     name="report_to"
-                                    value="{{ $reportTo ?? request('report_to', \Carbon\Carbon::now(getValidTimezone($userTimezone ?? null))->format('Y-m-d')) }}"
+                                    value="{{ $reportTo ?? request('report_to', \Carbon\Carbon::now($tz)->format('Y-m-d')) }}"
                                     class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                 >
                             </div>
@@ -675,7 +699,12 @@
                         </form>
                         <div class="flex gap-2 w-full lg:w-auto">
                             @php
-                                $userTz = getValidTimezone($userTimezone ?? null);
+                                $userTz = $userTimezone ?? config('app.timezone', 'Asia/Jakarta');
+                                try {
+                                    $tzObj = new DateTimeZone($userTz);
+                                } catch (Exception $e) {
+                                    $userTz = config('app.timezone', 'Asia/Jakarta');
+                                }
                                 $exportDateFrom = $reportFrom ?? request('report_from', \Carbon\Carbon::now($userTz)->startOfMonth()->format('Y-m-d'));
                                 $exportDateTo = $reportTo ?? request('report_to', \Carbon\Carbon::now($userTz)->format('Y-m-d'));
                                 $exportType = $reportType ?? request('report_type', 'all');

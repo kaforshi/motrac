@@ -18,7 +18,19 @@ class DashboardController extends Controller
      */
     private function getUserTimezone($user)
     {
-        return getValidTimezone($user->timezone ?? null);
+        // Use helper function if available, otherwise validate manually
+        if (function_exists('getValidTimezone')) {
+            return getValidTimezone($user->timezone ?? null);
+        }
+        
+        // Fallback: manual validation
+        $timezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+        try {
+            new \DateTimeZone($timezone);
+            return $timezone;
+        } catch (\Exception $e) {
+            return config('app.timezone', 'Asia/Jakarta');
+        }
     }
     
     public function index(Request $request)
