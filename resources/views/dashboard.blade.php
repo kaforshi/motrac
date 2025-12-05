@@ -106,6 +106,26 @@
         .dark .cash-flow-expense-card p {
             color: rgb(209, 213, 219) !important; /* gray-300 */
         }
+        
+        /* Ensure sidebar doesn't overlap content on desktop */
+        @media (min-width: 768px) {
+            #sidebar {
+                position: relative !important;
+                transform: translateX(0) !important;
+                left: auto !important;
+            }
+            body {
+                display: flex !important;
+            }
+        }
+        
+        /* Ensure main content doesn't get covered */
+        @media (min-width: 768px) {
+            main {
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+        }
     </style>
 </head>
 <body class="font-sans text-slate-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
@@ -114,7 +134,7 @@
     <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleMobileSidebar()"></div>
     
     <!-- ================= Sidebar ================= -->
-    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen">
+    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen flex-shrink-0">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="h-16 flex items-center gap-2 px-6 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
@@ -1253,8 +1273,21 @@
             }
         }
         
+        // Ensure sidebar is properly positioned on desktop
+        function ensureDesktopLayout() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && window.innerWidth >= 768) {
+                // Force sidebar to be relative on desktop
+                sidebar.style.position = 'relative';
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('-translate-x-full');
+            }
+        }
+        
         // Close sidebar when clicking on menu items (mobile only)
         document.addEventListener('DOMContentLoaded', function() {
+            ensureDesktopLayout();
+            
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileSidebarOverlay');
             const menuItems = sidebar?.querySelectorAll('.nav-item, a[href]');
@@ -1273,6 +1306,11 @@
                     });
                 });
             }
+        });
+        
+        // Re-check on window resize
+        window.addEventListener('resize', function() {
+            ensureDesktopLayout();
         });
 
         // Function to switch language
