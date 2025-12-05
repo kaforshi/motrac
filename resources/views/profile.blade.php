@@ -50,8 +50,11 @@
 </head>
 <body class="font-sans text-slate-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
 
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleMobileSidebar()"></div>
+    
     <!-- ================= Sidebar ================= -->
-    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col z-10 transition-all duration-300">
+    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="h-16 flex items-center gap-2 px-6 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
@@ -86,7 +89,7 @@
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-4 sm:px-8 flex items-center justify-between z-20">
             <div class="flex items-center gap-4">
-                <button class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
                 <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">{{ __('My Profile') }}</h2>
             </div>
             
@@ -390,6 +393,46 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // Function to toggle mobile sidebar
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (sidebar && overlay) {
+                const isHidden = sidebar.classList.contains('-translate-x-full');
+                if (isHidden) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; // Prevent body scroll when sidebar is open
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = ''; // Restore body scroll
+                }
+            }
+        }
+        
+        // Close sidebar when clicking on menu items (mobile only)
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            const menuItems = sidebar?.querySelectorAll('.nav-item, a[href]');
+            
+            if (menuItems) {
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Only close on mobile
+                        if (window.innerWidth < 768) {
+                            if (sidebar && overlay) {
+                                sidebar.classList.add('-translate-x-full');
+                                overlay.classList.add('hidden');
+                                document.body.style.overflow = '';
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
         // Function to switch language
         function switchLanguage(locale) {
             if (locale === 'id' || locale === 'en') {
