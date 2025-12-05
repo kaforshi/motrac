@@ -22,17 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Set Carbon timezone based on authenticated user's timezone or default
+        // Set Carbon locale
         Carbon::setLocale(config('app.locale', 'id'));
         
-        // Set timezone based on authenticated user
-        if (auth()->check() && auth()->user()->timezone) {
-            $timezone = auth()->user()->timezone;
-        } else {
-            $timezone = config('app.timezone', 'Asia/Jakarta');
-        }
-        
-        date_default_timezone_set($timezone);
+        // Set default timezone (will be overridden per request in controllers if needed)
+        date_default_timezone_set(config('app.timezone', 'Asia/Jakarta'));
         
         // Register Mailtrap API transport
         $this->app->resolving(MailManager::class, function (MailManager $manager) {

@@ -339,7 +339,7 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-4 sm:mt-6 md:mt-8">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-dark dark:text-white">{{ __("Today's Transactions") }}</h3>
-                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now($user->timezone ?? config('app.timezone', 'Asia/Jakarta'))->format('d M Y') }}</span>
+                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now($userTimezone ?? config('app.timezone', 'Asia/Jakarta'))->format('d M Y') }}</span>
                     </div>
                     @if($todayTransactions->count() > 0)
                         <div class="space-y-3">
