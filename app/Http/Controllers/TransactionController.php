@@ -469,6 +469,14 @@ class TransactionController extends Controller
 
         $transaction->delete();
 
+        // Return JSON response for AJAX requests
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('transactions.index')->with('success', 'Transaction deleted successfully.');
     }
 }

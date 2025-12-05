@@ -465,20 +465,26 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @foreach($transactions as $transaction)
-                                <a href="{{ route('transactions.index') }}" class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer block">
+                                <div onclick="window.openTransactionDetailModal({{ $transaction->id }})" class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" data-transaction-id="{{ $transaction->id }}">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-full {{ $transaction->type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400' }} flex items-center justify-center">
-                                            <i class="fa-solid {{ $transaction->type === 'income' ? 'fa-arrow-down' : 'fa-arrow-up' }}"></i>
+                                        <div class="w-10 h-10 rounded-full {{ $transaction->type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : ($transaction->type === 'expense' ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400') }} flex items-center justify-center">
+                                            <i class="fa-solid {{ $transaction->type === 'income' ? 'fa-arrow-down' : ($transaction->type === 'expense' ? 'fa-arrow-up' : 'fa-exchange-alt') }}"></i>
                                         </div>
                                         <div>
                                             <p class="font-medium text-dark dark:text-white text-sm">{{ $transaction->description }}</p>
-                                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ __('Wallet') }}: {{ $transaction->account->name ?? 'N/A' }}</p>
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">
+                                                @if($transaction->type === 'transfer')
+                                                    {{ $transaction->fromAccount->name ?? 'N/A' }} → {{ $transaction->toAccount->name ?? 'N/A' }}
+                                                @else
+                                                    {{ __('Wallet') }}: {{ $transaction->account->name ?? 'N/A' }}
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
-                                    <span class="font-bold {{ $transaction->type === 'income' ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400' }} text-sm sensitive-data">
-                                        {{ $transaction->type === 'income' ? '+' : '-' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, '.', ',') : number_format($transaction->amount, 0, ',', '.') }}
+                                    <span class="font-bold {{ $transaction->type === 'income' ? 'text-emerald-500 dark:text-emerald-400' : ($transaction->type === 'expense' ? 'text-rose-500 dark:text-rose-400' : 'text-blue-500 dark:text-blue-400') }} text-sm sensitive-data">
+                                        {{ $transaction->type === 'income' ? '+' : ($transaction->type === 'expense' ? '-' : '') }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, '.', ',') : number_format($transaction->amount, 0, ',', '.') }}
                                     </span>
-                                </a>
+                                </div>
                             @endforeach
                         </div>
                     @empty
@@ -1283,7 +1289,43 @@
             pleaseTryAgain: @json(__('Please try again')),
             noData: @json(__('No data')),
             failedMarkNotifications: @json(__('Failed to mark all notifications as read')),
-            failedMarkReceivable: @json(__('Failed to mark receivable as paid'))
+            failedMarkReceivable: @json(__('Failed to mark receivable as paid')),
+            addTransaction: @json(__('Add Transaction')),
+            editTransaction: @json(__('Edit Transaction')),
+            newCategory: @json(__('New Category')),
+            newBudget: @json(__('New Budget')),
+            editBudget: @json(__('Edit Budget')),
+            newWallet: @json(__('New Wallet')),
+            editWallet: @json(__('Edit Wallet')),
+            initialBalance: @json(__('Initial Balance')),
+            balance: @json(__('Balance')),
+            transactionDetail: @json(__('Transaction Detail')),
+            deleteTransaction: @json(__('Delete Transaction')),
+            income: @json(__('Income')),
+            expense: @json(__('Expense')),
+            transfer: @json(__('Transfer')),
+            account: @json(__('Account')),
+            fromAccount: @json(__('From Account')),
+            toAccount: @json(__('To Account')),
+            category: @json(__('Category')),
+            amount: @json(__('Amount')),
+            description: @json(__('Description')),
+            date: @json(__('Date')),
+            notes: @json(__('Notes')),
+            receiptPhoto: @json(__('Receipt Photo')),
+            saveTransaction: @json(__('Save Transaction')),
+            cancel: @json(__('Cancel')),
+            edit: @json(__('Edit')),
+            delete: @json(__('Delete')),
+            splitTransactions: @json(__('Split Transactions')),
+            thisActionCannotBeUndone: @json(__('This action cannot be undone')),
+            areYouSureDeleteTransaction: @json(__('Are you sure you want to delete this transaction?')),
+            deleteTransactionDescription: @json(__('The deleted transaction will restore the account balance according to the changes made previously.')),
+            deleting: @json(__('Deleting...')),
+            transactionDeletedSuccessfully: @json(__('Transaction deleted successfully.')),
+            failedToDeleteTransaction: @json(__('Failed to delete transaction.')),
+            enterDescription: @json(__('Enter description')),
+            additionalNotesOptional: @json(__('Additional notes (optional)'))
         };
         
         // Function to toggle mobile sidebar
@@ -1844,7 +1886,7 @@
             document.getElementById('transactionForm').reset();
             document.getElementById('modal_date').value = new Date().toISOString().split('T')[0];
             if (title) {
-                title.innerText = 'Tambah Transaksi';
+                title.innerText = translations.addTransaction;
             }
             clearErrors();
             
@@ -1862,7 +1904,7 @@
 
                     if (!response.ok || !data.success) {
                         console.error('Failed loading form data:', data);
-                        alert(data.message || 'Gagal memuat data form. Silakan refresh halaman.');
+                        alert(data.message || translations.errorLoadData);
                         return;
                     }
 
@@ -1871,7 +1913,7 @@
                     populateFormSelects();
                 } catch (error) {
                     console.error('Error loading form data:', error);
-                    alert('Gagal memuat data form. Silakan refresh halaman.');
+                    alert(translations.errorLoadData);
                 }
             } else {
                 // Re-populate if already loaded
@@ -1888,7 +1930,7 @@
             window.editingTransactionId = null;
             const title = document.getElementById('transactionModalTitle');
             if (title) {
-                title.innerText = 'Tambah Transaksi';
+                title.innerText = translations.addTransaction;
             }
             clearErrors();
         }
@@ -2027,7 +2069,7 @@
             
             [accountSelect, fromAccountSelect, toAccountSelect].forEach(select => {
                 if (select) {
-                    select.innerHTML = '<option value="">Pilih akun</option>';
+                    select.innerHTML = '<option value="">{{ __('Select account') }}</option>';
                     accountsData.forEach(account => {
                         const option = document.createElement('option');
                         option.value = account.id;
@@ -2040,7 +2082,7 @@
             // Populate categories
             const categorySelect = document.getElementById('modal_category_id');
             if (categorySelect) {
-                categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
+                categorySelect.innerHTML = '<option value="">{{ __('Select category') }}</option>';
                 categoriesData.forEach(category => {
                     const option = document.createElement('option');
                     option.value = category.id;
@@ -2265,12 +2307,12 @@
             if (account && account.id) {
                 // Edit mode
                 editingAccountId = account.id;
-                title.innerText = 'Edit Dompet';
+                title.innerText = translations.editWallet || '{{ __('Edit Wallet') }}';
                 document.getElementById('account_name').value = account.name || '';
                 document.getElementById('account_type').value = account.type || 'cash';
                 document.getElementById('account_currency').value = account.currency || 'IDR';
                 const initialBalanceInput = document.getElementById('account_initial_balance');
-                const balanceLabel = document.querySelector('label[for="account_initial_balance"]');
+                const balanceLabel = document.getElementById('account_balance_label');
                 // Use current balance for editing, not initial_balance
                 if (initialBalanceInput) {
                     const currentBalance = account.balance !== undefined ? account.balance : (account.initial_balance !== undefined ? account.initial_balance : '0');
@@ -2278,7 +2320,7 @@
                 }
                 // Change label to "Saldo" in edit mode
                 if (balanceLabel) {
-                    balanceLabel.innerText = 'Saldo';
+                    balanceLabel.innerText = translations.balance || '{{ __('Balance') }}';
                 }
                 document.getElementById('account_notes').value = account.notes || '';
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
@@ -2288,14 +2330,14 @@
             } else {
                 // Create mode
                 editingAccountId = null;
-                title.innerText = 'Tambah Dompet Baru';
+                title.innerText = translations.newWallet || '{{ __('New Wallet') }}';
                 document.getElementById('account_currency').value = 'IDR';
                 const initialBalanceInput = document.getElementById('account_initial_balance');
-                const balanceLabel = document.querySelector('label[for="account_initial_balance"]');
+                const balanceLabel = document.getElementById('account_balance_label');
                 if (initialBalanceInput) initialBalanceInput.value = '0';
                 // Change label back to "Saldo Awal" in create mode
                 if (balanceLabel) {
-                    balanceLabel.innerText = 'Saldo Awal';
+                    balanceLabel.innerText = translations.initialBalance || '{{ __('Initial Balance') }}';
                 }
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
                 const activeCheckbox = document.getElementById('account_is_active');
@@ -2734,9 +2776,9 @@
                 if (response.ok && data.success && data.transaction) {
                     const t = data.transaction;
                     const typeLabels = {
-                        'income': 'Pemasukan',
-                        'expense': 'Pengeluaran',
-                        'transfer': 'Transfer'
+                        'income': translations.income,
+                        'expense': translations.expense,
+                        'transfer': translations.transfer
                     };
                     const typeLabel = typeLabels[t.type] || t.type;
                     
@@ -2771,13 +2813,13 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Jumlah</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.amount}</label>
                                     <p class="${amountClass}">
                                         ${t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '')}${formatCurrencyJS(t.amount)}
                                     </p>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Kategori</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.category}</label>
                                     <p class="text-sm font-medium text-dark dark:text-white mt-1">${t.category ? t.category.name : 'N/A'}</p>
                                 </div>
                             </div>
@@ -2785,31 +2827,31 @@
                             ${t.type === 'transfer' ? `
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('From Account') }}</label>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.fromAccount}</label>
                                         <p class="text-sm font-medium text-dark dark:text-white mt-1">${t.from_account ? t.from_account.name : 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Ke Akun</label>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.toAccount}</label>
                                         <p class="text-sm font-medium text-dark dark:text-white mt-1">${t.to_account ? t.to_account.name : 'N/A'}</p>
                                     </div>
                                 </div>
                             ` : `
                                 <div>
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Akun</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.account}</label>
                                     <p class="text-sm font-medium text-dark dark:text-white mt-1">${t.account ? t.account.name : 'N/A'}</p>
                                 </div>
                             `}
 
                             ${t.notes ? `
                                 <div>
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Catatan</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.notes}</label>
                                     <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 whitespace-pre-wrap">${t.notes}</p>
                                 </div>
                             ` : ''}
 
                             ${t.receipt_path ? `
                                 <div>
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Foto Struk</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">${translations.receiptPhoto}</label>
                                     <div class="mt-2">
                                         <img src="/storage/${t.receipt_path}" alt="Receipt" class="max-w-full h-auto rounded-lg border border-gray-200 dark:border-gray-700">
                                     </div>
@@ -2818,7 +2860,7 @@
 
                             ${t.is_split && t.split_transactions && t.split_transactions.length > 0 ? `
                                 <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-3 block">Transaksi Terpisah</label>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-3 block">${translations.splitTransactions}</label>
                                     <div class="space-y-2">
                                         ${t.split_transactions.map(st => `
                                             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -2840,7 +2882,13 @@
                                     onclick="openTransactionEditModal(${t.id})" 
                                     class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center gap-2"
                                 >
-                                    <i class="fa-solid fa-edit"></i> Edit
+                                    <i class="fa-solid fa-edit"></i> ${translations.edit}
+                                </button>
+                                <button 
+                                    onclick="deleteTransaction(${t.id})" 
+                                    class="px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition flex items-center gap-2"
+                                >
+                                    <i class="fa-solid fa-trash"></i> ${translations.delete}
                                 </button>
                             </div>
                         </div>
@@ -2859,6 +2907,84 @@
         window.closeTransactionDetailModal = function closeTransactionDetailModal() {
             const modal = document.getElementById('transactionDetailModal');
             modal.classList.add('hidden');
+        }
+
+        // Function to open delete confirmation modal
+        window.deleteTransaction = function deleteTransaction(transactionId) {
+            window.deletingTransactionId = transactionId;
+            const modal = document.getElementById('deleteTransactionModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close delete confirmation modal
+        window.closeDeleteTransactionModal = function closeDeleteTransactionModal() {
+            const modal = document.getElementById('deleteTransactionModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.deletingTransactionId = null;
+        }
+
+        // Function to confirm and delete transaction
+        window.confirmDeleteTransaction = async function confirmDeleteTransaction() {
+            if (!window.deletingTransactionId) {
+                return;
+            }
+
+            const transactionId = window.deletingTransactionId;
+            const submitBtn = document.getElementById('confirmDeleteBtn');
+            const originalText = submitBtn ? submitBtn.innerHTML : '';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + translations.deleting;
+            }
+
+            try {
+                const response = await fetch(`/transactions/${transactionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + translations.transactionDeletedSuccessfully;
+                    document.body.appendChild(notification);
+                    
+                    // Close modals
+                    closeDeleteTransactionModal();
+                    closeTransactionDetailModal();
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        // Reload page to show updated transaction list
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    alert(data.message || translations.failedToDeleteTransaction);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                alert(translations.errorGeneral);
+            }
         }
 
         // Function to open transaction edit modal
@@ -2883,7 +3009,7 @@
             // Set editing mode
             window.editingTransactionId = transactionId;
             if (title) {
-                title.innerText = 'Edit Transaksi';
+                title.innerText = translations.editTransaction;
             }
             
             try {
@@ -3175,7 +3301,7 @@
             // Reset budget_id for new budget
             setTimeout(() => {
                 document.getElementById('budget_id').value = '';
-                modalTitle.textContent = 'Tambah Budget Baru';
+                modalTitle.textContent = translations.newBudget || '{{ __('New Budget') }}';
                 // Set default month and year
                 document.getElementById('budget_month').value = new Date().getMonth() + 1;
                 document.getElementById('budget_year').value = new Date().getFullYear();
@@ -3226,7 +3352,7 @@
             }
             
             // Set modal title
-            modalTitle.textContent = 'Edit Budget';
+            modalTitle.textContent = translations.editBudget || '{{ __('Edit Budget') }}';
             
             // Use setTimeout to ensure form.reset() has completed
             setTimeout(() => {
@@ -3958,6 +4084,16 @@
                 });
             }
 
+            // Delete transaction modal events
+            const deleteTransactionModal = document.getElementById('deleteTransactionModal');
+            if (deleteTransactionModal) {
+                deleteTransactionModal.addEventListener('click', function(e) {
+                    if (e.target === deleteTransactionModal) {
+                        closeDeleteTransactionModal();
+                    }
+                });
+            }
+
             // Set initial view based on URL params
             const params = new URLSearchParams(window.location.search);
             const hasTransactionFilter = params.has('transaction_search') || params.has('transaction_category_id');
@@ -4023,7 +4159,7 @@
     <div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 id="transactionModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
+                <h3 id="transactionModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Add Transaction') }}</h3>
                     <button onclick="window.closeTransactionModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
@@ -4033,18 +4169,18 @@
                 @csrf
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe Transaksi</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Transaction Type') }}</label>
                     <select name="type" id="modal_transactionType" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                        <option value="income">Pemasukan</option>
-                        <option value="expense">Pengeluaran</option>
-                        <option value="transfer">Transfer</option>
+                        <option value="income">{{ __('Income') }}</option>
+                        <option value="expense">{{ __('Expense') }}</option>
+                        <option value="transfer">{{ __('Transfer') }}</option>
                     </select>
                 </div>
 
                 <div id="singleAccountField">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Akun</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Account') }}</label>
                     <select name="account_id" id="modal_account_id" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                        <option value="">Pilih akun</option>
+                        <option value="">{{ __('Select account') }}</option>
                     </select>
                 </div>
 
@@ -4057,52 +4193,52 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ke Akun</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('To Account') }}</label>
                             <select name="to_account_id" id="modal_to_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                                <option value="">Pilih akun</option>
+                                <option value="">{{ __('Select account') }}</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Category') }}</label>
                     <select name="category_id" id="modal_category_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                        <option value="">Pilih kategori</option>
+                        <option value="">{{ __('Select category') }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Amount') }}</label>
                     <input type="text" name="amount" id="modal_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi</label>
-                    <input type="text" name="description" id="modal_description" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary" placeholder="Masukkan deskripsi">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Description') }}</label>
+                    <input type="text" name="description" id="modal_description" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary" placeholder="{{ __('Enter description') }}">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Date') }}</label>
                     <input type="date" name="date" id="modal_date" value="{{ date('Y-m-d') }}" required class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan</label>
-                    <textarea name="notes" id="modal_notes" rows="3" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan (opsional)"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Notes') }}</label>
+                    <textarea name="notes" id="modal_notes" rows="3" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary" placeholder="{{ __('Additional notes (optional)') }}"></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Struk (Opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Receipt Photo') }} ({{ __('Optional') }})</label>
                     <input type="file" name="receipt" id="modal_receipt" accept="image/*" class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary">
                 </div>
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
-                        <i class="fa-solid fa-save mr-2"></i> Simpan Transaksi
+                        <i class="fa-solid fa-save mr-2"></i> {{ __('Save Transaction') }}
                     </button>
                     <button type="button" onclick="window.closeTransactionModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                        Batal
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>
@@ -4113,7 +4249,7 @@
     <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 id="accountModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Dompet Baru</h3>
+                <h3 id="accountModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('New Wallet') }}</h3>
                 <button onclick="window.closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
@@ -4123,35 +4259,35 @@
                 @csrf
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Dompet</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Wallet Name') }}</label>
                     <input
                         type="text"
                         name="name"
                         id="account_name"
                         required
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                        placeholder="Contoh: BCA, Dompet Cash"
+                        placeholder="{{ __('Example: BCA, Cash Wallet') }}"
                     >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe Dompet</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Wallet Type') }}</label>
                     <select
                         name="type"
                         id="account_type"
                         required
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                     >
-                        <option value="cash">Cash</option>
-                        <option value="bank">Rekening Bank</option>
-                        <option value="ewallet">E-Wallet</option>
-                        <option value="liability">Kewajiban (Kartu Kredit, Paylater)</option>
-                        <option value="investment">Investasi</option>
+                        <option value="cash">{{ __('Cash') }}</option>
+                        <option value="bank">{{ __('Bank Account') }}</option>
+                        <option value="ewallet">{{ __('E-Wallet') }}</option>
+                        <option value="liability">{{ __('Liability (Credit Card, Paylater)') }}</option>
+                        <option value="investment">{{ __('Investment') }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Saldo Awal</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="account_balance_label">{{ __('Initial Balance') }}</label>
                     <input
                         type="text"
                         name="initial_balance"
@@ -4164,7 +4300,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mata Uang</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Currency') }}</label>
                     <input
                         type="text"
                         name="currency"
@@ -4196,27 +4332,27 @@
                             class="rounded border-gray-300 dark:border-gray-600"
                             checked
                         >
-                        <span>Dompet aktif</span>
+                        <span>{{ __('Active wallet') }}</span>
                     </label>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Notes') }}</label>
                     <textarea
                         name="notes"
                         id="account_notes"
                         rows="3"
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                        placeholder="Catatan tambahan (opsional)"
+                        placeholder="{{ __('Additional notes (optional)') }}"
                     ></textarea>
                 </div>
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
-                        <i class="fa-solid fa-save mr-2"></i> Simpan Dompet
+                        <i class="fa-solid fa-save mr-2"></i> {{ __('Save Wallet') }}
                     </button>
                     <button type="button" onclick="window.closeAccountModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                        Batal
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>
@@ -4227,7 +4363,7 @@
     <div id="categoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">Tambah Kategori Baru</h3>
+                <h3 class="text-xl font-bold text-dark dark:text-white">{{ __('New Category') }}</h3>
                 <button onclick="window.closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
@@ -4237,27 +4373,27 @@
                 @csrf
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Category Name') }}</label>
                     <input
                         type="text"
                         name="name"
                         id="category_name"
                         required
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                        placeholder="Contoh: Makan, Transport"
+                        placeholder="{{ __('Example: Food, Transport') }}"
                     >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Type') }}</label>
                     <select
                         name="type"
                         id="category_type"
                         required
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                     >
-                        <option value="expense">Pengeluaran</option>
-                        <option value="income">Pemasukan</option>
+                        <option value="expense">{{ __('Expense') }}</option>
+                        <option value="income">{{ __('Income') }}</option>
                     </select>
                 </div>
 
@@ -4274,11 +4410,11 @@
                                 name="icon"
                                 id="category_icon"
                                 class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                                placeholder="Pilih icon atau ketik nama icon"
+                                placeholder="{{ __('Select icon or type icon name') }}"
                             >
                         </div>
                         <button type="button" onclick="toggleIconPicker()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
-                            <i class="fa-solid fa-icons mr-1"></i> Pilih
+                            <i class="fa-solid fa-icons mr-1"></i> {{ __('Select') }}
                         </button>
                     </div>
                     
@@ -4286,7 +4422,7 @@
                     <div id="iconPickerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
                             <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                                <h4 class="text-lg font-bold text-dark dark:text-white">Pilih Icon</h4>
+                                <h4 class="text-lg font-bold text-dark dark:text-white">{{ __('Select Icon') }}</h4>
                                 <button onclick="toggleIconPicker()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                     <i class="fa-solid fa-times text-xl"></i>
                                 </button>
@@ -4367,7 +4503,7 @@
                             
                             <!-- Preset Colors Grid -->
                             <div class="flex-1 overflow-y-auto p-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Warna Preset</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ __('Preset Colors') }}</label>
                                 <div id="colorGrid" class="grid grid-cols-8 gap-2">
                                     <!-- Colors will be populated by JavaScript -->
                                 </div>
@@ -4377,13 +4513,13 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Parent (opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Parent') }} ({{ __('Optional') }})</label>
                     <select
                         name="parent_id"
                         id="category_parent_id"
                             class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                     >
-                        <option value="">Tanpa parent</option>
+                        <option value="">{{ __('No parent') }}</option>
                         @php
                             $allCategoriesForParent = \App\Models\Category::where('user_id', auth()->id())
                                 ->whereNull('parent_id')
@@ -4398,10 +4534,10 @@
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
-                        <i class="fa-solid fa-save mr-2"></i> Simpan Kategori
+                        <i class="fa-solid fa-save mr-2"></i> {{ __('Save Category') }}
                     </button>
                     <button type="button" onclick="window.closeCategoryModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                        Batal
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>
@@ -4412,7 +4548,7 @@
     <div id="transactionDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Detail Transaksi</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Transaction Detail') }}</h3>
                 <button onclick="window.closeTransactionDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
@@ -4430,7 +4566,7 @@
     <div id="budgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 id="budgetModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Budget Baru</h3>
+                <h3 id="budgetModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('New Budget') }}</h3>
                 <button onclick="window.closeBudgetModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
@@ -4441,9 +4577,9 @@
                 <input type="hidden" id="budget_id" name="budget_id" value="">
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Category') }}</label>
                     <select name="category_id" id="budget_category_id" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                        <option value="">Pilih kategori</option>
+                        <option value="">{{ __('Select category') }}</option>
                         @foreach($expenseCategories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
@@ -4452,14 +4588,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Budget</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Budget Amount') }}</label>
                     <input type="text" name="amount" id="budget_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_amount"></span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bulan</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Month') }}</label>
                         <select name="month" id="budget_month" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                             @for($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ $i == date('n') ? 'selected' : '' }}>{{ \Carbon\Carbon::create(null, $i, 1)->locale('id')->monthName }}</option>
@@ -4468,7 +4604,7 @@
                         <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_month"></span>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Year') }}</label>
                         <input type="number" name="year" id="budget_year" value="{{ date('Y') }}" min="2020" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                         <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_year"></span>
                     </div>
@@ -4482,16 +4618,16 @@
                             id="budget_rollover_enabled"
                             class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                         >
-                        <span>Aktifkan rollover (sisa budget bulan ini akan ditambahkan ke bulan berikutnya)</span>
+                        <span>{{ __('Enable rollover (remaining budget this month will be added to next month)') }}</span>
                     </label>
                 </div>
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
-                        <i class="fa-solid fa-save mr-2"></i> Simpan Budget
+                        <i class="fa-solid fa-save mr-2"></i> {{ __('Save Budget') }}
                     </button>
                     <button type="button" onclick="window.closeBudgetModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                        Batal
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>
@@ -4502,7 +4638,7 @@
     <div id="debtModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 id="debtModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Piutang</h3>
+                <h3 id="debtModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Add Receivable') }}</h3>
                 <button onclick="window.closeDebtModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
@@ -4513,39 +4649,39 @@
                 <input type="hidden" id="debt_type" name="type" value="">
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Kontak</label>
-                    <input type="text" name="contact_name" id="debt_contact_name" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="Nama orang/kontak">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Contact Name') }}</label>
+                    <input type="text" name="contact_name" id="debt_contact_name" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="{{ __('Person/contact name') }}">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_name"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor Telepon (Opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Phone Number (Optional)') }}</label>
                     <input type="text" name="contact_phone" id="debt_contact_phone" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="08xxxxxxxxxx">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_phone"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email (Opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Email (Optional)') }}</label>
                     <input type="email" name="contact_email" id="debt_contact_email" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="email@example.com">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_contact_email"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Initial Amount') }}</label>
                     <input type="text" name="initial_amount" id="debt_initial_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_initial_amount"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal Jatuh Tempo (Opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Due Date (Optional)') }}</label>
                     <input type="date" name="due_date" id="debt_due_date" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_due_date"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Akun Terkait (Opsional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Related Account (Optional)') }}</label>
                     <select name="account_id" id="debt_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
-                        <option value="">Pilih akun (opsional)</option>
+                        <option value="">{{ __('Select account (optional)') }}</option>
                         @foreach($accounts as $account)
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
                         @endforeach
@@ -4554,17 +4690,17 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi (Opsional)</label>
-                    <textarea name="description" id="debt_description" rows="3" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="Catatan tambahan"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Description (Optional)') }}</label>
+                    <textarea name="description" id="debt_description" rows="3" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="{{ __('Additional notes') }}"></textarea>
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_description"></span>
                 </div>
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
-                        <i class="fa-solid fa-save mr-2"></i> Simpan
+                        <i class="fa-solid fa-save mr-2"></i> {{ __('Save') }}
                     </button>
                     <button type="button" onclick="window.closeDebtModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                        Batal
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>
@@ -4761,6 +4897,45 @@
             <div id="debtDetailContent" class="p-6 space-y-4">
                 <div class="flex items-center justify-center py-8">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Transaction Confirmation Modal -->
+    <div id="deleteTransactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md">
+            <div class="p-4 sm:p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-500 dark:text-rose-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark dark:text-white">{{ __('Delete Transaction') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('This action cannot be undone') }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+                    {{ __('Are you sure you want to delete this transaction?') }} {{ __('The deleted transaction will restore the account balance according to the changes made previously.') }}
+                </p>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="window.closeDeleteTransactionModal()" 
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    >
+                        {{ __('Cancel') }}
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteBtn"
+                        onclick="window.confirmDeleteTransaction()" 
+                        class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
+                    >
+                        <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
+                    </button>
                 </div>
             </div>
         </div>
