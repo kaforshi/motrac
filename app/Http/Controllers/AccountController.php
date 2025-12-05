@@ -84,6 +84,8 @@ class AccountController extends Controller
                 'is_hidden' => 'nullable',
                 'is_active' => 'nullable',
                 'notes' => 'nullable|string',
+                'initial_balance' => 'nullable|numeric',
+                'balance' => 'nullable|numeric',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax() || $request->wantsJson()) {
@@ -100,6 +102,19 @@ class AccountController extends Controller
         // Checkbox yang dicentang akan mengirim "on" atau "1", yang tidak dicentang tidak dikirim sama sekali
         $validated['is_hidden'] = $request->has('is_hidden') && ($request->input('is_hidden') === 'on' || $request->input('is_hidden') === '1' || $request->input('is_hidden') === true || $request->input('is_hidden') === 1);
         $validated['is_active'] = $request->has('is_active') && ($request->input('is_active') === 'on' || $request->input('is_active') === '1' || $request->input('is_active') === true || $request->input('is_active') === 1);
+
+        // Update balance if provided (for editing)
+        if ($request->has('balance')) {
+            $validated['balance'] = $request->input('balance');
+        } elseif ($request->has('initial_balance')) {
+            // If balance not provided but initial_balance is, use initial_balance for balance
+            $validated['balance'] = $request->input('initial_balance');
+        }
+
+        // Update initial_balance if provided
+        if ($request->has('initial_balance')) {
+            $validated['initial_balance'] = $request->input('initial_balance');
+        }
 
         $account->update($validated);
 

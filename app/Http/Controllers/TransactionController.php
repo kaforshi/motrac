@@ -311,6 +311,131 @@ class TransactionController extends Controller
         ]);
     }
 
+    public function update(Request $request, $id)
+    {
+        $user = auth()->user();
+        $transaction = Transaction::where('user_id', $user->id)->findOrFail($id);
+        
+        // Store old values for balance reversal
+        $oldType = $transaction->type;
+        $oldAmount = $transaction->amount;
+        $oldAccountId = $transaction->account_id;
+        $oldFromAccountId = $transaction->from_account_id;
+        $oldToAccountId = $transaction->to_account_id;
+
+        DB::beginTransaction();
+        try {
+            // Reverse old balance changes
+            if ($oldType === Transaction::TYPE_INCOME && $oldAccountId) {
+                $account = Account::find($oldAccountId);
+                if ($account) {
+                    $account->balance -= $oldAmount;
+                    $account->save();
+                }
+            } elseif ($oldType === Transaction::TYPE_EXPENSE && $oldAccountId) {
+                $account = Account::find($oldAccountId);
+                if ($account) {
+                    $account->balance += $oldAmount;
+                    $account->save();
+                }
+            } elseif ($oldType === Transaction::TYPE_TRANSFER) {
+                if ($oldFromAccountId) {
+                    $fromAccount = Account::find($oldFromAccountId);
+                    if ($fromAccount) {
+                        $fromAccount->balance += $oldAmount;
+                        $fromAccount->save();
+                    }
+                }
+                if ($oldToAccountId) {
+                    $toAccount = Account::find($oldToAccountId);
+                    if ($toAccount) {
+                        $toAccount->balance -= $oldAmount;
+                        $toAccount->save();
+                    }
+                }
+            }
+
+            // Validate new data
+            $validated = $request->validate([
+                'type' => 'required|in:income,expense,transfer',
+                'amount' => 'required|numeric|min:0.01',
+                'description' => 'required|string|max:255',
+                'date' => 'required|date',
+                'category_id' => 'nullable|exists:categories,id',
+                'account_id' => [
+                    Rule::requiredIf(function () use ($request) {
+                        return in_array($request->type, ['income', 'expense']);
+                    }),
+                    'nullable',
+                    'exists:accounts,id'
+                ],
+                'from_account_id' => [
+                    Rule::requiredIf(function () use ($request) {
+                        return $request->type === 'transfer';
+                    }),
+                    'nullable',
+                    'exists:accounts,id'
+                ],
+                'to_account_id' => [
+                    Rule::requiredIf(function () use ($request) {
+                        return $request->type === 'transfer';
+                    }),
+                    'nullable',
+                    'exists:accounts,id'
+                ],
+                'notes' => 'nullable|string',
+            ]);
+
+            // Update transaction
+            $transaction->update([
+                'type' => $validated['type'],
+                'amount' => $validated['amount'],
+                'description' => $validated['description'],
+                'date' => $validated['date'],
+                'category_id' => $validated['category_id'] ?? null,
+                'account_id' => $validated['account_id'] ?? null,
+                'from_account_id' => $validated['from_account_id'] ?? null,
+                'to_account_id' => $validated['to_account_id'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            // Apply new balance changes
+            $this->updateAccountBalance(
+                $validated['type'],
+                $validated['account_id'] ?? $validated['from_account_id'] ?? null,
+                $validated['amount'],
+                $validated['to_account_id'] ?? null
+            );
+
+            DB::commit();
+
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                $transaction->load(['account', 'category', 'fromAccount', 'toAccount']);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Transaction updated successfully.',
+                    'transaction' => $transaction
+                ]);
+            }
+
+            return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update transaction: ' . $e->getMessage(),
+                    'errors' => $e->getMessage()
+                ], 422);
+            }
+            
+            return back()->withErrors(['error' => 'Failed to update transaction: ' . $e->getMessage()])->withInput();
+        }
+    }
+
     public function destroy($id)
     {
         $transaction = Transaction::where('user_id', auth()->id())->findOrFail($id);

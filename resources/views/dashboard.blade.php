@@ -541,6 +541,8 @@
                                     data-notes="{{ e($account->notes) }}"
                                     data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
                                     data-is-active="{{ $account->is_active ? 1 : 0 }}"
+                                    data-balance="{{ $account->balance }}"
+                                    data-initial-balance="{{ $account->initial_balance }}"
                                     onclick="window.openAccountEditFromButton(this)"
                                 >
                                     <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -1833,11 +1835,17 @@
 
         window.openTransactionModal = async function openTransactionModal() {
             const modal = document.getElementById('transactionModal');
+            const title = document.getElementById('transactionModalTitle');
+            
             modal.classList.remove('hidden');
             
-            // Reset form
+            // Reset form and clear editing mode
+            window.editingTransactionId = null;
             document.getElementById('transactionForm').reset();
             document.getElementById('modal_date').value = new Date().toISOString().split('T')[0];
+            if (title) {
+                title.innerText = 'Tambah Transaksi';
+            }
             clearErrors();
             
             // Load form data if not already loaded
@@ -1877,6 +1885,11 @@
             document.getElementById('transactionForm').reset();
             document.getElementById('singleAccountField').style.display = 'block';
             document.getElementById('transferAccountsField').style.display = 'none';
+            window.editingTransactionId = null;
+            const title = document.getElementById('transactionModalTitle');
+            if (title) {
+                title.innerText = 'Tambah Transaksi';
+            }
             clearErrors();
         }
 
@@ -2145,12 +2158,30 @@
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             
+            // Format amount before sending
+            const amountInput = document.getElementById('modal_amount');
+            if (amountInput) {
+                const formattedValue = amountInput.value;
+                const unformattedValue = unformatNumber(formattedValue);
+                formData.set('amount', unformattedValue || '0');
+            }
+            
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                const response = await fetch('{{ route("transactions.store") }}', {
-                    method: 'POST',
+                let url = '{{ route("transactions.store") }}';
+                let method = 'POST';
+                
+                // If editing, use update route
+                if (window.editingTransactionId) {
+                    url = `/transactions/${window.editingTransactionId}`;
+                    method = 'POST';
+                    formData.append('_method', 'PUT');
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
@@ -2165,13 +2196,16 @@
                     // Success - show notification
                     const notification = document.createElement('div');
                     notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Transaksi berhasil ditambahkan!';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + (window.editingTransactionId ? 'Transaksi berhasil diperbarui!' : 'Transaksi berhasil ditambahkan!');
                     document.body.appendChild(notification);
+                    
+                    // Clear editing mode
+                    window.editingTransactionId = null;
                     
                     setTimeout(() => {
                         notification.remove();
                         closeTransactionModal();
-                        // Reload page to show new transaction
+                        // Reload page to show updated transaction
                         window.location.reload();
                     }, 1500);
                 } else {
@@ -2213,6 +2247,8 @@
                 notes: btn.dataset.notes || '',
                 is_hidden: btn.dataset.isHidden === '1',
                 is_active: btn.dataset.isActive === '1',
+                balance: btn.dataset.balance || '0',
+                initial_balance: btn.dataset.initialBalance || '0',
             };
             openAccountModal(account);
         }
@@ -2234,10 +2270,15 @@
                 document.getElementById('account_type').value = account.type || 'cash';
                 document.getElementById('account_currency').value = account.currency || 'IDR';
                 const initialBalanceInput = document.getElementById('account_initial_balance');
-                if (initialBalanceInput && account.initial_balance !== undefined) {
-                    initialBalanceInput.value = formatNumber(account.initial_balance, 0);
-                } else {
-                    initialBalanceInput.value = '';
+                const balanceLabel = document.querySelector('label[for="account_initial_balance"]');
+                // Use current balance for editing, not initial_balance
+                if (initialBalanceInput) {
+                    const currentBalance = account.balance !== undefined ? account.balance : (account.initial_balance !== undefined ? account.initial_balance : '0');
+                    initialBalanceInput.value = formatNumber(parseFloat(currentBalance) || 0, 0);
+                }
+                // Change label to "Saldo" in edit mode
+                if (balanceLabel) {
+                    balanceLabel.innerText = 'Saldo';
                 }
                 document.getElementById('account_notes').value = account.notes || '';
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
@@ -2250,7 +2291,12 @@
                 title.innerText = 'Tambah Dompet Baru';
                 document.getElementById('account_currency').value = 'IDR';
                 const initialBalanceInput = document.getElementById('account_initial_balance');
+                const balanceLabel = document.querySelector('label[for="account_initial_balance"]');
                 if (initialBalanceInput) initialBalanceInput.value = '0';
+                // Change label back to "Saldo Awal" in create mode
+                if (balanceLabel) {
+                    balanceLabel.innerText = 'Saldo Awal';
+                }
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
                 const activeCheckbox = document.getElementById('account_is_active');
                 if (hiddenCheckbox) hiddenCheckbox.checked = false;
@@ -2286,6 +2332,19 @@
             // Add correct boolean values
             formData.append('is_hidden', isHiddenCheckbox && isHiddenCheckbox.checked ? '1' : '0');
             formData.append('is_active', isActiveCheckbox && isActiveCheckbox.checked ? '1' : '0');
+            
+            // Format initial_balance: unformat the number before sending
+            const initialBalanceInput = document.getElementById('account_initial_balance');
+            if (initialBalanceInput) {
+                const formattedValue = initialBalanceInput.value;
+                const unformattedValue = unformatNumber(formattedValue);
+                formData.set('initial_balance', unformattedValue || '0');
+                
+                // If editing, also send as balance to update current balance
+                if (editingAccountId) {
+                    formData.append('balance', unformattedValue || '0');
+                }
+            }
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
@@ -2775,6 +2834,15 @@
                                     </div>
                                 </div>
                             ` : ''}
+
+                            <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                                <button 
+                                    onclick="openTransactionEditModal(${t.id})" 
+                                    class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center gap-2"
+                                >
+                                    <i class="fa-solid fa-edit"></i> Edit
+                                </button>
+                            </div>
                         </div>
                     `;
 
@@ -2788,9 +2856,156 @@
             }
         }
 
-        function closeTransactionDetailModal() {
+        window.closeTransactionDetailModal = function closeTransactionDetailModal() {
             const modal = document.getElementById('transactionDetailModal');
             modal.classList.add('hidden');
+        }
+
+        // Function to open transaction edit modal
+        window.openTransactionEditModal = async function openTransactionEditModal(transactionId) {
+            // Close detail modal first
+            closeTransactionDetailModal();
+            
+            // Open transaction modal
+            const modal = document.getElementById('transactionModal');
+            const form = document.getElementById('transactionForm');
+            const title = document.getElementById('transactionModalTitle');
+            
+            if (!modal || !form) {
+                console.error('Transaction modal elements not found');
+                return;
+            }
+            
+            modal.classList.remove('hidden');
+            form.reset();
+            clearErrors();
+            
+            // Set editing mode
+            window.editingTransactionId = transactionId;
+            if (title) {
+                title.innerText = 'Edit Transaksi';
+            }
+            
+            try {
+                // Fetch transaction data
+                const response = await fetch(`/transactions/${transactionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success && data.transaction) {
+                    const t = data.transaction;
+                    
+                    // Load form data if not already loaded
+                    if (accountsData.length === 0) {
+                        const formDataResponse = await fetch('{{ route("transactions.formData") }}', {
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin'
+                        });
+                        const formData = await formDataResponse.json();
+                        if (formDataResponse.ok && formData.success) {
+                            accountsData = Array.isArray(formData.accounts) ? formData.accounts : [];
+                            categoriesData = Array.isArray(formData.categories) ? formData.categories : [];
+                            populateFormSelects();
+                        }
+                    } else {
+                        populateFormSelects();
+                    }
+                    
+                    // Function to fill form fields after selects are populated
+                    const fillFormFields = () => {
+                        // Set transaction type first
+                        const typeSelect = document.getElementById('modal_transactionType');
+                        if (typeSelect) {
+                            typeSelect.value = t.type || 'expense';
+                            // Trigger change to show/hide correct account fields
+                            const changeEvent = new Event('change', { bubbles: true });
+                            typeSelect.dispatchEvent(changeEvent);
+                            handleTransactionTypeChange();
+                        }
+                        
+                        // Wait for account fields to show/hide and selects to be populated
+                        setTimeout(() => {
+                            // Fill account fields based on type
+                            if (t.type === 'transfer') {
+                                const fromAccountSelect = document.getElementById('modal_from_account_id');
+                                const toAccountSelect = document.getElementById('modal_to_account_id');
+                                if (fromAccountSelect && t.from_account_id) {
+                                    fromAccountSelect.value = t.from_account_id.toString();
+                                    // Trigger change event to ensure it's set
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    fromAccountSelect.dispatchEvent(changeEvent);
+                                }
+                                if (toAccountSelect && t.to_account_id) {
+                                    toAccountSelect.value = t.to_account_id.toString();
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    toAccountSelect.dispatchEvent(changeEvent);
+                                }
+                            } else {
+                                const accountSelect = document.getElementById('modal_account_id');
+                                if (accountSelect && t.account_id) {
+                                    accountSelect.value = t.account_id.toString();
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    accountSelect.dispatchEvent(changeEvent);
+                                }
+                            }
+                            
+                            // Fill category
+                            const categorySelect = document.getElementById('modal_category_id');
+                            if (categorySelect && t.category_id) {
+                                categorySelect.value = t.category_id.toString();
+                                const changeEvent = new Event('change', { bubbles: true });
+                                categorySelect.dispatchEvent(changeEvent);
+                            }
+                            
+                            // Fill amount (format with dots as thousands separator)
+                            const amountInput = document.getElementById('modal_amount');
+                            if (amountInput) {
+                                const amount = parseFloat(t.amount) || 0;
+                                amountInput.value = formatNumber(amount, 0);
+                                // Trigger input event for formatting
+                                const inputEvent = new Event('input', { bubbles: true });
+                                amountInput.dispatchEvent(inputEvent);
+                            }
+                            
+                            // Fill description
+                            const descriptionInput = document.getElementById('modal_description');
+                            if (descriptionInput) {
+                                descriptionInput.value = t.description || '';
+                            }
+                            
+                            // Fill date
+                            const dateInput = document.getElementById('modal_date');
+                            if (dateInput) {
+                                const dateValue = t.date ? (t.date.includes('T') ? t.date.split('T')[0] : t.date) : new Date().toISOString().split('T')[0];
+                                dateInput.value = dateValue;
+                            }
+                            
+                            // Fill notes
+                            const notesInput = document.getElementById('modal_notes');
+                            if (notesInput) {
+                                notesInput.value = t.notes || '';
+                            }
+                        }, 300);
+                    };
+                    
+                    // Wait for populateFormSelects to complete, then fill fields
+                    // Use a longer timeout to ensure selects are fully populated
+                    setTimeout(fillFormFields, 500);
+                } else {
+                    alert('Gagal memuat data transaksi');
+                }
+            } catch (error) {
+                console.error('Error loading transaction:', error);
+                alert('Gagal memuat data transaksi');
+            }
         }
 
         // 7.5. Debt Detail Modal Functions
@@ -3808,7 +4023,7 @@
     <div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
+                <h3 id="transactionModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
                     <button onclick="window.closeTransactionModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
