@@ -31,7 +31,7 @@ class DashboardController extends Controller
         $selectedYear = Carbon::now($userTimezone)->year;
         
         if ($monthYear) {
-            $selectedDate = Carbon::parse($monthYear . '-01', $userTimezone);
+            $selectedDate = Carbon::parse($monthYear . '-01')->setTimezone($userTimezone);
             $selectedMonth = $selectedDate->month;
             $selectedYear = $selectedDate->year;
             $fromDate = $selectedDate->copy()->startOfMonth();
@@ -47,10 +47,10 @@ class DashboardController extends Controller
         $reportType = $request->get('report_type', 'all'); // all, income, expense, transfer
 
         if ($reportFrom) {
-            $fromDate = Carbon::parse($reportFrom)->startOfDay();
+            $fromDate = Carbon::parse($reportFrom)->setTimezone($userTimezone)->startOfDay();
         }
         if ($reportTo) {
-            $toDate = Carbon::parse($reportTo)->endOfDay();
+            $toDate = Carbon::parse($reportTo)->setTimezone($userTimezone)->endOfDay();
         }
 
         // Monthly income and expense (respect filters)
@@ -256,7 +256,7 @@ class DashboardController extends Controller
         $maxCashFlow = 1;
         
         // Use selected month/year for cash flow calculations
-        $selectedDate = $monthYear ? Carbon::parse($monthYear . '-01', $userTimezone) : Carbon::now($userTimezone);
+        $selectedDate = $monthYear ? Carbon::parse($monthYear . '-01')->setTimezone($userTimezone) : Carbon::now($userTimezone);
         
         switch ($periodType) {
             case 'daily':
@@ -457,7 +457,8 @@ class DashboardController extends Controller
                 // Check if budget exceeds 80%
                 if ($usagePercent >= 80) {
                     // Check if notification already exists for this budget this month
-                    $now = Carbon::now($user->timezone ?? config('app.timezone', 'Asia/Jakarta'));
+                    $userTz = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+                    $now = Carbon::now($userTz);
                     $existingNotification = Notification::where('user_id', $user->id)
                         ->where('type', 'budget')
                         ->whereJsonContains('data->budget_id', $budget->id)
