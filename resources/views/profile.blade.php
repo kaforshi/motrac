@@ -47,15 +47,25 @@
             background-color: #10B981;
         }
         
-        /* Ensure sidebar doesn't overlap content on desktop */
+        /* Ensure sidebar doesn't overlap content on desktop - More robust for cross-browser */
         @media (min-width: 768px) {
             #sidebar {
                 position: relative !important;
                 transform: translateX(0) !important;
+                -webkit-transform: translateX(0) !important;
+                -moz-transform: translateX(0) !important;
+                -ms-transform: translateX(0) !important;
                 left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
             }
             body {
                 display: flex !important;
+                -webkit-display: flex !important;
+            }
+            body > aside#sidebar {
+                position: relative !important;
             }
         }
         
@@ -63,7 +73,19 @@
         @media (min-width: 768px) {
             main {
                 flex: 1 !important;
+                -webkit-flex: 1 !important;
                 min-width: 0 !important;
+                width: auto !important;
+                max-width: none !important;
+            }
+        }
+        
+        /* Force sidebar width on desktop to prevent overflow */
+        @media (min-width: 768px) {
+            #sidebar {
+                width: 16rem !important; /* 256px / w-64 */
+                max-width: 16rem !important;
+                min-width: 16rem !important;
             }
         }
     </style>
@@ -431,16 +453,51 @@
             }
         }
         
-        // Ensure sidebar is properly positioned on desktop
+        // Ensure sidebar is properly positioned on desktop - More robust for cross-browser
         function ensureDesktopLayout() {
             const sidebar = document.getElementById('sidebar');
             if (sidebar && window.innerWidth >= 768) {
-                // Force sidebar to be relative on desktop
+                // Force sidebar to be relative on desktop with vendor prefixes
                 sidebar.style.position = 'relative';
                 sidebar.style.transform = 'translateX(0)';
+                sidebar.style.webkitTransform = 'translateX(0)';
+                sidebar.style.mozTransform = 'translateX(0)';
+                sidebar.style.msTransform = 'translateX(0)';
+                sidebar.style.left = 'auto';
+                sidebar.style.right = 'auto';
+                sidebar.style.top = 'auto';
+                sidebar.style.bottom = 'auto';
                 sidebar.classList.remove('-translate-x-full');
+                
+                // Ensure body is flex
+                document.body.style.display = 'flex';
+                document.body.style.webkitDisplay = 'flex';
+                
+                // Ensure main content is flex-1
+                const main = document.querySelector('main');
+                if (main) {
+                    main.style.flex = '1';
+                    main.style.webkitFlex = '1';
+                    main.style.minWidth = '0';
+                }
+            } else if (sidebar && window.innerWidth < 768) {
+                // On mobile, ensure sidebar is hidden by default
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                }
             }
         }
+        
+        // Run immediately on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ensureDesktopLayout);
+        } else {
+            ensureDesktopLayout();
+        }
+        
+        // Run after a short delay to ensure Tailwind is loaded
+        setTimeout(ensureDesktopLayout, 100);
+        setTimeout(ensureDesktopLayout, 500);
         
         // Close sidebar when clicking on menu items (mobile only)
         document.addEventListener('DOMContentLoaded', function() {
