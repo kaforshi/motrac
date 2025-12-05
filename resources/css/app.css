@@ -1,6 +1,215 @@
+/* Google Fonts */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+
+
 @tailwind base;
+
 @tailwind components;
+
 @tailwind utilities;
 
 
 
+/* Custom Scrollbar */
+
+::-webkit-scrollbar { 
+
+    width: 6px; 
+
+    height: 6px; 
+
+}
+
+::-webkit-scrollbar-track { 
+
+    background: #f1f1f1; 
+
+}
+
+::-webkit-scrollbar-thumb { 
+
+    background: #cbd5e1; 
+
+    border-radius: 10px; 
+
+}
+
+::-webkit-scrollbar-thumb:hover { 
+
+    background: #94a3b8; 
+
+}
+
+
+
+/* Custom Chart Utilities */
+
+.conic-expense {
+
+    background: conic-gradient(
+
+        #F43F5E 0% 40%, 
+
+        #F59E0B 40% 70%, 
+
+        #8B5CF6 70% 90%, 
+
+        #64748B 90% 100%
+
+    );
+
+    border-radius: 50%;
+
+}
+
+
+
+.conic-income {
+
+    background: conic-gradient(
+
+        #10B981 0% 60%, 
+
+        #3B82F6 60% 85%, 
+
+        #06B6D4 85% 100%
+
+    );
+
+    border-radius: 50%;
+
+}
+
+
+
+.hide-scroll::-webkit-scrollbar { 
+
+    display: none; 
+
+}
+
+.hide-scroll { 
+
+    -ms-overflow-style: none; 
+
+    scrollbar-width: none; 
+
+}
+
+
+
+/* Custom Classes untuk Landing Page */
+
+.glass-nav {
+
+    background: rgba(255, 255, 255, 0.8);
+
+    backdrop-filter: blur(12px);
+
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+}
+
+
+
+.hero-pattern {
+
+    background-color: #ffffff;
+
+    background-image: radial-gradient(#10b981 0.5px, #f8fafc 0.5px);
+
+    background-size: 20px 20px;
+
+}
+
+
+
+.text-gradient {
+
+    background: linear-gradient(to right, #10b981, #3b82f6);
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+    background-clip: text;
+
+}
+
+
+
+/* Animations */
+
+.reveal {
+
+    opacity: 0;
+
+    transform: translateY(30px);
+
+    transition: all 0.8s ease-out;
+
+}
+
+.reveal.active {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+}
+
+
+
+/* 3D Transform Support */
+
+.perspective-1000 {
+
+    perspective: 1000px;
+
+}
+
+.rotate-y-12 {
+
+    transform: rotateY(12deg);
+
+}
+
+.rotate-x-6 {
+
+    transform: rotateX(6deg);
+
+}
+
+
+
+/* Toggle Switch */
+
+.toggle-checkbox:checked {
+
+    right: 0;
+
+    border-color: #10B981;
+
+}
+
+.toggle-checkbox:checked + .toggle-label {
+
+    background-color: #10B981;
+
+}
+
+
+
+/* Privacy mode blur */
+
+.privacy-mode .amount-display {
+
+    filter: blur(8px);
+
+}
