@@ -18,15 +18,7 @@ class DashboardController extends Controller
      */
     private function getUserTimezone($user)
     {
-        $timezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
-        
-        // Validate timezone - if invalid, use default
-        try {
-            Carbon::now($timezone);
-            return $timezone;
-        } catch (\Exception $e) {
-            return config('app.timezone', 'Asia/Jakarta');
-        }
+        return getValidTimezone($user->timezone ?? null);
     }
     
     public function index(Request $request)

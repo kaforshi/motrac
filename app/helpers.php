@@ -36,3 +36,24 @@ if (!function_exists('formatNumber')) {
         return number_format($number, $decimals, ',', '.');
     }
 }
+
+if (!function_exists('getValidTimezone')) {
+    /**
+     * Get and validate timezone, fallback to default if invalid
+     * 
+     * @param string|null $timezone
+     * @return string
+     */
+    function getValidTimezone($timezone = null)
+    {
+        $default = config('app.timezone', 'Asia/Jakarta');
+        $tz = $timezone ?? $default;
+        
+        try {
+            $test = new \DateTimeZone($tz);
+            return $tz;
+        } catch (\Exception $e) {
+            return $default;
+        }
+    }
+}
