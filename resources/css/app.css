@@ -213,3 +213,13 @@
     filter: blur(8px);
 
 }
+
+
+
+/* Ensure bg-primary works correctly */
+
+.bg-primary {
+
+    background-color: #10b981 !important;
+
+}

@@ -66,7 +66,7 @@
         <div class="p-4 border-t border-gray-100 dark:border-gray-700">
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
-                <button type="submit" class="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 font-medium w-full px-2 py-2 rounded hover:bg-red-50 transition">
+                <button type="submit" class="flex items-center gap-2 text-sm bg-white dark:bg-gray-700 border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 font-medium w-full px-2 py-2 rounded transition">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> {{ __('Logout') }}
                 </button>
             </form>
@@ -79,7 +79,7 @@
         <!-- Top Header (Sticky) -->
         <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-3 sm:px-4 md:px-8 flex items-center justify-between z-20">
             <div class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white flex-shrink-0"><i class="fa-solid fa-bars text-xl"></i></button>
+                <button onclick="toggleMobileSidebar()" class="md:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 flex-shrink-0 transition"><i class="fa-solid fa-bars text-xl"></i></button>
                 <div class="min-w-0 flex-1">
                     <h2 class="text-base sm:text-lg font-bold text-dark dark:text-white truncate" id="page-title">{{ __('Dashboard Overview') }}</h2>
                     <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block truncate">{{ __('Hello') }} {{ auth()->user()->name }}, {{ __('manage your finances wisely') }}.</p>
@@ -90,10 +90,10 @@
                 <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 sm:p-1">
-                    <button onclick="switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         ID
                     </button>
-                    <button onclick="switchLanguage('en')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="switchLanguage('en')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         EN
                     </button>
                 </div>
@@ -112,7 +112,7 @@
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <h3 class="font-bold text-dark dark:text-white">{{ __('Notifications') }}</h3>
                             @if(isset($unreadCount) && $unreadCount > 0)
-                                <button onclick="markAllNotificationsAsRead()" class="text-xs text-primary hover:underline">{{ __('Mark all as read') }}</button>
+                                <button onclick="markAllNotificationsAsRead()" class="text-xs bg-primary text-white px-3 py-1.5 rounded-lg font-medium transition">{{ __('Mark all as read') }}</button>
                             @endif
                         </div>
                         <div id="notificationList" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -273,11 +273,11 @@
                                         <div class="relative w-full h-full bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-inner">
                                             <div class="absolute inset-0 m-auto bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center" style="width: 160px; height: 160px;">
                                                 <i class="fa-solid fa-chart-pie text-gray-300 dark:text-gray-600 text-2xl mb-2"></i>
-                                                <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">Tidak ada data</span>
+                                                <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">{{ __('No data') }}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">Belum ada transaksi untuk periode ini</p>
+                                    <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">{{ __('No transactions yet for this period') }}</p>
                                 </div>
                             @endif
                         </div>
@@ -396,7 +396,7 @@
                         <div class="text-center py-8">
                             <i class="fa-solid fa-receipt text-gray-300 text-3xl mb-3"></i>
                             <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">{{ __('No transactions today') }}</p>
-                            <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline text-xs mt-2 inline-block">
+                            <button type="button" onclick="openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
                                 {{ __('Add transaction') }}
                             </button>
                         </div>
@@ -429,7 +429,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                             <i class="fa-solid fa-search"></i>
                             <span>Filter</span>
                         </button>
@@ -470,8 +470,8 @@
                         </div>
                     @empty
                         <div class="p-8 text-center text-gray-400">
-                            <p>Belum ada transaksi</p>
-                            <button type="button" onclick="openTransactionModal()" class="text-primary hover:underline mt-2 inline-block">
+                            <p>{{ __('No transactions yet') }}</p>
+                            <button type="button" onclick="openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
                                 {{ __('Add first transaction') }}
                             </button>
                         </div>
@@ -520,7 +520,7 @@
                                 </div>
                                 <button
                                     type="button"
-                                    class="text-gray-300 dark:text-gray-500 hover:text-dark dark:hover:text-white"
+                                    class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-500 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg p-2 transition"
                                     data-id="{{ $account->id }}"
                                     data-name="{{ e($account->name) }}"
                                     data-type="{{ $account->type }}"
@@ -547,9 +547,9 @@
                 <div class="flex justify-between items-end mb-6">
                     <div>
                         <h3 class="text-xl font-bold text-dark dark:text-white">{{ __('Manage Categories') }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Sesuaikan label pengeluaran dan pemasukan Anda.</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Adjust your expense and income labels.') }}</p>
                     </div>
-                    <button type="button" onclick="openCategoryModal()" class="bg-primary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <button type="button" onclick="openCategoryModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> {{ __('New Category') }}
                     </button>
                 </div>
@@ -578,7 +578,7 @@
                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-400 group-hover:text-rose-700 dark:group-hover:text-rose-400">{{ $category->name }}</span>
                                 </div>
                             @empty
-                                <p class="col-span-3 text-center text-gray-400 text-sm py-4">Belum ada kategori</p>
+                                <p class="col-span-3 text-center text-gray-400 text-sm py-4">{{ __('No categories yet') }}</p>
                             @endforelse
                         </div>
                     </div>
@@ -598,7 +598,7 @@
                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">{{ $category->name }}</span>
                                 </div>
                             @empty
-                                <p class="col-span-3 text-center text-gray-400 text-sm py-4">Belum ada kategori</p>
+                                <p class="col-span-3 text-center text-gray-400 text-sm py-4">{{ __('No categories yet') }}</p>
                             @endforelse
                         </div>
                     </div>
@@ -643,7 +643,7 @@
                                 </select>
                             </div>
                             <div class="flex items-end gap-2">
-                                <button type="submit" class="bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center gap-2">
+                                <button type="submit" class="bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
                                     <i class="fa-solid fa-filter"></i>
                                     <span>{{ __('Filter') }}</span>
                                 </button>
@@ -731,7 +731,7 @@
                                     </div>
                                 </div>
                             @else
-                                <p class="text-gray-400 dark:text-gray-500 text-sm py-8">Belum ada data pemasukan</p>
+                                <p class="text-gray-400 dark:text-gray-500 text-sm py-8">{{ __('No income data yet') }}</p>
                             @endif
                         </div>
 
@@ -769,7 +769,7 @@
                                     </div>
                                 </div>
                             @else
-                                <p class="text-gray-400 dark:text-gray-500 text-sm py-8">Belum ada data pengeluaran</p>
+                                <p class="text-gray-400 dark:text-gray-500 text-sm py-8">{{ __('No expense data yet') }}</p>
                             @endif
                         </div>
                     </div>
@@ -846,7 +846,7 @@
                         <h3 class="text-xl font-bold text-dark dark:text-white">Budget Planner</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Sisa budget total: <span class="text-emerald-600 dark:text-emerald-400 font-bold sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalRemainingBudget ?? 0, 2, '.', ',') : number_format($totalRemainingBudget ?? 0, 0, ',', '.') }}</span></p>
                     </div>
-                    <button type="button" onclick="openBudgetModal()" class="bg-dark text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">+ {{ __('Add New Budget') }}</button>
+                    <button type="button" onclick="openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm transition">+ {{ __('Add New Budget') }}</button>
                 </div>
 
                 <div class="space-y-4">
@@ -900,12 +900,12 @@
                                 @endphp
                                 <div class="h-3 rounded-full flex items-center justify-end pr-2 text-[8px] text-white font-bold" style="width: {{ $percentage }}%; background-color: {{ $progressColor }};">{{ number_format($percentage, 0) }}%</div>
                             </div>
-                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 relative z-10">Terpakai <span class="sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->spent, 2, '.', ',') : number_format($budget->spent, 0, ',', '.') }}</span> dari {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->amount, 2, '.', ',') : number_format($budget->amount, 0, ',', '.') }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 relative z-10">{{ __('Used') }} <span class="sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->spent, 2, '.', ',') : number_format($budget->spent, 0, ',', '.') }}</span> {{ __('from') }} {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->amount, 2, '.', ',') : number_format($budget->amount, 0, ',', '.') }}</p>
                         </div>
                     @empty
                         <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
-                            <p class="text-gray-400 dark:text-gray-500 mb-4">Belum ada budget yang dibuat</p>
-                            <button type="button" onclick="openBudgetModal()" class="text-primary dark:text-emerald-400 hover:underline">Buat budget pertama</button>
+                            <p class="text-gray-400 dark:text-gray-500 mb-4">{{ __('No budget has been created yet') }}</p>
+                            <button type="button" onclick="openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Create first budget') }}</button>
                         </div>
                     @endforelse
                 </div>
@@ -983,7 +983,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ {{ __('Add Receivable') }}</button>
+                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Receivable') }}</button>
                     </div>
 
                     <!-- Column: Utang (Saya berutang ke orang) -->
@@ -1019,16 +1019,16 @@
                                                 ];
                                             @endphp
                                             data-debt="{{ htmlspecialchars(json_encode($debtData), ENT_QUOTES, 'UTF-8') }}"
-                                            class="text-[10px] text-gray-500 dark:text-gray-400 hover:underline">{{ __('Pay Installment') }}</button>
+                                            class="bg-primary text-white text-[10px] px-2 py-1 rounded transition">{{ __('Pay Installment') }}</button>
                                     </div>
                                 </div>
                             @empty
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
-                                    <p>Belum ada utang</p>
+                                    <p>{{ __('No debts yet') }}</p>
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 border-t border-gray-100 dark:border-gray-700 transition text-center">+ {{ __('Add Payable') }}</button>
+                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Payable') }}</button>
                     </div>
                 </div>
 
@@ -1039,7 +1039,7 @@
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 border-b border-gray-100 dark:border-gray-600 flex justify-between items-center">
                             <h3 class="font-bold text-gray-700 dark:text-white">{{ __('Paid Receivables') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded font-bold">
-                                {{ $paidReceivables->count() }} item
+                                {{ $paidReceivables->count() }} {{ __('item') }}
                             </span>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-96 overflow-y-auto">
@@ -1053,10 +1053,10 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                            Jumlah: <span class="font-semibold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, '.', ',') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
+                                            {{ __('Amount:') }} <span class="font-semibold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, '.', ',') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
                                         </p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
-                                            Dibayar: {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
+                                            {{ __('Paid on:') }} {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
                                         </p>
                                         @if($debt->description)
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">{{ \Illuminate\Support\Str::limit($debt->description, 50) }}</p>
@@ -1066,7 +1066,7 @@
                             @empty
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
                                     <i class="fa-solid fa-history text-3xl mb-2"></i>
-                                    <p>Belum ada history piutang yang sudah lunas</p>
+                                    <p>{{ __('No paid receivables history') }}</p>
                                 </div>
                             @endforelse
                         </div>
@@ -1077,7 +1077,7 @@
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 border-b border-gray-100 dark:border-gray-600 flex justify-between items-center">
                             <h3 class="font-bold text-gray-700 dark:text-white">{{ __('Paid Debts') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded font-bold">
-                                {{ $paidPayables->count() }} item
+                                {{ $paidPayables->count() }} {{ __('item') }}
                             </span>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-96 overflow-y-auto">
@@ -1109,7 +1109,7 @@
                             @empty
                                 <div class="p-8 text-center text-gray-400 dark:text-gray-500">
                                     <i class="fa-solid fa-history text-3xl mb-2"></i>
-                                    <p>Belum ada history utang yang sudah lunas</p>
+                                    <p>{{ __('No paid debts history') }}</p>
                                 </div>
                             @endforelse
                         </div>
@@ -1125,7 +1125,7 @@
         id="add-transaction-fab"
         type="button"
         onclick="openTransactionModal()"
-        class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary hover:bg-emerald-600 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-xl sm:text-2xl transition transform hover:scale-110 z-50">
+        class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-xl sm:text-2xl transition transform hover:scale-110 z-50">
         <i class="fa-solid fa-plus"></i>
     </button>
 
@@ -1154,7 +1154,20 @@
             addPayable: @json(__('Add Payable')),
             payInstallment: @json(__('Pay Installment')),
             paymentHistory: @json(__('History')),
-            relatedTransaction: @json(__('Related Transaction'))
+            relatedTransaction: @json(__('Related Transaction')),
+            errorMarkNotifications: @json(__('An error occurred while marking all notifications as read.')),
+            errorLoadReceivables: @json(__('An error occurred while loading receivables data.')),
+            errorLoadBudget: @json(__('An error occurred while loading budget data.')),
+            errorLoadDebts: @json(__('An error occurred while loading debts data.')),
+            errorLoadTransactionDetails: @json(__('An error occurred while loading transaction details.')),
+            errorLoadData: @json(__('An error occurred while loading data.')),
+            errorProcessing: @json(__('An error occurred while processing the server response.')),
+            errorGeneral: @json(__('An error occurred. Please try again.')),
+            errorOccurred: @json(__('An error occurred')),
+            pleaseTryAgain: @json(__('Please try again')),
+            noData: @json(__('No data')),
+            failedMarkNotifications: @json(__('Failed to mark all notifications as read')),
+            failedMarkReceivable: @json(__('Failed to mark receivable as paid'))
         };
         
         // Function to toggle mobile sidebar
@@ -1588,11 +1601,11 @@
                     // Reload notifications to get fresh data
                     loadNotifications();
                 } else {
-                    console.error('Error:', data.message || 'Gagal menandai semua notifikasi sebagai sudah dibaca');
+                    console.error('Error:', data.message || translations.errorMarkNotifications);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat menandai semua notifikasi sebagai sudah dibaca');
+                alert(translations.errorMarkNotifications);
             }
         }
 
@@ -1764,7 +1777,7 @@
                 const receivableDataStr = buttonElement.dataset.receivable || buttonElement.getAttribute('data-receivable');
                 if (!receivableDataStr) {
                     console.error('Receivable data not found in button element');
-                    alert('Terjadi kesalahan saat memuat data piutang');
+                    alert(translations.errorLoadReceivables);
                     return;
                 }
                 
@@ -1775,7 +1788,7 @@
                 receivableData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
             } catch (e) {
                 console.error('Error parsing receivable data:', e);
-                alert('Terjadi kesalahan saat memuat data piutang');
+                alert(translations.errorLoadReceivables);
                 return;
             }
             
@@ -1831,7 +1844,7 @@
                     data = await response.json();
                 } catch (e) {
                     console.error('Error parsing response:', e);
-                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    alert(translations.errorProcessing);
                     return;
                 }
 
@@ -1857,14 +1870,14 @@
                             showError(field, errorMessage);
                         });
                     } else {
-                        alert(data.message || 'Gagal menandai piutang sebagai lunas');
+                        alert(data.message || translations.failedMarkReceivable);
                     }
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
             }
@@ -2058,7 +2071,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2188,7 +2201,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2257,7 +2270,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2337,7 +2350,7 @@
                             ${t.type === 'transfer' ? `
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Dari Akun</label>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('From Account') }}</label>
                                         <p class="text-sm font-medium text-dark dark:text-white mt-1">${t.from_account ? t.from_account.name : 'N/A'}</p>
                                     </div>
                                     <div>
@@ -2395,7 +2408,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                content.innerHTML = '<div class="text-center py-8 text-red-500 dark:text-red-400">Terjadi kesalahan saat memuat detail transaksi</div>';
+                content.innerHTML = '<div class="text-center py-8 text-red-500 dark:text-red-400">' + translations.errorLoadTransactionDetails + '</div>';
             }
         }
 
@@ -2537,7 +2550,7 @@
                         <div class="text-center py-8">
                             <i class="fa-solid fa-exclamation-circle text-red-500 dark:text-red-400 text-3xl mb-3"></i>
                             <p class="text-gray-600 dark:text-gray-300">Gagal memuat detail utang/piutang</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${data.message || 'Terjadi kesalahan'}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${data.message || translations.errorOccurred}</p>
                         </div>
                     `;
                 }
@@ -2546,8 +2559,8 @@
                 content.innerHTML = `
                     <div class="text-center py-8">
                         <i class="fa-solid fa-exclamation-circle text-red-500 dark:text-red-400 text-3xl mb-3"></i>
-                        <p class="text-gray-600 dark:text-gray-300">Terjadi kesalahan saat memuat data</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Silakan coba lagi</p>
+                        <p class="text-gray-600 dark:text-gray-300">${translations.errorLoadData}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${translations.pleaseTryAgain}</p>
                     </div>
                 `;
             }
@@ -2601,7 +2614,7 @@
                 let budgetDataStr = buttonElement.dataset.budget || buttonElement.getAttribute('data-budget');
                 if (!budgetDataStr) {
                     console.error('Budget data not found in button element');
-                    alert('Terjadi kesalahan saat memuat data budget');
+                    alert(translations.errorLoadBudget);
                     return;
                 }
                 
@@ -2617,7 +2630,7 @@
             } catch (e) {
                 console.error('Error parsing budget data:', e);
                 console.error('Data string:', buttonElement.getAttribute('data-budget'));
-                alert('Terjadi kesalahan saat memuat data budget');
+                alert(translations.errorLoadBudget);
                 return;
             }
             
@@ -2699,7 +2712,7 @@
                 const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
                 if (!debtDataStr) {
                     console.error('Debt data not found in button element');
-                    alert('Terjadi kesalahan saat memuat data utang');
+                    alert(translations.errorLoadDebts);
                     return;
                 }
                 
@@ -2711,7 +2724,7 @@
             } catch (e) {
                 console.error('Error parsing debt data:', e);
                 console.error('Data string:', buttonElement.getAttribute('data-debt'));
-                alert('Terjadi kesalahan saat memuat data utang');
+                alert(translations.errorLoadDebts);
                 return;
             }
             
@@ -2797,7 +2810,7 @@
                     data = await response.json();
                 } catch (e) {
                     console.error('Error parsing response:', e);
-                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    alert(translations.errorProcessing);
                     return;
                 }
 
@@ -2828,7 +2841,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2884,7 +2897,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2951,7 +2964,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2978,7 +2991,7 @@
                 const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
                 if (!debtDataStr) {
                     console.error('Debt data not found in button element');
-                    alert('Terjadi kesalahan saat memuat data piutang');
+                    alert(translations.errorLoadReceivables);
                     return;
                 }
                 
@@ -2990,7 +3003,7 @@
             } catch (e) {
                 console.error('Error parsing debt data:', e);
                 console.error('Data string:', buttonElement.getAttribute('data-debt'));
-                alert('Terjadi kesalahan saat memuat data piutang');
+                alert(translations.errorLoadReceivables);
                 return;
             }
             
@@ -3065,7 +3078,7 @@
                     data = await response.json();
                 } catch (e) {
                     console.error('Error parsing response:', e);
-                    alert('Terjadi kesalahan saat memproses respons dari server.');
+                    alert(translations.errorProcessing);
                     return;
                 }
 
@@ -3096,7 +3109,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -3332,7 +3345,7 @@
                 <div id="transferAccountsField" style="display: none;">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dari Akun</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('From Account') }}</label>
                             <select name="from_account_id" id="modal_from_account_id" class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary">
                                 <option value="">Pilih akun</option>
                             </select>
@@ -3379,10 +3392,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Transaksi
                     </button>
-                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3463,7 +3476,7 @@
                             id="account_is_hidden"
                             class="rounded border-gray-300 dark:border-gray-600"
                         >
-                        <span>Sembunyikan dari ringkasan saldo</span>
+                        <span>{{ __('Hide from balance summary') }}</span>
                     </label>
                 </div>
 
@@ -3492,10 +3505,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Dompet
                     </button>
-                    <button type="button" onclick="closeAccountModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeAccountModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3584,10 +3597,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Kategori
                     </button>
-                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3674,10 +3687,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Budget
                     </button>
-                    <button type="button" onclick="closeBudgetModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeBudgetModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3747,10 +3760,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan
                     </button>
-                    <button type="button" onclick="closeDebtModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeDebtModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3821,10 +3834,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Catat Pembayaran
                     </button>
-                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3880,10 +3893,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-calendar-plus mr-2"></i> Buat Reminder
                     </button>
-                    <button type="button" onclick="closeReminderModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeReminderModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3925,10 +3938,10 @@
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition">
+                    <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-check-circle mr-2"></i> Tandai sebagai Lunas
                     </button>
-                    <button type="button" onclick="closeMarkPaidModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <button type="button" onclick="closeMarkPaidModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>

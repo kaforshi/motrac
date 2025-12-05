@@ -26,14 +26,16 @@
             <!-- Logo and Language Switch -->
             <div class="flex items-center justify-between w-full z-10">
                 <a href="{{ route('landing') }}" class="flex items-center gap-2 group">
-                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-10 w-auto group-hover:scale-105 transition">
+                    <div class="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-white text-xl shadow-lg transition group-hover:scale-105">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
                     <span class="text-2xl font-extrabold tracking-tight text-white">Motrac</span>
                 </a>
                 
                 <!-- Language Toggle -->
                 <div class="flex items-center bg-white/20 backdrop-blur border border-white/30 rounded-full p-1">
-                    <a href="{{ route('language.switch', ['locale' => 'id', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'id' ? 'bg-white text-indigo-800 shadow-sm' : 'text-white/80 hover:text-white' }}">ID</a>
-                    <a href="{{ route('language.switch', ['locale' => 'en', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'en' ? 'bg-white text-indigo-800 shadow-sm' : 'text-white/80 hover:text-white' }}">EN</a>
+                    <a href="{{ route('language.switch', ['locale' => 'id']) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'id' ? 'bg-white text-indigo-800 shadow-sm' : 'text-white/80 hover:text-white' }}">ID</a>
+                    <a href="{{ route('language.switch', ['locale' => 'en']) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'en' ? 'bg-white text-indigo-800 shadow-sm' : 'text-white/80 hover:text-white' }}">EN</a>
                 </div>
             </div>
 
@@ -77,7 +79,9 @@
                 
                 <!-- Mobile Logo -->
                 <div class="lg:hidden flex items-center justify-center gap-2 mb-6">
-                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-10 w-auto">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
                     <span class="text-2xl font-extrabold tracking-tight text-dark">Motrac</span>
                 </div>
 
@@ -103,10 +107,10 @@
                     <div class="space-y-1.5">
                         <label for="name" class="block text-sm font-semibold text-slate-700">{{ __('Full Name') }}</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                                 <i class="fa-regular fa-user"></i>
                             </div>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Budi Santoso" class="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                            <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Budi Santoso" class="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                         </div>
                     </div>
 
@@ -114,10 +118,10 @@
                     <div class="space-y-1.5">
                         <label for="email" class="block text-sm font-semibold text-slate-700">{{ __('Email Address') }}</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                                 <i class="fa-regular fa-envelope"></i>
                             </div>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="nama@email.com" class="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="nama@email.com" class="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                         </div>
                     </div>
 
@@ -125,10 +129,10 @@
                     <div class="space-y-1.5">
                         <label for="password" class="block text-sm font-semibold text-slate-700">{{ __('Create Password') }}</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
-                            <input type="password" id="password" name="password" required placeholder="{{ __('Min. 8 characters') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                            <input type="password" id="password" name="password" required placeholder="{{ __('Min. 8 characters') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                             <button type="button" onclick="togglePassword('password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -139,10 +143,10 @@
                     <div class="space-y-1.5">
                         <label for="password_confirmation" class="block text-sm font-semibold text-slate-700">{{ __('Confirm Password') }}</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
-                            <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="{{ __('Repeat password') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                            <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="{{ __('Repeat password') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                             <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -152,15 +156,15 @@
                     <!-- Terms Checkbox -->
                     <div class="flex items-start gap-3">
                         <div class="flex items-center h-5">
-                            <input id="terms" type="checkbox" required class="w-4 h-4 text-primary-600 bg-slate-50 border-slate-300 rounded focus:ring-primary-500 focus:ring-2 transition cursor-pointer">
+                            <input id="terms" type="checkbox" required class="w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 transition cursor-pointer">
                         </div>
                         <label for="terms" class="text-sm text-slate-600 select-none">
-                            {{ __('I agree to the') }} <a href="#" class="text-primary-600 font-semibold hover:text-primary-700 hover:underline">{{ __('Terms & Conditions') }}</a> {{ __('and') }} <a href="#" class="text-primary-600 font-semibold hover:text-primary-700 hover:underline">{{ __('Privacy Policy') }}</a>.
+                            {{ __('I agree to the') }} <a href="#" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline">{{ __('Terms & Conditions') }}</a> {{ __('and') }} <a href="#" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline">{{ __('Privacy Policy') }}</a>.
                         </label>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary-600/30 transform active:scale-[0.98] flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-dark hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-slate-900/20 transform active:scale-[0.98] flex items-center justify-center gap-2">
                         <span>{{ __('Register Account') }}</span>
                         <i class="fa-solid fa-user-plus"></i>
                     </button>
@@ -169,7 +173,7 @@
                 <!-- Footer -->
                 <p class="text-center text-sm text-slate-600">
                     {{ __('Already have an account?') }} 
-                    <a href="{{ route('login') }}" class="font-bold text-primary-600 hover:text-primary-700 transition hover:underline">{{ __('Login here') }}</a>
+                    <a href="{{ route('login') }}" class="font-bold text-indigo-600 hover:text-indigo-700 transition hover:underline">{{ __('Login here') }}</a>
                 </p>
             </div>
         </div>

@@ -17,6 +17,7 @@ export default {
             },
             colors: {
                 primary: {
+                    DEFAULT: '#10b981', // Default primary color (emerald-500)
                     50: '#ecfdf5',
                     100: '#d1fae5',
                     200: '#a7f3d0',
@@ -81,6 +82,7 @@ export default {
         'opacity-50',
         'opacity-90',
         // Primary color variants
+        'bg-primary',
         'bg-primary-50',
         'bg-primary-100',
         'bg-primary-200',

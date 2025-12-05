@@ -17,17 +17,9 @@
 
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 animate-fade-up">
         <div class="p-8 sm:p-10">
-            <!-- Language Switch -->
-            <div class="flex justify-end mb-6">
-                <div class="flex items-center bg-slate-100 border border-slate-200 rounded-full p-1">
-                    <a href="{{ route('language.switch', ['locale' => 'id', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'id' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:text-dark' }}">ID</a>
-                    <a href="{{ route('language.switch', ['locale' => 'en', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'en' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:text-dark' }}">EN</a>
-                </div>
-            </div>
-            
             <!-- Header -->
             <div class="text-center mb-8">
-                <div class="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-2xl shadow-sm mx-auto mb-4">
+                <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl shadow-sm mx-auto mb-4">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-dark mb-2">{{ __('Reset Password') }}</h1>
@@ -67,10 +59,10 @@
                 <div class="space-y-1.5">
                     <label for="password" class="block text-sm font-semibold text-slate-700">{{ __('New Password') }}</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                             <i class="fa-solid fa-lock"></i>
                         </div>
-                        <input type="password" id="password" name="password" required autofocus placeholder="{{ __('Min. 8 characters') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                        <input type="password" id="password" name="password" required autofocus placeholder="{{ __('Min. 8 characters') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                         <button type="button" onclick="togglePassword('password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer">
                             <i class="fa-regular fa-eye"></i>
                         </button>
@@ -81,17 +73,17 @@
                 <div class="space-y-1.5">
                     <label for="password_confirmation" class="block text-sm font-semibold text-slate-700">{{ __('Confirm Password') }}</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition">
                             <i class="fa-solid fa-lock"></i>
                         </div>
-                        <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="{{ __('Repeat new password') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition shadow-sm placeholder:text-slate-400">
+                        <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="{{ __('Repeat new password') }}" class="pl-10 pr-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm placeholder:text-slate-400">
                         <button type="button" onclick="togglePassword('password_confirmation', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer">
                             <i class="fa-regular fa-eye"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary-600/30 transform active:scale-[0.98] flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/30 transform active:scale-[0.98] flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rotate"></i>
                     <span>{{ __('Reset Password') }}</span>
                 </button>

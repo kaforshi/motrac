@@ -49,14 +49,14 @@
                             EN
                         </a>
                     </div>
-                    <a href="{{ route('login') }}" class="text-sm font-bold text-slate-600 hover:text-primary-600 transition">{{ __('Login') }}</a>
+                    <a href="{{ route('login') }}" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-sm font-bold px-6 py-3 rounded-full transition shadow-sm hover:shadow-md">{{ __('Login') }}</a>
                     <a href="{{ route('register') }}" class="bg-dark hover:bg-slate-800 text-white text-sm font-bold px-6 py-3 rounded-full transition shadow-xl shadow-slate-900/20 hover:-translate-y-1">
                         {{ __('Register Free') }}
                     </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <button class="md:hidden text-slate-600 hover:text-primary-600 focus:outline-none" onclick="toggleMobileMenu()">
+                <button class="md:hidden bg-white hover:bg-slate-50 text-slate-600 hover:text-primary-600 border border-slate-200 rounded-lg p-2 focus:outline-none transition" onclick="toggleMobileMenu()">
                     <i class="fa-solid fa-bars text-2xl"></i>
                 </button>
             </div>
@@ -78,8 +78,8 @@
                         EN
                     </a>
                 </div>
-                <a href="{{ route('login') }}" class="block text-base font-semibold text-primary-600">{{ __('Login') }}</a>
-                <a href="{{ route('register') }}" class="block w-full text-center bg-primary-600 text-white font-bold py-3 rounded-xl">{{ __('Register Free') }}</a>
+                <a href="{{ route('login') }}" class="block w-full text-center bg-white border border-slate-300 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50 transition">{{ __('Login') }}</a>
+                <a href="{{ route('register') }}" class="block w-full text-center bg-primary-600 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition">{{ __('Register Free') }}</a>
             </div>
         </div>
     </nav>
@@ -457,7 +457,7 @@
                         <a href="{{ route('register') }}" class="bg-white text-primary-700 font-bold text-lg px-8 py-4 rounded-full hover:bg-slate-50 transition shadow-lg transform hover:-translate-y-1">
                             @if(app()->getLocale() === 'id') Buat Akun Sekarang @else {{ __('Create New Account') }} @endif
                         </a>
-                        <a href="{{ route('login') }}" class="bg-primary-700 text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-primary-800 transition border border-primary-500">
+                        <a href="{{ route('login') }}" class="bg-white text-primary-700 border-2 border-primary-500 font-bold text-lg px-8 py-4 rounded-full hover:bg-primary-50 transition shadow-lg">
                             {{ __('Login') }}
                         </a>
                     </div>

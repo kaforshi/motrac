@@ -17,14 +17,6 @@
 
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 animate-fade-up">
         <div class="p-8 sm:p-10">
-            <!-- Language Switch -->
-            <div class="flex justify-end mb-6">
-                <div class="flex items-center bg-slate-100 border border-slate-200 rounded-full p-1">
-                    <a href="{{ route('language.switch', ['locale' => 'id', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'id' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:text-dark' }}">ID</a>
-                    <a href="{{ route('language.switch', ['locale' => 'en', 'redirect' => url()->current()]) }}" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all {{ app()->getLocale() === 'en' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:text-dark' }}">EN</a>
-                </div>
-            </div>
-            
             <!-- Header -->
             <div class="text-center mb-8">
                 <div class="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-2xl shadow-sm mx-auto mb-4">
@@ -69,7 +61,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary-600/30 transform active:scale-[0.98] flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary-600/30 transform active:scale-[0.98] flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane text-sm"></i>
                     <span>{{ __('Send Reset Link') }}</span>
                 </button>

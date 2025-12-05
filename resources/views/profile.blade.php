@@ -54,7 +54,7 @@
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-4 sm:px-8 flex items-center justify-between z-20">
             <div class="flex items-center gap-4">
-                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white"><i class="fa-solid fa-bars text-xl"></i></button>
+                <button onclick="toggleMobileSidebar()" class="md:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 transition"><i class="fa-solid fa-bars text-xl"></i></button>
                 <h2 class="text-lg font-bold text-dark dark:text-white" id="page-title">{{ __('My Profile') }}</h2>
             </div>
             
@@ -62,10 +62,10 @@
             <div class="flex items-center gap-3">
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1">
-                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="switchLanguage('id')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         ID
                     </button>
-                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="switchLanguage('en')" class="px-3 py-1.5 rounded-full text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         EN
                     </button>
                 </div>
@@ -153,7 +153,7 @@
                                     <span class="error-message text-red-500 text-xs mt-1 hidden" id="error_bio"></span>
                                 </div>
                                 <div class="flex justify-end pt-2">
-                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save Changes') }}</button>
+                                    <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save Changes') }}</button>
                                 </div>
                             </form>
                         </div>
@@ -185,7 +185,7 @@
                         <div class="bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-800 p-6">
                             <h3 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">{{ __('Delete Account') }}</h3>
                             <p class="text-sm text-red-600 mb-6">{{ __('This action is permanent. All data will be lost.') }}</p>
-                            <button onclick="openDeleteAccountModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Delete My Account') }}</button>
+                            <button onclick="openDeleteAccountModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Delete My Account') }}</button>
                         </div>
                     </div>
 
@@ -214,7 +214,7 @@
                                     </div>
                                 </div>
                                 <div class="flex justify-end pt-2">
-                                    <button type="submit" class="bg-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Update Password') }}</button>
+                                    <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Update Password') }}</button>
                                 </div>
                             </form>
                         </div>
@@ -307,7 +307,7 @@
                             </div>
 
                             <div class="flex justify-end pt-6 mt-6 border-t border-gray-100 dark:border-gray-700">
-                                <button type="button" onclick="updateNotificationPreferences()" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save') }}</button>
+                                <button type="button" onclick="updateNotificationPreferences()" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium transition">{{ __('Save') }}</button>
                             </div>
                         </div>
                     </div>
@@ -344,10 +344,10 @@
                     </div>
                     
                     <div class="flex gap-3 pt-4">
-                        <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                        <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
                             {{ __('Delete Account') }}
                         </button>
-                        <button type="button" onclick="closeDeleteAccountModal()" class="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <button type="button" onclick="closeDeleteAccountModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                             {{ __('Cancel') }}
                         </button>
                     </div>
