@@ -46,6 +46,26 @@
         .toggle-checkbox:checked + .toggle-label {
             background-color: #10B981;
         }
+        
+        /* Ensure sidebar doesn't overlap content on desktop */
+        @media (min-width: 768px) {
+            #sidebar {
+                position: relative !important;
+                transform: translateX(0) !important;
+                left: auto !important;
+            }
+            body {
+                display: flex !important;
+            }
+        }
+        
+        /* Ensure main content doesn't get covered */
+        @media (min-width: 768px) {
+            main {
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+        }
     </style>
 </head>
 <body class="font-sans text-slate-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
@@ -54,7 +74,7 @@
     <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleMobileSidebar()"></div>
     
     <!-- ================= Sidebar ================= -->
-    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen">
+    <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen flex-shrink-0">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="h-16 flex items-center gap-2 px-6 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-8 w-auto">
@@ -69,9 +89,9 @@
             
             <div class="my-4 border-t border-gray-100 dark:border-gray-700"></div>
 
-            <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ __('Settings') }}</p>
+            <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">{{ __('Settings') }}</p>
             
-            <button onclick="switchSettings('profile', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left">
+            <button onclick="switchSettings('profile', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
                 <i class="fa-regular fa-user w-5 text-center"></i> {{ __('My Profile') }}
             </button>
             <button onclick="switchSettings('security', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
@@ -411,8 +431,21 @@
             }
         }
         
+        // Ensure sidebar is properly positioned on desktop
+        function ensureDesktopLayout() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && window.innerWidth >= 768) {
+                // Force sidebar to be relative on desktop
+                sidebar.style.position = 'relative';
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('-translate-x-full');
+            }
+        }
+        
         // Close sidebar when clicking on menu items (mobile only)
         document.addEventListener('DOMContentLoaded', function() {
+            ensureDesktopLayout();
+            
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileSidebarOverlay');
             const menuItems = sidebar?.querySelectorAll('.nav-item, a[href]');
@@ -431,6 +464,11 @@
                     });
                 });
             }
+        });
+        
+        // Re-check on window resize
+        window.addEventListener('resize', function() {
+            ensureDesktopLayout();
         });
 
         // Function to switch language
@@ -461,7 +499,7 @@
 
             // 4. Set Active styling on clicked button
             if (btnElement) {
-                btnElement.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium transition text-left';
+                btnElement.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left';
             }
 
             // 5. Update Header Title based on view
