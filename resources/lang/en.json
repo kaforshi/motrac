@@ -341,5 +341,6 @@
     "Failed to mark all notifications as read": "Failed to mark all notifications as read",
     "Failed to mark receivable as paid": "Failed to mark receivable as paid",
     "Icon": "Icon",
-    "Optional": "Optional"
+    "Optional": "Optional",
+    "Color": "Color"
 }

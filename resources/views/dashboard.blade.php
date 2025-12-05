@@ -2403,6 +2403,132 @@
             toggleIconPicker();
         }
 
+        // Popular colors for categories
+        const categoryColors = [
+            // Red/Pink
+            '#EF4444', '#F87171', '#FB7185', '#EC4899', '#F43F5E',
+            // Orange
+            '#F97316', '#FB923C', '#F59E0B', '#FBBF24', '#FCD34D',
+            // Yellow
+            '#EAB308', '#FACC15', '#FDE047', '#FEF08A', '#FEF9C3',
+            // Green
+            '#10B981', '#34D399', '#4ADE80', '#22C55E', '#16A34A',
+            // Blue
+            '#3B82F6', '#60A5FA', '#93C5FD', '#2563EB', '#1D4ED8',
+            // Indigo
+            '#6366F1', '#818CF8', '#A5B4FC', '#4F46E5', '#4338CA',
+            // Purple
+            '#8B5CF6', '#A78BFA', '#C4B5FD', '#7C3AED', '#6D28D9',
+            // Pink
+            '#EC4899', '#F472B6', '#F9A8D4', '#DB2777', '#BE185D',
+            // Gray
+            '#6B7280', '#9CA3AF', '#D1D5DB', '#4B5563', '#374151',
+            // Teal/Cyan
+            '#14B8A6', '#5EEAD4', '#2DD4BF', '#0D9488', '#0F766E',
+            // Emerald
+            '#059669', '#10B981', '#34D399', '#047857', '#065F46',
+            // Rose
+            '#E11D48', '#F43F5E', '#FB7185', '#BE123C', '#9F1239'
+        ];
+
+        function toggleColorPicker() {
+            const modal = document.getElementById('colorPickerModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                populateColorGrid();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function populateColorGrid() {
+            const grid = document.getElementById('colorGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            categoryColors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'w-full aspect-square rounded-lg cursor-pointer transition transform hover:scale-110 border-2 border-gray-200 dark:border-gray-600 hover:border-gray-400';
+                colorDiv.style.backgroundColor = color;
+                colorDiv.onclick = () => selectColor(color);
+                colorDiv.title = color;
+                
+                grid.appendChild(colorDiv);
+            });
+        }
+
+        function selectColor(color) {
+            const colorInput = document.getElementById('category_color');
+            const colorPreview = document.getElementById('category_color_preview');
+            const customColorPicker = document.getElementById('customColorPicker');
+            const customColorHex = document.getElementById('customColorHex');
+            
+            if (colorInput) {
+                colorInput.value = color;
+            }
+            
+            if (colorPreview) {
+                colorPreview.style.backgroundColor = color;
+                colorPreview.classList.remove('border-gray-200', 'dark:border-gray-600');
+                colorPreview.classList.add('border-primary');
+                
+                // Show check icon
+                const checkIcon = document.getElementById('color_check_icon');
+                if (checkIcon) {
+                    checkIcon.classList.remove('opacity-0');
+                    checkIcon.classList.add('opacity-100');
+                }
+            }
+            
+            if (customColorPicker) {
+                customColorPicker.value = color;
+            }
+            
+            if (customColorHex) {
+                customColorHex.value = color;
+            }
+            
+            toggleColorPicker();
+        }
+
+        function selectCustomColor(color) {
+            // Normalize color format
+            if (!color.startsWith('#')) {
+                color = '#' + color;
+            }
+            
+            const colorInput = document.getElementById('category_color');
+            const colorPreview = document.getElementById('category_color_preview');
+            const customColorHex = document.getElementById('customColorHex');
+            const customColorPicker = document.getElementById('customColorPicker');
+            
+            if (colorInput) {
+                colorInput.value = color;
+            }
+            
+            if (colorPreview) {
+                colorPreview.style.backgroundColor = color;
+                colorPreview.classList.remove('border-gray-200', 'dark:border-gray-600');
+                colorPreview.classList.add('border-primary');
+                
+                // Show check icon
+                const checkIcon = document.getElementById('color_check_icon');
+                if (checkIcon) {
+                    checkIcon.classList.remove('opacity-0');
+                    checkIcon.classList.add('opacity-100');
+                }
+            }
+            
+            if (customColorHex) {
+                customColorHex.value = color;
+            }
+            
+            if (customColorPicker) {
+                customColorPicker.value = color;
+            }
+        }
+
         function openCategoryModal() {
             const modal = document.getElementById('categoryModal');
             const form = document.getElementById('categoryForm');
@@ -2418,6 +2544,20 @@
                 iconPreview.classList.remove('border-primary');
                 iconPreview.classList.add('border-gray-200', 'dark:border-gray-600');
             }
+            
+            // Reset color preview
+            const colorPreview = document.getElementById('category_color_preview');
+            if (colorPreview) {
+                colorPreview.style.backgroundColor = '#F97316';
+                colorPreview.classList.remove('border-primary');
+                colorPreview.classList.add('border-gray-200', 'dark:border-gray-600');
+                
+                const checkIcon = document.getElementById('color_check_icon');
+                if (checkIcon) {
+                    checkIcon.classList.remove('opacity-100');
+                    checkIcon.classList.add('opacity-0');
+                }
+            }
         }
 
         function closeCategoryModal() {
@@ -2429,6 +2569,12 @@
             const iconPicker = document.getElementById('iconPickerModal');
             if (iconPicker) {
                 iconPicker.classList.add('hidden');
+            }
+            
+            // Close color picker if open
+            const colorPicker = document.getElementById('colorPickerModal');
+            if (colorPicker) {
+                colorPicker.classList.add('hidden');
             }
         }
 
@@ -3419,6 +3565,67 @@
                 });
             }
 
+            // Color input change event - update preview when user types manually
+            const categoryColorInput = document.getElementById('category_color');
+            if (categoryColorInput) {
+                categoryColorInput.addEventListener('input', function() {
+                    const colorValue = this.value.trim();
+                    const colorPreview = document.getElementById('category_color_preview');
+                    const customColorPicker = document.getElementById('customColorPicker');
+                    const customColorHex = document.getElementById('customColorHex');
+                    
+                    if (colorPreview) {
+                        if (colorValue) {
+                            // Normalize color format
+                            let normalizedColor = colorValue;
+                            if (!normalizedColor.startsWith('#')) {
+                                normalizedColor = '#' + normalizedColor;
+                            }
+                            
+                            colorPreview.style.backgroundColor = normalizedColor;
+                            colorPreview.classList.remove('border-gray-200', 'dark:border-gray-600');
+                            colorPreview.classList.add('border-primary');
+                            
+                            // Show check icon
+                            const checkIcon = document.getElementById('color_check_icon');
+                            if (checkIcon) {
+                                checkIcon.classList.remove('opacity-0');
+                                checkIcon.classList.add('opacity-100');
+                            }
+                            
+                            // Sync with custom color picker
+                            if (customColorPicker) {
+                                customColorPicker.value = normalizedColor;
+                            }
+                            if (customColorHex) {
+                                customColorHex.value = normalizedColor;
+                            }
+                        } else {
+                            colorPreview.style.backgroundColor = '#F97316';
+                            colorPreview.classList.remove('border-primary');
+                            colorPreview.classList.add('border-gray-200', 'dark:border-gray-600');
+                            
+                            // Hide check icon
+                            const checkIcon = document.getElementById('color_check_icon');
+                            if (checkIcon) {
+                                checkIcon.classList.remove('opacity-100');
+                                checkIcon.classList.add('opacity-0');
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Color picker modal click outside to close
+            const colorPickerModal = document.getElementById('colorPickerModal');
+            if (colorPickerModal) {
+                colorPickerModal.addEventListener('click', function(e) {
+                    if (e.target === colorPickerModal) {
+                        toggleColorPicker();
+                    }
+                });
+            }
+
             // Budget modal events
             const budgetForm = document.getElementById('budgetForm');
             if (budgetForm) {
@@ -3859,14 +4066,66 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Warna (opsional)</label>
-                    <input
-                        type="text"
-                        name="color"
-                        id="category_color"
-                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                        placeholder="#F97316"
-                    >
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Color') }} ({{ __('Optional') }})</label>
+                    <!-- Color Preview -->
+                    <div class="mb-2 flex items-center gap-3">
+                        <div id="category_color_preview" class="w-12 h-12 rounded-lg border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center" style="background-color: #F97316;">
+                            <i class="fa-solid fa-check text-white text-sm opacity-0" id="color_check_icon"></i>
+                        </div>
+                        <div class="flex-1">
+                            <input
+                                type="text"
+                                name="color"
+                                id="category_color"
+                                class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                                placeholder="#F97316"
+                            >
+                        </div>
+                        <button type="button" onclick="toggleColorPicker()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
+                            <i class="fa-solid fa-palette mr-1"></i> Pilih
+                        </button>
+                    </div>
+                    
+                    <!-- Color Picker Modal -->
+                    <div id="colorPickerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h4 class="text-lg font-bold text-dark dark:text-white">Pilih Warna</h4>
+                                <button onclick="toggleColorPicker()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <i class="fa-solid fa-times text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Custom Color Picker -->
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warna Kustom</label>
+                                <div class="flex items-center gap-3">
+                                    <input
+                                        type="color"
+                                        id="customColorPicker"
+                                        value="#F97316"
+                                        class="w-16 h-16 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer"
+                                        onchange="selectCustomColor(this.value)"
+                                    >
+                                    <input
+                                        type="text"
+                                        id="customColorHex"
+                                        placeholder="#F97316"
+                                        class="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-dark dark:text-white focus:outline-none focus:border-primary"
+                                        onchange="selectCustomColor(this.value)"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <!-- Preset Colors Grid -->
+                            <div class="flex-1 overflow-y-auto p-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Warna Preset</label>
+                                <div id="colorGrid" class="grid grid-cols-8 gap-2">
+                                    <!-- Colors will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
