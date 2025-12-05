@@ -26,9 +26,7 @@
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <a href="{{ route('landing') }}" class="flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-primary-500/30 group-hover:scale-105 transition">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
+                    <img src="{{ asset('logo.png') }}" alt="Motrac" class="h-10 w-auto group-hover:scale-105 transition">
                     <span class="text-2xl font-bold text-dark tracking-tight">Motrac</span>
                 </a>
 
