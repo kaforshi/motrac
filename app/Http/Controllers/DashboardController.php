@@ -13,6 +13,22 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    /**
+     * Get and validate user timezone
+     */
+    private function getUserTimezone($user)
+    {
+        $timezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+        
+        // Validate timezone - if invalid, use default
+        try {
+            Carbon::now($timezone);
+            return $timezone;
+        } catch (\Exception $e) {
+            return config('app.timezone', 'Asia/Jakarta');
+        }
+    }
+    
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -22,8 +38,8 @@ class DashboardController extends Controller
             ->where('is_hidden', false)
             ->sum('balance');
 
-        // Get user timezone
-        $userTimezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+        // Get user timezone with validation
+        $userTimezone = $this->getUserTimezone($user);
         
         // Month and Year filter (from month picker in navbar)
         $monthYear = $request->get('month_year');
@@ -457,7 +473,7 @@ class DashboardController extends Controller
                 // Check if budget exceeds 80%
                 if ($usagePercent >= 80) {
                     // Check if notification already exists for this budget this month
-                    $userTz = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+                    $userTz = $this->getUserTimezone($user);
                     $now = Carbon::now($userTz);
                     $existingNotification = Notification::where('user_id', $user->id)
                         ->where('type', 'budget')
