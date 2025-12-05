@@ -16,7 +16,7 @@
 <body class="font-sans text-slate-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
 
     <!-- Mobile Sidebar Overlay -->
-    <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleMobileSidebar()"></div>
+    <div id="mobileSidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="window.toggleMobileSidebar()"></div>
     
     <!-- ================= Sidebar ================= -->
     <aside id="sidebar" class="fixed md:relative w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 md:z-10 transition-all duration-300 -translate-x-full md:translate-x-0 h-screen flex-shrink-0">
@@ -30,34 +30,34 @@
         <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Menu Utama</p>
             
-            <button id="nav-dashboard" onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
+            <button id="nav-dashboard" onclick="if(window.switchView) window.switchView('dashboard', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
                 <i class="fa-solid fa-house w-5 text-center"></i> {{ __('Dashboard') }}
             </button>
             
-            <button id="nav-transactions" onclick="switchView('transactions', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button id="nav-transactions" onclick="if(window.switchView) window.switchView('transactions', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> {{ __('Transactions') }}
             </button>
             
-            <button onclick="switchView('wallets', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button onclick="if(window.switchView) window.switchView('wallets', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-wallet w-5 text-center group-hover:text-primary"></i> {{ __('Wallets') }}
             </button>
 
             <!-- Menu Kategori Baru -->
-            <button onclick="switchView('categories', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button onclick="if(window.switchView) window.switchView('categories', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> {{ __('Categories') }}
             </button>
             
-            <button id="nav-reports" onclick="switchView('reports', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button id="nav-reports" onclick="if(window.switchView) window.switchView('reports', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> {{ __('Reports') }}
             </button>
 
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-6 mb-2">Planning</p>
             
-            <button onclick="switchView('budget', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button onclick="if(window.switchView) window.switchView('budget', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-bullseye w-5 text-center group-hover:text-primary"></i> {{ __('Budget') }}
             </button>
             
-            <button onclick="switchView('debts', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <button onclick="if(window.switchView) window.switchView('debts', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-hand-holding-dollar w-5 text-center group-hover:text-primary"></i> {{ __('Debts & Receivables') }}
             </button>
         </div>
@@ -79,7 +79,7 @@
         <!-- Top Header (Sticky) -->
         <header class="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 px-3 sm:px-4 md:px-8 flex items-center justify-between z-20">
             <div class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                <button onclick="toggleMobileSidebar()" class="md:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 flex-shrink-0 transition"><i class="fa-solid fa-bars text-xl"></i></button>
+                <button onclick="window.toggleMobileSidebar()" class="md:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 flex-shrink-0 transition"><i class="fa-solid fa-bars text-xl"></i></button>
                 <div class="min-w-0 flex-1">
                     <h2 class="text-base sm:text-lg font-bold text-dark dark:text-white truncate" id="page-title">{{ __('Dashboard Overview') }}</h2>
                     <p class="text-xs text-gray-400 dark:text-gray-400 hidden sm:block truncate">{{ __('Hello') }} {{ auth()->user()->name }}, {{ __('manage your finances wisely') }}.</p>
@@ -87,21 +87,21 @@
             </div>
 
             <div class="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
-                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
+                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="window.changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 sm:p-1">
-                    <button onclick="switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="window.switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         ID
                     </button>
-                    <button onclick="switchLanguage('en')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
+                    <button onclick="window.switchLanguage('en')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'en' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
                         EN
                     </button>
                 </div>
-                <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition flex-shrink-0" title="{{ __('Privacy Mode') }}" onclick="togglePrivacy(this)">
+                <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition flex-shrink-0" title="{{ __('Privacy Mode') }}" onclick="window.togglePrivacy(this)">
                     <i class="fa-regular fa-eye text-sm sm:text-base"></i>
                 </button>
                 <div class="relative">
-                    <button onclick="toggleNotificationDropdown()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition relative flex-shrink-0">
+                    <button onclick="window.toggleNotificationDropdown()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center transition relative flex-shrink-0">
                         <i class="fa-regular fa-bell text-sm sm:text-base"></i>
                         @if(isset($unreadCount) && $unreadCount > 0)
                             <span class="absolute top-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
@@ -112,13 +112,13 @@
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <h3 class="font-bold text-dark dark:text-white">{{ __('Notifications') }}</h3>
                             @if(isset($unreadCount) && $unreadCount > 0)
-                                <button onclick="markAllNotificationsAsRead()" class="text-xs bg-primary text-white px-3 py-1.5 rounded-lg font-medium transition">{{ __('Mark all as read') }}</button>
+                                <button onclick="window.markAllNotificationsAsRead()" class="text-xs bg-primary text-white px-3 py-1.5 rounded-lg font-medium transition">{{ __('Mark all as read') }}</button>
                             @endif
                         </div>
                         <div id="notificationList" class="divide-y divide-gray-200 dark:divide-gray-700">
                             @if(isset($unreadNotifications) && $unreadNotifications->count() > 0)
                                 @foreach($unreadNotifications as $notification)
-                                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer notification-item {{ $notification->read_at ? '' : 'bg-blue-50 dark:bg-blue-900/20' }}" data-notification-id="{{ $notification->id }}" onclick="markNotificationAsRead({{ $notification->id }})">
+                                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer notification-item {{ $notification->read_at ? '' : 'bg-blue-50 dark:bg-blue-900/20' }}" data-notification-id="{{ $notification->id }}" onclick="window.markNotificationAsRead({{ $notification->id }})">
                                         <div class="flex items-start gap-3">
                                             <div class="flex-shrink-0 mt-1">
                                                 @if($notification->type === 'budget')
@@ -204,7 +204,7 @@
                                     {{ __('Weekly Cash Flow') }}
                                 @endif
                             </h3>
-                            <select id="period-selector" onchange="changePeriod(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-full sm:w-auto">
+                            <select id="period-selector" onchange="window.changePeriod(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-full sm:w-auto">
                                 <option value="daily" {{ (isset($periodType) && $periodType === 'daily') ? 'selected' : '' }}>{{ __('Daily') }}</option>
                                 <option value="weekly" {{ (!isset($periodType) || $periodType === 'weekly') ? 'selected' : '' }}>{{ __('Weekly') }}</option>
                                 <option value="monthly" {{ (isset($periodType) && $periodType === 'monthly') ? 'selected' : '' }}>{{ __('Monthly') }}</option>
@@ -286,7 +286,7 @@
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                         <h3 class="font-bold text-dark dark:text-white mb-4">{{ __('Budget Monitoring') }}</h3>
                         <div class="space-y-6">
-                            @forelse($budgets->take(2) as $budget)
+                            @forelse($budgets->take(4) as $budget)
                                 @php
                                     $available = $budget->amount + ($budget->rollover_enabled ? $budget->rollover_amount : 0);
                                     $spent = $budget->spent;
@@ -318,12 +318,25 @@
                             @empty
                                 <p class="text-sm text-gray-400 dark:text-gray-500 text-center">{{ __('No budget yet') }}</p>
                             @endforelse
+                            
+                            @if($budgets->count() > 4)
+                                <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                    <button 
+                                        type="button" 
+                                        onclick="window.goToBudgetView()" 
+                                        class="w-full py-2.5 px-4 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center justify-center gap-2"
+                                    >
+                                        <span>{{ __('View All') }}</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
                 
                 <!-- Transaksi Harian -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-4 sm:mt-6 md:mt-8">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-dark dark:text-white">{{ __("Today's Transactions") }}</h3>
                         <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
@@ -331,7 +344,7 @@
                     @if($todayTransactions->count() > 0)
                         <div class="space-y-3">
                             @foreach($todayTransactions as $transaction)
-                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
+                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
                                     <div class="flex items-center gap-3 flex-1">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
                                             @if($transaction->type === 'income') bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400
@@ -396,7 +409,7 @@
                         <div class="text-center py-8">
                             <i class="fa-solid fa-receipt text-gray-300 text-3xl mb-3"></i>
                             <p class="text-sm text-gray-400 dark:text-gray-500 font-medium">{{ __('No transactions today') }}</p>
-                            <button type="button" onclick="openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
+                            <button type="button" onclick="window.openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
                                 {{ __('Add transaction') }}
                             </button>
                         </div>
@@ -471,7 +484,7 @@
                     @empty
                         <div class="p-8 text-center text-gray-400">
                             <p>{{ __('No transactions yet') }}</p>
-                            <button type="button" onclick="openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
+                            <button type="button" onclick="window.openTransactionModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition mt-2 inline-block">
                                 {{ __('Add first transaction') }}
                             </button>
                         </div>
@@ -483,7 +496,7 @@
             <div id="view-wallets" class="content-section hidden">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Add Wallet Button -->
-                    <button type="button" onclick="openAccountModal()" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:border-primary hover:text-primary transition h-48 bg-gray-50 dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-600">
+                    <button type="button" onclick="window.openAccountModal()" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:border-primary hover:text-primary transition h-48 bg-gray-50 dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-600">
                         <i class="fa-solid fa-plus text-3xl mb-2"></i>
                         <span class="font-medium">{{ __('Add New Wallet') }}</span>
                     </button>
@@ -528,7 +541,7 @@
                                     data-notes="{{ e($account->notes) }}"
                                     data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
                                     data-is-active="{{ $account->is_active ? 1 : 0 }}"
-                                    onclick="openAccountEditFromButton(this)"
+                                    onclick="window.openAccountEditFromButton(this)"
                                 >
                                     <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
@@ -549,7 +562,7 @@
                         <h3 class="text-xl font-bold text-dark dark:text-white">{{ __('Manage Categories') }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Adjust your expense and income labels.') }}</p>
                     </div>
-                    <button type="button" onclick="openCategoryModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <button type="button" onclick="window.openCategoryModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> {{ __('New Category') }}
                     </button>
                 </div>
@@ -792,7 +805,7 @@
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
                                     @forelse($allTransactions->take(10) as $transaction)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
                                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $transaction->date->format('d M Y') }}</td>
                                             <td class="px-6 py-4 font-medium text-dark dark:text-white">{{ $transaction->description }}</td>
                                             <td class="px-6 py-4">
@@ -846,7 +859,7 @@
                         <h3 class="text-xl font-bold text-dark dark:text-white">Budget Planner</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Sisa budget total: <span class="text-emerald-600 dark:text-emerald-400 font-bold sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalRemainingBudget ?? 0, 2, '.', ',') : number_format($totalRemainingBudget ?? 0, 0, ',', '.') }}</span></p>
                     </div>
-                    <button type="button" onclick="openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm transition">+ {{ __('Add New Budget') }}</button>
+                    <button type="button" onclick="window.openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm transition">+ {{ __('Add New Budget') }}</button>
                 </div>
 
                 <div class="space-y-4">
@@ -886,7 +899,7 @@
                                     @endphp
                                     <button 
                                         type="button" 
-                                        onclick="openBudgetEditModal({{ $budget->id }}, this)"
+                                        onclick="window.openBudgetEditModal({{ $budget->id }}, this)"
                                         data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
                                         class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-2"
                                         title="Edit Budget">
@@ -905,7 +918,7 @@
                     @empty
                         <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
                             <p class="text-gray-400 dark:text-gray-500 mb-4">{{ __('No budget has been created yet') }}</p>
-                            <button type="button" onclick="openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Create first budget') }}</button>
+                            <button type="button" onclick="window.openBudgetModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition">{{ __('Create first budget') }}</button>
                         </div>
                     @endforelse
                 </div>
@@ -940,7 +953,7 @@
                                             @if(!$debt->is_paid)
                                                 <button 
                                                     type="button"
-                                                    onclick="openMarkPaidModal({{ $debt->id }}, this)"
+                                                    onclick="window.openMarkPaidModal({{ $debt->id }}, this)"
                                                     @php
                                                         $receivablePaidData = [
                                                             'contact_name' => $debt->contact_name,
@@ -961,7 +974,7 @@
                                             @endif
                                             <button 
                                                 type="button"
-                                                onclick="openReminderModal({{ $debt->id }}, this)"
+                                                onclick="window.openReminderModal({{ $debt->id }}, this)"
                                                 @php
                                                     $debtReminderData = [
                                                         'contact_name' => $debt->contact_name,
@@ -983,7 +996,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('receivable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Receivable') }}</button>
+                        <button type="button" onclick="window.openDebtModal('receivable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Receivable') }}</button>
                     </div>
 
                     <!-- Column: Utang (Saya berutang ke orang) -->
@@ -1010,7 +1023,7 @@
                                         <p class="font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, ',', '.') : number_format($debt->current_amount, 0, ',', '.') }}</p>
                                         <button 
                                             type="button" 
-                                            onclick="openPaymentModal({{ $debt->id }}, this)"
+                                            onclick="window.openPaymentModal({{ $debt->id }}, this)"
                                             @php
                                                 $debtData = [
                                                     'contact_name' => $debt->contact_name,
@@ -1028,7 +1041,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        <button type="button" onclick="openDebtModal('payable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Payable') }}</button>
+                        <button type="button" onclick="window.openDebtModal('payable')" class="block w-full py-3 text-sm bg-primary text-white transition text-center">+ {{ __('Add Payable') }}</button>
                     </div>
                 </div>
 
@@ -1044,7 +1057,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-96 overflow-y-auto">
                             @forelse($paidReceivables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="openDebtDetailModal({{ $debt->id }})">
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.openDebtDetailModal({{ $debt->id }})">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="font-bold text-dark dark:text-white">{{ $debt->contact_name }}</p>
@@ -1082,7 +1095,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-96 overflow-y-auto">
                             @forelse($paidPayables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="openDebtDetailModal({{ $debt->id }})">
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.openDebtDetailModal({{ $debt->id }})">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="font-bold text-dark dark:text-white">{{ $debt->contact_name }}</p>
@@ -1124,7 +1137,7 @@
     <button
         id="add-transaction-fab"
         type="button"
-        onclick="openTransactionModal()"
+        onclick="window.openTransactionModal()"
         class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg shadow-emerald-300 flex items-center justify-center text-xl sm:text-2xl transition transform hover:scale-110 z-50">
         <i class="fa-solid fa-plus"></i>
     </button>
@@ -1272,7 +1285,7 @@
         };
         
         // Function to toggle mobile sidebar
-        function toggleMobileSidebar() {
+        window.toggleMobileSidebar = function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileSidebarOverlay');
             if (sidebar && overlay) {
@@ -1365,7 +1378,7 @@
         });
 
         // Function to switch language
-        function switchLanguage(locale) {
+        window.switchLanguage = function switchLanguage(locale) {
             if (locale === 'id' || locale === 'en') {
                 // Preserve current URL parameters
                 const currentUrl = new URL(window.location.href);
@@ -1375,7 +1388,7 @@
         }
 
         // Function to change month and year
-        function changeMonthYear(monthYear) {
+        window.changeMonthYear = function changeMonthYear(monthYear) {
             if (!monthYear) return;
             
             // Get current URL and parameters
@@ -1390,8 +1403,20 @@
             window.location.href = url.toString();
         }
 
+        // Helper function to navigate to budget view
+        window.goToBudgetView = function goToBudgetView() {
+            // Find the budget button in sidebar - use simpler selector
+            const budgetButton = document.querySelector('button[onclick*="budget"]');
+            if (budgetButton && window.switchView) {
+                window.switchView('budget', budgetButton);
+            } else if (window.switchView) {
+                // Fallback: directly switch to budget view
+                window.switchView('budget', null);
+            }
+        }
+
         // 1. Navigation Logic (SPA Switcher)
-        function switchView(viewId, btnElement) {
+        window.switchView = function switchView(viewId, btnElement) {
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(el => {
                 el.classList.add('hidden');
@@ -1416,7 +1441,10 @@
                 btnElement.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left';
                 // Update Title
                 const text = btnElement.innerText.trim();
-                document.getElementById('page-title').innerText = text;
+                const pageTitle = document.getElementById('page-title');
+                if (pageTitle) {
+                    pageTitle.innerText = text;
+                }
             }
 
             // Tampilkan / sembunyikan tombol FAB tambah transaksi
@@ -1433,7 +1461,7 @@
 
         // 2. Privacy Toggle Logic
         let isHidden = false;
-        function togglePrivacy(btn) {
+        window.togglePrivacy = function togglePrivacy(btn) {
             const sensitiveElements = document.querySelectorAll('.sensitive-data');
             const icon = btn.querySelector('i');
             
@@ -1460,7 +1488,7 @@
         }
 
         // 3. Change Period for Cash Flow Chart
-        function changePeriod(period) {
+        window.changePeriod = function changePeriod(period) {
             const titles = {
                 'daily': 'Arus Kas Harian',
                 'weekly': 'Arus Kas Mingguan',
@@ -1600,17 +1628,11 @@
         });
         
         // Also watch for when view switches to dashboard
-        const originalSwitchView = window.switchView;
-        if (originalSwitchView) {
-            window.switchView = function(...args) {
-                const result = originalSwitchView.apply(this, args);
-                setTimeout(forceApplyDarkMode, 100);
-                return result;
-            };
-        }
+        // Wrap switchView to apply dark mode after view switch
+        // This will be set up after switchView is defined
         
         // Notification Functions
-        function toggleNotificationDropdown() {
+        window.toggleNotificationDropdown = function toggleNotificationDropdown() {
             const dropdown = document.getElementById('notificationDropdown');
             if (dropdown) {
                 dropdown.classList.toggle('hidden');
@@ -1629,7 +1651,7 @@
             }
         }
 
-        async function markNotificationAsRead(notificationId) {
+        window.markNotificationAsRead = async function markNotificationAsRead(notificationId) {
             try {
                 const response = await fetch(`/notifications/${notificationId}/read`, {
                     method: 'POST',
@@ -1661,7 +1683,7 @@
             }
         }
 
-        async function markAllNotificationsAsRead() {
+        window.markAllNotificationsAsRead = async function markAllNotificationsAsRead() {
             try {
                 const response = await fetch('/notifications/read-all', {
                     method: 'POST',
@@ -1809,7 +1831,7 @@
         let accountsData = [];
         let categoriesData = [];
 
-        async function openTransactionModal() {
+        window.openTransactionModal = async function openTransactionModal() {
             const modal = document.getElementById('transactionModal');
             modal.classList.remove('hidden');
             
@@ -1849,7 +1871,7 @@
             }
         }
 
-        function closeTransactionModal() {
+        window.closeTransactionModal = function closeTransactionModal() {
             const modal = document.getElementById('transactionModal');
             modal.classList.add('hidden');
             document.getElementById('transactionForm').reset();
@@ -1859,7 +1881,7 @@
         }
 
         // 12. Mark Paid Modal Functions (Tandai Piutang sebagai Lunas)
-        function openMarkPaidModal(receivableId, buttonElement) {
+        window.openMarkPaidModal = function openMarkPaidModal(receivableId, buttonElement) {
             const modal = document.getElementById('markPaidModal');
             const form = document.getElementById('markPaidForm');
             
@@ -1910,7 +1932,7 @@
             modal.classList.remove('hidden');
         }
 
-        function closeMarkPaidModal() {
+        window.closeMarkPaidModal = function closeMarkPaidModal() {
             const modal = document.getElementById('markPaidModal');
             modal.classList.add('hidden');
             clearErrors();
@@ -2182,7 +2204,7 @@
         // 5. Account (Wallet) Modal Functions
         let editingAccountId = null;
 
-        function openAccountEditFromButton(btn) {
+        window.openAccountEditFromButton = function openAccountEditFromButton(btn) {
             const account = {
                 id: btn.dataset.id,
                 name: btn.dataset.name || '',
@@ -2195,7 +2217,7 @@
             openAccountModal(account);
         }
 
-        function openAccountModal(account = null) {
+        window.openAccountModal = function openAccountModal(account = null) {
             const modal = document.getElementById('accountModal');
             const form = document.getElementById('accountForm');
             const title = document.getElementById('accountModalTitle');
@@ -2236,7 +2258,7 @@
             }
         }
 
-        function closeAccountModal() {
+        window.closeAccountModal = function closeAccountModal() {
             const modal = document.getElementById('accountModal');
             modal.classList.add('hidden');
             clearErrors();
@@ -2529,7 +2551,7 @@
             }
         }
 
-        function openCategoryModal() {
+        window.openCategoryModal = function openCategoryModal() {
             const modal = document.getElementById('categoryModal');
             const form = document.getElementById('categoryForm');
             modal.classList.remove('hidden');
@@ -2560,7 +2582,7 @@
             }
         }
 
-        function closeCategoryModal() {
+        window.closeCategoryModal = function closeCategoryModal() {
             const modal = document.getElementById('categoryModal');
             modal.classList.add('hidden');
             clearErrors();
@@ -2632,7 +2654,7 @@
         }
 
         // 7. Transaction Detail Modal Functions
-        async function openTransactionDetailModal(transactionId) {
+        window.openTransactionDetailModal = async function openTransactionDetailModal(transactionId) {
             const modal = document.getElementById('transactionDetailModal');
             const content = document.getElementById('transactionDetailContent');
             
@@ -2772,7 +2794,7 @@
         }
 
         // 7.5. Debt Detail Modal Functions
-        async function openDebtDetailModal(debtId) {
+        window.openDebtDetailModal = async function openDebtDetailModal(debtId) {
             const modal = document.getElementById('debtDetailModal');
             const content = document.getElementById('debtDetailContent');
             
@@ -2920,13 +2942,13 @@
             }
         }
 
-        function closeDebtDetailModal() {
+        window.closeDebtDetailModal = function closeDebtDetailModal() {
             const modal = document.getElementById('debtDetailModal');
             modal.classList.add('hidden');
         }
 
         // 8. Budget Modal Functions
-        function openBudgetModal() {
+        window.openBudgetModal = function openBudgetModal() {
             const modal = document.getElementById('budgetModal');
             const form = document.getElementById('budgetForm');
             const modalTitle = document.getElementById('budgetModalTitle');
@@ -2947,7 +2969,7 @@
             modal.classList.remove('hidden');
         }
 
-        function openBudgetEditModal(budgetId, buttonElement) {
+        window.openBudgetEditModal = function openBudgetEditModal(budgetId, buttonElement) {
             const modal = document.getElementById('budgetModal');
             const form = document.getElementById('budgetForm');
             const modalTitle = document.getElementById('budgetModalTitle');
@@ -3016,14 +3038,14 @@
             modal.classList.remove('hidden');
         }
 
-        function closeBudgetModal() {
+        window.closeBudgetModal = function closeBudgetModal() {
             const modal = document.getElementById('budgetModal');
             modal.classList.add('hidden');
             clearErrors();
         }
 
         // 9. Debt Modal Functions (Piutang/Utang)
-        function openDebtModal(type) {
+        window.openDebtModal = function openDebtModal(type) {
             const modal = document.getElementById('debtModal');
             const form = document.getElementById('debtForm');
             const modalTitle = document.getElementById('debtModalTitle');
@@ -3042,14 +3064,14 @@
             }
         }
 
-        function closeDebtModal() {
+        window.closeDebtModal = function closeDebtModal() {
             const modal = document.getElementById('debtModal');
             modal.classList.add('hidden');
             clearErrors();
         }
 
         // 10. Payment Modal Functions (Bayar Cicilan)
-        function openPaymentModal(debtId, buttonElement) {
+        window.openPaymentModal = function openPaymentModal(debtId, buttonElement) {
             const modal = document.getElementById('paymentModal');
             const form = document.getElementById('paymentForm');
             const modalTitle = document.getElementById('paymentModalTitle');
@@ -3113,7 +3135,7 @@
             modal.classList.remove('hidden');
         }
 
-        function closePaymentModal() {
+        window.closePaymentModal = function closePaymentModal() {
             const modal = document.getElementById('paymentModal');
             modal.classList.add('hidden');
             clearErrors();
@@ -3338,7 +3360,7 @@
         }
 
         // 11. Reminder Modal Functions (Ingatkan Piutang)
-        function openReminderModal(debtId, buttonElement) {
+        window.openReminderModal = function openReminderModal(debtId, buttonElement) {
             const modal = document.getElementById('reminderModal');
             const form = document.getElementById('reminderForm');
             
@@ -3409,7 +3431,7 @@
             modal.classList.remove('hidden');
         }
 
-        function closeReminderModal() {
+        window.closeReminderModal = function closeReminderModal() {
             const modal = document.getElementById('reminderModal');
             modal.classList.add('hidden');
             clearErrors();
@@ -3730,12 +3752,12 @@
             if (hasTransactionFilter) {
                 const transactionsBtn = document.getElementById('nav-transactions');
                 if (transactionsBtn) {
-                    switchView('transactions', transactionsBtn);
+                    window.switchView('transactions', transactionsBtn);
                 }
             } else if (hasReportFilter || viewParam === 'reports') {
                 const reportsBtn = document.getElementById('nav-reports');
                 if (reportsBtn) {
-                    switchView('reports', reportsBtn);
+                    window.switchView('reports', reportsBtn);
                 }
             } else if (viewParam === 'budget') {
                 // Find budget button by looking for the one that contains "Budget" text
@@ -3747,7 +3769,7 @@
                     }
                 });
                 if (budgetBtn) {
-                    switchView('budget', budgetBtn);
+                    window.switchView('budget', budgetBtn);
                 }
             } else if (viewParam === 'debts') {
                 // Find debts button by looking for the one that contains "Utang" text
@@ -3759,14 +3781,25 @@
                     }
                 });
                 if (debtsBtn) {
-                    switchView('debts', debtsBtn);
+                    window.switchView('debts', debtsBtn);
                 }
             } else {
                 // Default view is Dashboard
                 const dashboardBtn = document.getElementById('nav-dashboard');
-                if (dashboardBtn) {
-                    switchView('dashboard', dashboardBtn);
+                if (dashboardBtn && window.switchView) {
+                    window.switchView('dashboard', dashboardBtn);
                 }
+            }
+            
+            // Wrap switchView to apply dark mode after view switch
+            // Do this after DOM is loaded to ensure switchView is defined
+            if (window.switchView && typeof window.switchView === 'function') {
+                const originalSwitchView = window.switchView;
+                window.switchView = function(...args) {
+                    const result = originalSwitchView.apply(this, args);
+                    setTimeout(forceApplyDarkMode, 100);
+                    return result;
+                };
             }
         });
     </script>
@@ -3776,7 +3809,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Transaksi</h3>
-                    <button onclick="closeTransactionModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                    <button onclick="window.closeTransactionModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -3853,7 +3886,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Transaksi
                     </button>
-                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeTransactionModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3866,7 +3899,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 id="accountModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Dompet Baru</h3>
-                <button onclick="closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
+                <button onclick="window.closeAccountModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -3967,7 +4000,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Dompet
                     </button>
-                    <button type="button" onclick="closeAccountModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeAccountModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -3980,7 +4013,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-dark dark:text-white">Tambah Kategori Baru</h3>
-                <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
+                <button onclick="window.closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
@@ -4152,7 +4185,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Kategori
                     </button>
-                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeCategoryModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4165,7 +4198,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Detail Transaksi</h3>
-                <button onclick="closeTransactionDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeTransactionDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4183,7 +4216,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 id="budgetModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Budget Baru</h3>
-                <button onclick="closeBudgetModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeBudgetModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4242,7 +4275,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan Budget
                     </button>
-                    <button type="button" onclick="closeBudgetModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeBudgetModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4255,7 +4288,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 id="debtModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tambah Piutang</h3>
-                <button onclick="closeDebtModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeDebtModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4315,7 +4348,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Simpan
                     </button>
-                    <button type="button" onclick="closeDebtModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeDebtModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4328,7 +4361,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 id="paymentModalTitle" class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Pay Installment') }}</h3>
-                <button onclick="closePaymentModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closePaymentModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4389,7 +4422,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-save mr-2"></i> Catat Pembayaran
                     </button>
-                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closePaymentModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4402,7 +4435,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Buat Reminder</h3>
-                <button onclick="closeReminderModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeReminderModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4448,7 +4481,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-calendar-plus mr-2"></i> Buat Reminder
                     </button>
-                    <button type="button" onclick="closeReminderModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeReminderModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4461,7 +4494,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Tandai sebagai Lunas</h3>
-                <button onclick="closeMarkPaidModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeMarkPaidModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
@@ -4493,7 +4526,7 @@
                     <button type="submit" class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium transition">
                         <i class="fa-solid fa-check-circle mr-2"></i> Tandai sebagai Lunas
                     </button>
-                    <button type="button" onclick="closeMarkPaidModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    <button type="button" onclick="window.closeMarkPaidModal()" class="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                         Batal
                     </button>
                 </div>
@@ -4506,7 +4539,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">Detail Utang/Piutang</h3>
-                <button onclick="closeDebtDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                <button onclick="window.closeDebtDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
