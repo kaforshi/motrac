@@ -165,7 +165,7 @@
                     <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600 relative overflow-hidden group">
                         <div class="absolute right-0 top-0 p-2 sm:p-4 opacity-5 group-hover:opacity-10 transition"><i class="fa-solid fa-wallet text-4xl sm:text-6xl text-blue-500"></i></div>
                         <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">{{ __('Total Balance') }}</p>
-                        <h3 class="text-xl sm:text-2xl font-bold text-dark dark:text-white sensitive-data break-words">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalBalance, 2, '.', ',') : number_format($totalBalance, 0, ',', '.') }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-bold text-dark dark:text-white sensitive-data break-words">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalBalance, 2, ',', '.') : number_format($totalBalance, 0, ',', '.') }}</h3>
                         <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
                             @if($monthlyIncome > 0)
                                 <span class="text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">
@@ -177,11 +177,11 @@
                     </div>
                     <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
                         <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4"><div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-arrow-down text-sm sm:text-base"></i></div><span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Income') }}</span></div>
-                        <h3 class="text-xl sm:text-2xl font-bold text-emerald-600 sensitive-data income-amount break-words" id="income-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-bold text-emerald-600 sensitive-data income-amount break-words" id="income-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, ',', '.') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
                     </div>
                     <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600">
                         <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4"><div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400"><i class="fa-solid fa-arrow-up text-sm sm:text-base"></i></div><span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('Expense') }}</span></div>
-                        <h3 class="text-xl sm:text-2xl font-bold text-rose-600 sensitive-data expense-amount break-words" id="expense-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-bold text-rose-600 sensitive-data expense-amount break-words" id="expense-amount-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : '' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, ',', '.') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
                     </div>
                 </div>
 
@@ -242,7 +242,7 @@
                                             <div class="absolute inset-0 m-auto bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center shadow-inner w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px]">
                                                 <span class="text-[10px] sm:text-xs text-gray-400 font-medium mb-0.5 sm:mb-1">Net Cash Flow</span>
                                                 <span class="font-bold text-sm sm:text-base md:text-lg {{ $totalNet >= 0 ? 'text-emerald-500' : 'text-rose-500' }} sensitive-data break-words text-center px-1">
-                                                    {{ $totalNet >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($totalNet), 2, '.', ',') : number_format(abs($totalNet), 0, ',', '.') }}
+                                                    {{ $totalNet >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($totalNet), 2, ',', '.') : number_format(abs($totalNet), 0, ',', '.') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -254,14 +254,14 @@
                                             <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 shadow-sm flex-shrink-0"></div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-[10px] sm:text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Income') }}</p>
-                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-income-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncome, 2, '.', ',') : number_format($totalIncome, 0, ',', '.') }}</p>
+                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-income-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(16, 185, 129) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncome, 2, ',', '.') : number_format($totalIncome, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl flex-1 min-w-[120px] sm:min-w-[140px] cash-flow-expense-card" style="{{ auth()->user() && auth()->user()->dark_mode ? 'background-color: rgb(127, 29, 29) !important; border: 1px solid rgb(225, 29, 72) !important;' : 'background-color: rgb(255, 241, 242); border: 1px solid rgb(254, 205, 211);' }}">
                                             <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-rose-500 shadow-sm flex-shrink-0"></div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-[10px] sm:text-[11px] font-medium mb-0.5" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(209, 213, 219) !important;' : 'color: rgb(107, 114, 128);' }}">{{ __('Expense') }}</p>
-                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-expense-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpense, 2, '.', ',') : number_format($totalExpense, 0, ',', '.') }}</p>
+                                                <p class="font-bold text-xs sm:text-sm sensitive-data cash-flow-expense-amount break-words" style="{{ auth()->user() && auth()->user()->dark_mode ? 'color: rgb(225, 29, 72) !important;' : 'color: rgb(17, 24, 39);' }}">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpense, 2, ',', '.') : number_format($totalExpense, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -305,12 +305,12 @@
                                     <div class="flex justify-between items-center text-xs">
                                         <div class="flex flex-col">
                                             <span class="text-gray-400 dark:text-gray-500 mb-0.5">{{ __('Used') }}</span>
-                                            <span class="font-semibold text-gray-700 dark:text-gray-300 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($spent, 2, '.', ',') : number_format($spent, 0, ',', '.') }}</span>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($spent, 2, ',', '.') : number_format($spent, 0, ',', '.') }}</span>
                                         </div>
                                         <div class="flex flex-col text-right">
                                             <span class="text-gray-400 dark:text-gray-500 mb-0.5">{{ __('Remaining') }}</span>
                                             <span class="font-semibold {{ $remaining >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} sensitive-data">
-                                                {{ $remaining >= 0 ? '' : '-' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($remaining), 2, '.', ',') : number_format(abs($remaining), 0, ',', '.') }}
+                                                {{ $remaining >= 0 ? '' : '-' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($remaining), 2, ',', '.') : number_format(abs($remaining), 0, ',', '.') }}
                                             </span>
                                         </div>
                                     </div>
@@ -370,7 +370,7 @@
                                             @if($transaction->type === 'income')+
                                             @elseif($transaction->type === 'expense')-
                                             @endif
-                                            {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, '.', ',') : number_format($transaction->amount, 0, ',', '.') }}
+                                            {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, ',', '.') : number_format($transaction->amount, 0, ',', '.') }}
                                         </span>
                                         <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                                             {{ $transaction->created_at->format('H:i') }}
@@ -389,7 +389,7 @@
                         <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Total Today') }}</span>
                             <span class="font-bold text-base {{ $todayTotal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} sensitive-data">
-                                {{ $todayTotal >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($todayTotal), 2, '.', ',') : number_format(abs($todayTotal), 0, ',', '.') }}
+                                {{ $todayTotal >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($todayTotal), 2, ',', '.') : number_format(abs($todayTotal), 0, ',', '.') }}
                             </span>
                         </div>
                     @else
@@ -447,7 +447,7 @@
                         <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 border-b border-gray-100 dark:border-gray-600 flex justify-between items-center">
                             <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">{{ $transactions->first()->date->format('d M') }}</span>
                             <span class="text-xs font-bold {{ $transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; }) >= 0 ? 'text-emerald-500' : 'text-rose-500' }} sensitive-data">
-                                {{ $transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; }) >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; })), 2, '.', ',') : number_format(abs($transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; })), 0, ',', '.') }}
+                                {{ $transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; }) >= 0 ? '+' : '' }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format(abs($transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; })), 2, ',', '.') : number_format(abs($transactions->sum(function($t) { return $t->type === 'income' ? $t->amount : -$t->amount; })), 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -534,7 +534,7 @@
                                 </button>
                             </div>
                             <div class="pl-2">
-                                <p class="text-2xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($account->balance, 2, '.', ',') : number_format($account->balance, 0, ',', '.') }}</p>
+                                <p class="text-2xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($account->balance, 2, ',', '.') : number_format($account->balance, 0, ',', '.') }}</p>
                                 <p class="text-xs text-gray-400 mt-1">Updated: {{ $account->updated_at->diffForHumans() }}</p>
                             </div>
                         </div>
@@ -672,25 +672,25 @@
                         <!-- Total Income -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                             <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Income</p>
-                            <h3 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, '.', ',') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
+                            <h3 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome, 2, ',', '.') : number_format($monthlyIncome, 0, ',', '.') }}</h3>
                             <span class="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> {{ __('Current Month') }}</span>
                         </div>
                         <!-- Total Expense -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                             <p class="text-xs text-gray-500 font-medium uppercase mb-1">{{ __('Total Expense') }}</p>
-                            <h3 class="text-xl font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, '.', ',') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
+                            <h3 class="text-xl font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyExpense, 2, ',', '.') : number_format($monthlyExpense, 0, ',', '.') }}</h3>
                             <span class="text-[10px] text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-1.5 py-0.5 rounded mt-1 inline-block"><i class="fa-solid fa-arrow-trend-down"></i> {{ __('Current Month') }}</span>
                         </div>
                         <!-- Total Transfer -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                             <p class="text-xs text-gray-500 font-medium uppercase mb-1">{{ __('Total Transfer') }}</p>
-                            <h3 class="text-xl font-bold text-blue-600 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalTransfer ?? 0, 2, '.', ',') : number_format($totalTransfer ?? 0, 0, ',', '.') }}</h3>
+                            <h3 class="text-xl font-bold text-blue-600 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalTransfer ?? 0, 2, ',', '.') : number_format($totalTransfer ?? 0, 0, ',', '.') }}</h3>
                             <span class="text-[10px] text-gray-400 mt-1 inline-block">Internal mutations</span>
                         </div>
                         <!-- Net Amount -->
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm bg-gradient-to-br from-emerald-50 dark:from-emerald-900/20 to-white dark:to-gray-800">
                             <p class="text-xs text-gray-500 font-medium uppercase mb-1">Net Amount</p>
-                            <h3 class="text-xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome - $monthlyExpense, 2, '.', ',') : number_format($monthlyIncome - $monthlyExpense, 0, ',', '.') }}</h3>
+                            <h3 class="text-xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($monthlyIncome - $monthlyExpense, 2, ',', '.') : number_format($monthlyIncome - $monthlyExpense, 0, ',', '.') }}</h3>
                             <span class="text-[10px] {{ ($monthlyIncome - $monthlyExpense) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} font-bold mt-1 inline-block">{{ ($monthlyIncome - $monthlyExpense) >= 0 ? 'Healthy Cashflow' : 'Deficit' }}</span>
                         </div>
                     </div>
@@ -709,7 +709,7 @@
                                         <div class="absolute inset-0 m-auto w-36 h-36 bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center px-4 py-3">
                                             <span class="text-xs text-gray-400 dark:text-gray-500 mb-1">Total</span>
                                             <span class="font-bold text-base text-dark dark:text-white sensitive-data text-center leading-tight">
-                                                {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncomeCat, 2, '.', ',') : number_format($totalIncomeCat, 0, ',', '.') }}
+                                                {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalIncomeCat, 2, ',', '.') : number_format($totalIncomeCat, 0, ',', '.') }}
                                             </span>
                                         </div>
                                     </div>
@@ -724,7 +724,7 @@
                                                     <span class="text-gray-600 dark:text-gray-400">{{ $item->category->name ?? 'N/A' }} ({{ number_format($percentage, 0) }}%)</span>
                                                 </div>
                                                 <span class="font-bold text-dark dark:text-white sensitive-data">
-                                                    {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($item->total, 2, '.', ',') : number_format($item->total, 0, ',', '.') }}
+                                                    {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($item->total, 2, ',', '.') : number_format($item->total, 0, ',', '.') }}
                                                 </span>
                                             </div>
                                         @endforeach
@@ -747,7 +747,7 @@
                                         <div class="absolute inset-0 m-auto w-36 h-36 bg-white dark:bg-gray-800 rounded-full flex flex-col items-center justify-center px-4 py-3">
                                             <span class="text-xs text-gray-400 dark:text-gray-500 mb-1">Total</span>
                                             <span class="font-bold text-base text-dark dark:text-white sensitive-data text-center leading-tight">
-                                                {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpenseCat, 2, '.', ',') : number_format($totalExpenseCat, 0, ',', '.') }}
+                                                {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalExpenseCat, 2, ',', '.') : number_format($totalExpenseCat, 0, ',', '.') }}
                                             </span>
                                         </div>
                                     </div>
@@ -762,7 +762,7 @@
                                                     <span class="text-gray-600 dark:text-gray-400">{{ $item->category->name ?? 'N/A' }} ({{ number_format($percentage, 0) }}%)</span>
                                                 </div>
                                                 <span class="font-bold text-dark dark:text-white sensitive-data">
-                                                    {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($item->total, 2, '.', ',') : number_format($item->total, 0, ',', '.') }}
+                                                    {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($item->total, 2, ',', '.') : number_format($item->total, 0, ',', '.') }}
                                                 </span>
                                             </div>
                                         @endforeach
@@ -804,7 +804,7 @@
                                                 {{ ucfirst($transaction->type) }}
                                             </td>
                                             <td class="px-6 py-4 text-right font-bold {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : ($transaction->type === 'expense' ? 'text-rose-600 dark:text-rose-400' : 'text-gray-600 dark:text-gray-400') }} sensitive-data">
-                                                {{ $transaction->type === 'income' ? '+' : ($transaction->type === 'expense' ? '-' : '') }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, '.', ',') : number_format($transaction->amount, 0, ',', '.') }}
+                                                {{ $transaction->type === 'income' ? '+' : ($transaction->type === 'expense' ? '-' : '') }}{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($transaction->amount, 2, ',', '.') : number_format($transaction->amount, 0, ',', '.') }}
                                             </td>
                                         </tr>
                                     @empty
@@ -824,7 +824,7 @@
                                 <div>
                                     <span class="text-xs text-gray-500 dark:text-gray-400 uppercase block mb-1">{{ __('Total Income') }}</span>
                                     <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">
-                                        +{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalDetailedIncome ?? 0, 2, '.', ',') : number_format($totalDetailedIncome ?? 0, 0, ',', '.') }}
+                                        +{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($totalDetailedIncome ?? 0, 2, ',', '.') : number_format($totalDetailedIncome ?? 0, 0, ',', '.') }}
                                     </span>
                                 </div>
                                 <div>
@@ -900,7 +900,7 @@
                                 @endphp
                                 <div class="h-3 rounded-full flex items-center justify-end pr-2 text-[8px] text-white font-bold" style="width: {{ $percentage }}%; background-color: {{ $progressColor }};">{{ number_format($percentage, 0) }}%</div>
                             </div>
-                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 relative z-10">{{ __('Used') }} <span class="sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->spent, 2, '.', ',') : number_format($budget->spent, 0, ',', '.') }}</span> {{ __('from') }} {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->amount, 2, '.', ',') : number_format($budget->amount, 0, ',', '.') }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 relative z-10">{{ __('Used') }} <span class="sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->spent, 2, ',', '.') : number_format($budget->spent, 0, ',', '.') }}</span> {{ __('from') }} {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($budget->amount, 2, ',', '.') : number_format($budget->amount, 0, ',', '.') }}</p>
                         </div>
                     @empty
                         <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
@@ -919,7 +919,7 @@
                         <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 border-b border-emerald-100 dark:border-emerald-800 flex justify-between items-center">
                             <h3 class="font-bold text-emerald-800 dark:text-emerald-400">Piutang (Uang Saya)</h3>
                             <span class="bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 text-xs px-2 py-1 rounded font-bold sensitive-data">
-                                Total: {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($receivables->sum('current_amount'), 2, '.', ',') : number_format($receivables->sum('current_amount'), 0, ',', '.') }}
+                                Total: {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($receivables->sum('current_amount'), 2, ',', '.') : number_format($receivables->sum('current_amount'), 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -935,7 +935,7 @@
                                         </p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, '.', ',') : number_format($debt->current_amount, 0, ',', '.') }}</p>
+                                        <p class="font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, ',', '.') : number_format($debt->current_amount, 0, ',', '.') }}</p>
                                         <div class="flex gap-2 items-center justify-end">
                                             @if(!$debt->is_paid)
                                                 <button 
@@ -991,7 +991,7 @@
                         <div class="bg-rose-50 dark:bg-rose-900/20 p-4 border-b border-rose-100 dark:border-rose-800 flex justify-between items-center">
                             <h3 class="font-bold text-rose-800 dark:text-rose-400">{{ __('My Debts') }}</h3>
                             <span class="bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 text-xs px-2 py-1 rounded font-bold sensitive-data">
-                                Total: {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($payables->sum('current_amount'), 2, '.', ',') : number_format($payables->sum('current_amount'), 0, ',', '.') }}
+                                Total: {{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($payables->sum('current_amount'), 2, ',', '.') : number_format($payables->sum('current_amount'), 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -1007,7 +1007,7 @@
                                         </p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, '.', ',') : number_format($debt->current_amount, 0, ',', '.') }}</p>
+                                        <p class="font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, ',', '.') : number_format($debt->current_amount, 0, ',', '.') }}</p>
                                         <button 
                                             type="button" 
                                             onclick="openPaymentModal({{ $debt->id }}, this)"
@@ -1053,7 +1053,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                            {{ __('Amount:') }} <span class="font-semibold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, '.', ',') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
+                                            {{ __('Amount:') }} <span class="font-semibold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, ',', '.') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
                                         </p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
                                             {{ __('Paid on:') }} {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
@@ -1091,7 +1091,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                            Jumlah: <span class="font-semibold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, '.', ',') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
+                                            {{ __('Amount:') }} <span class="font-semibold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->initial_amount, 2, ',', '.') : number_format($debt->initial_amount, 0, ',', '.') }}</span>
                                         </p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
                                             Dibayar: {{ $debt->paid_at ? $debt->paid_at->format('d M Y') : '-' }}
@@ -1148,6 +1148,107 @@
             };
         })();
         
+        // Format number with dot as thousands separator (Indonesian format)
+        function formatNumber(number, decimals = 0) {
+            if (isNaN(number) || number === null || number === undefined) {
+                return '0';
+            }
+            const num = parseFloat(number);
+            const parts = num.toFixed(decimals).split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return parts.join(',');
+        }
+
+        // Format currency with symbol
+        function formatCurrency(amount, currency = 'IDR', decimals = null) {
+            const symbols = {
+                'IDR': 'Rp',
+                'USD': '$'
+            };
+            const symbol = symbols[currency] || currency;
+            
+            // Determine decimals based on currency
+            if (decimals === null) {
+                decimals = currency === 'USD' ? 2 : 0;
+            }
+            
+            return symbol + ' ' + formatNumber(amount, decimals);
+        }
+
+        // Convert formatted string back to number (remove dots and replace comma with dot)
+        function unformatNumber(formattedString) {
+            if (!formattedString) return '';
+            // Remove all dots (thousands separator) and replace comma with dot for decimal
+            return formattedString.toString().replace(/\./g, '').replace(',', '.');
+        }
+
+        // Format input on input event
+        function formatAmountInput(input) {
+            const value = input.value;
+            // Remove all non-digit characters except comma
+            const cleaned = value.replace(/[^\d,]/g, '');
+            
+            // Split by comma to handle decimal
+            const parts = cleaned.split(',');
+            let integerPart = parts[0].replace(/\D/g, '');
+            const decimalPart = parts[1] ? parts[1].replace(/\D/g, '').substring(0, 2) : '';
+            
+            // Add thousands separator (dots)
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            
+            // Combine
+            let formatted = integerPart;
+            if (decimalPart) {
+                formatted += ',' + decimalPart;
+            }
+            
+            input.value = formatted;
+        }
+
+        // Initialize amount input formatting
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of amount input IDs
+            const amountInputs = [
+                'modal_amount',
+                'budget_amount',
+                'debt_initial_amount',
+                'payment_amount',
+                'account_initial_balance'
+            ];
+
+            // Add event listeners for formatting
+            amountInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    // Format on input
+                    input.addEventListener('input', function() {
+                        formatAmountInput(this);
+                    });
+
+                    // Format on blur (when user leaves the field)
+                    input.addEventListener('blur', function() {
+                        formatAmountInput(this);
+                    });
+
+                    // Convert back to number format before form submit
+                    const form = input.closest('form');
+                    if (form && !form.hasAttribute('data-amount-formatted')) {
+                        form.setAttribute('data-amount-formatted', 'true');
+                        form.addEventListener('submit', function(e) {
+                            const amountInputs = form.querySelectorAll('input[id="modal_amount"], input[id="budget_amount"], input[id="debt_initial_amount"], input[id="payment_amount"], input[id="account_initial_balance"]');
+                            amountInputs.forEach(input => {
+                                if (input.value) {
+                                    // Convert formatted value back to numeric
+                                    const numericValue = unformatNumber(input.value);
+                                    input.value = numericValue;
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+        });
+
         // Translation strings for JavaScript
         const translations = {
             addReceivable: @json(__('Add Receivable')),
@@ -2110,7 +2211,12 @@
                 document.getElementById('account_name').value = account.name || '';
                 document.getElementById('account_type').value = account.type || 'cash';
                 document.getElementById('account_currency').value = account.currency || 'IDR';
-                document.getElementById('account_initial_balance').value = '';
+                const initialBalanceInput = document.getElementById('account_initial_balance');
+                if (initialBalanceInput && account.initial_balance !== undefined) {
+                    initialBalanceInput.value = formatNumber(account.initial_balance, 0);
+                } else {
+                    initialBalanceInput.value = '';
+                }
                 document.getElementById('account_notes').value = account.notes || '';
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
                 const activeCheckbox = document.getElementById('account_is_active');
@@ -2121,7 +2227,8 @@
                 editingAccountId = null;
                 title.innerText = 'Tambah Dompet Baru';
                 document.getElementById('account_currency').value = 'IDR';
-                document.getElementById('account_initial_balance').value = 0;
+                const initialBalanceInput = document.getElementById('account_initial_balance');
+                if (initialBalanceInput) initialBalanceInput.value = '0';
                 const hiddenCheckbox = document.getElementById('account_is_hidden');
                 const activeCheckbox = document.getElementById('account_is_active');
                 if (hiddenCheckbox) hiddenCheckbox.checked = false;
@@ -2649,7 +2756,10 @@
                 
                 if (budgetIdInput) budgetIdInput.value = budgetId || '';
                 if (categorySelect) categorySelect.value = budgetData.category_id || '';
-                if (amountInput) amountInput.value = budgetData.amount || '';
+                if (amountInput) {
+                    const amount = budgetData.amount || 0;
+                    amountInput.value = formatNumber(amount, 0);
+                }
                 if (monthSelect) monthSelect.value = budgetData.month || new Date().getMonth() + 1;
                 if (yearInput) yearInput.value = budgetData.year || new Date().getFullYear();
                 if (rolloverCheckbox) rolloverCheckbox.checked = budgetData.rollover_enabled || false;
@@ -2736,8 +2846,17 @@
                 // Populate form with debt data
                 document.getElementById('payment_debt_id').value = debtId;
                 document.getElementById('payment_contact_name').textContent = debtData.contact_name || 'N/A';
-                document.getElementById('payment_remaining_amount').textContent = formatCurrencyJS(debtData.current_amount || 0);
-                document.getElementById('payment_amount').max = debtData.current_amount || 0;
+                const remainingAmountEl = document.getElementById('payment_remaining_amount');
+                if (remainingAmountEl) {
+                    remainingAmountEl.textContent = formatCurrency(debtData.current_amount || 0, 'IDR', 0);
+                }
+                const paymentAmountInput = document.getElementById('payment_amount');
+                if (paymentAmountInput) {
+                    const maxAmount = debtData.current_amount || 0;
+                    paymentAmountInput.value = formatNumber(maxAmount, 0);
+                    // Store max value as data attribute for validation
+                    paymentAmountInput.setAttribute('data-max', maxAmount);
+                }
                 document.getElementById('payment_payment_date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('payment_create_transaction').checked = false;
                 document.getElementById('payment_account_field').style.display = 'none';
@@ -3368,7 +3487,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
-                    <input type="number" name="amount" id="modal_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <input type="text" name="amount" id="modal_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                 </div>
 
                 <div>
@@ -3447,12 +3566,13 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Saldo Awal</label>
                     <input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         name="initial_balance"
                         id="account_initial_balance"
                         value="0"
-                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                        inputmode="numeric"
+                        pattern="[0-9.,]*"
+                        class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                     >
                 </div>
 
@@ -3653,7 +3773,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Budget</label>
-                    <input type="number" name="amount" id="budget_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <input type="text" name="amount" id="budget_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_amount"></span>
                 </div>
 
@@ -3732,7 +3852,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah</label>
-                    <input type="number" name="initial_amount" id="debt_initial_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0.00">
+                    <input type="text" name="initial_amount" id="debt_initial_amount" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_initial_amount"></span>
                 </div>
 
@@ -3793,7 +3913,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Pembayaran</label>
-                    <input type="number" name="amount" id="payment_amount" step="0.01" min="0.01" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="0.00">
+                    <input type="text" name="amount" id="payment_amount" required class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="0" inputmode="numeric" pattern="[0-9.,]*">
                     <span class="error-message text-red-500 dark:text-red-400 text-xs mt-1 hidden" id="error_amount"></span>
                 </div>
 
