@@ -87,7 +87,7 @@
             </div>
 
             <div class="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
-                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now()->format('Y-m')) }}" onchange="window.changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
+                <input type="month" id="monthYearPicker" value="{{ request('month_year', \Carbon\Carbon::now($userTimezone ?? config('app.timezone', 'Asia/Jakarta'))->format('Y-m')) }}" onchange="window.changeMonthYear(this.value)" class="hidden lg:block bg-white dark:bg-gray-700 text-dark dark:text-white border border-gray-200 dark:border-gray-600 text-xs sm:text-sm rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:outline-none focus:border-primary cursor-pointer">
                 <!-- Language Toggle Switch -->
                 <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 sm:p-1">
                     <button onclick="window.switchLanguage('id')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all {{ app()->getLocale() === 'id' ? 'bg-dark dark:bg-gray-700 text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
@@ -339,12 +339,12 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-4 sm:mt-6 md:mt-8">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-dark dark:text-white">{{ __("Today's Transactions") }}</h3>
-                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
+                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::now($user->timezone ?? config('app.timezone', 'Asia/Jakarta'))->format('d M Y') }}</span>
                     </div>
                     @if($todayTransactions->count() > 0)
                         <div class="space-y-3">
                             @foreach($todayTransactions as $transaction)
-                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
+                                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }}, true)" data-transaction-id="{{ $transaction->id }}">
                                     <div class="flex items-center gap-3 flex-1">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
                                             @if($transaction->type === 'income') bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400
@@ -465,7 +465,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @foreach($transactions as $transaction)
-                                <div onclick="window.openTransactionDetailModal({{ $transaction->id }})" class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" data-transaction-id="{{ $transaction->id }}">
+                                <div onclick="window.openTransactionDetailModal({{ $transaction->id }}, false)" class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" data-transaction-id="{{ $transaction->id }}">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 rounded-full {{ $transaction->type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : ($transaction->type === 'expense' ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400') }} flex items-center justify-center">
                                             <i class="fa-solid {{ $transaction->type === 'income' ? 'fa-arrow-down' : ($transaction->type === 'expense' ? 'fa-arrow-up' : 'fa-exchange-alt') }}"></i>
@@ -637,7 +637,7 @@
                                 <input
                                     type="date"
                                     name="report_from"
-                                    value="{{ $reportFrom ?? request('report_from', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d')) }}"
+                                    value="{{ $reportFrom ?? request('report_from', \Carbon\Carbon::now($userTimezone ?? config('app.timezone', 'Asia/Jakarta'))->startOfMonth()->format('Y-m-d')) }}"
                                     class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                 >
                             </div>
@@ -646,7 +646,7 @@
                                 <input
                                     type="date"
                                     name="report_to"
-                                    value="{{ $reportTo ?? request('report_to', \Carbon\Carbon::now()->format('Y-m-d')) }}"
+                                    value="{{ $reportTo ?? request('report_to', \Carbon\Carbon::now($userTimezone ?? config('app.timezone', 'Asia/Jakarta'))->format('Y-m-d')) }}"
                                     class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                 >
                             </div>
@@ -675,8 +675,9 @@
                         </form>
                         <div class="flex gap-2 w-full lg:w-auto">
                             @php
-                                $exportDateFrom = $reportFrom ?? request('report_from', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d'));
-                                $exportDateTo = $reportTo ?? request('report_to', \Carbon\Carbon::now()->format('Y-m-d'));
+                                $userTz = $userTimezone ?? config('app.timezone', 'Asia/Jakarta');
+                                $exportDateFrom = $reportFrom ?? request('report_from', \Carbon\Carbon::now($userTz)->startOfMonth()->format('Y-m-d'));
+                                $exportDateTo = $reportTo ?? request('report_to', \Carbon\Carbon::now($userTz)->format('Y-m-d'));
                                 $exportType = $reportType ?? request('report_type', 'all');
                             @endphp
                             <a href="{{ route('reports.export', ['date_from' => $exportDateFrom, 'date_to' => $exportDateTo, 'type' => $exportType]) }}" class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-lg text-sm font-medium transition">
@@ -813,7 +814,7 @@
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
                                     @forelse($allTransactions->take(10) as $transaction)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }})" data-transaction-id="{{ $transaction->id }}">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer" onclick="window.openTransactionDetailModal({{ $transaction->id }}, false)" data-transaction-id="{{ $transaction->id }}">
                                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $transaction->date->format('d M Y') }}</td>
                                             <td class="px-6 py-4 font-medium text-dark dark:text-white">{{ $transaction->description }}</td>
                                             <td class="px-6 py-4">
@@ -1227,7 +1228,52 @@
         }
 
         // Initialize amount input formatting
+        // Detect and save user timezone
+        function detectAndSaveTimezone() {
+            try {
+                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const savedTimezone = '{{ auth()->user()->timezone ?? "" }}';
+                
+                // Always save timezone if detected and different from saved (or if saved is empty/null)
+                // This ensures existing users get their timezone updated automatically
+                if (userTimezone && (!savedTimezone || userTimezone !== savedTimezone)) {
+                    fetch('{{ route("profile.timezone") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({
+                            timezone: userTimezone
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Timezone saved/updated:', userTimezone);
+                            // Reload page to apply new timezone
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving timezone:', error);
+                    });
+                } else if (userTimezone && userTimezone === savedTimezone) {
+                    console.log('Timezone already set:', userTimezone);
+                }
+            } catch (error) {
+                console.error('Error detecting timezone:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Detect and save timezone on page load
+            detectAndSaveTimezone();
+            
             // List of amount input IDs
             const amountInputs = [
                 'modal_amount',
@@ -2755,7 +2801,7 @@
         }
 
         // 7. Transaction Detail Modal Functions
-        window.openTransactionDetailModal = async function openTransactionDetailModal(transactionId) {
+        window.openTransactionDetailModal = async function openTransactionDetailModal(transactionId, allowEdit = false) {
             const modal = document.getElementById('transactionDetailModal');
             const content = document.getElementById('transactionDetailContent');
             
@@ -2775,6 +2821,12 @@
 
                 if (response.ok && data.success && data.transaction) {
                     const t = data.transaction;
+                    
+                    // If allowEdit is true, it means this transaction is from "Today's Transactions" section
+                    // which is already filtered by server to only show today's transactions
+                    // So we can trust the allowEdit parameter without checking date again
+                    // This avoids timezone issues between server and client
+                    const canEdit = allowEdit;
                     const typeLabels = {
                         'income': translations.income,
                         'expense': translations.expense,
@@ -2877,6 +2929,7 @@
                                 </div>
                             ` : ''}
 
+                            ${canEdit ? `
                             <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
                                 <button 
                                     onclick="openTransactionEditModal(${t.id})" 
@@ -2891,6 +2944,7 @@
                                     <i class="fa-solid fa-trash"></i> ${translations.delete}
                                 </button>
                             </div>
+                            ` : ''}
                         </div>
                     `;
 

@@ -22,20 +22,23 @@ class DashboardController extends Controller
             ->where('is_hidden', false)
             ->sum('balance');
 
+        // Get user timezone
+        $userTimezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+        
         // Month and Year filter (from month picker in navbar)
         $monthYear = $request->get('month_year');
-        $selectedMonth = Carbon::now()->month;
-        $selectedYear = Carbon::now()->year;
+        $selectedMonth = Carbon::now($userTimezone)->month;
+        $selectedYear = Carbon::now($userTimezone)->year;
         
         if ($monthYear) {
-            $selectedDate = Carbon::parse($monthYear . '-01');
+            $selectedDate = Carbon::parse($monthYear . '-01', $userTimezone);
             $selectedMonth = $selectedDate->month;
             $selectedYear = $selectedDate->year;
             $fromDate = $selectedDate->copy()->startOfMonth();
             $toDate = $selectedDate->copy()->endOfMonth();
         } else {
-            $fromDate = Carbon::now()->startOfMonth();
-            $toDate = Carbon::now()->endOfMonth();
+            $fromDate = Carbon::now($userTimezone)->startOfMonth();
+            $toDate = Carbon::now($userTimezone)->endOfMonth();
         }
 
         // Report filters (date range & type) - these override month_year if provided
@@ -79,11 +82,14 @@ class DashboardController extends Controller
             ->get();
 
         // Today's transactions - only show if selected month is current month
-        $today = Carbon::today();
+        // Use user's timezone if available
+        $today = Carbon::today($userTimezone);
         $todayTransactions = collect();
-        if (!$monthYear || ($selectedMonth == Carbon::now()->month && $selectedYear == Carbon::now()->year)) {
+        if (!$monthYear || ($selectedMonth == Carbon::now($userTimezone)->month && $selectedYear == Carbon::now($userTimezone)->year)) {
+            // Use whereDate with the date string to ensure timezone is handled correctly
+            $todayDateStr = $today->format('Y-m-d');
             $todayTransactions = Transaction::where('user_id', $user->id)
-                ->whereDate('date', $today)
+                ->whereDate('date', $todayDateStr)
                 ->with(['account', 'category', 'fromAccount', 'toAccount'])
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -99,7 +105,7 @@ class DashboardController extends Controller
         // Overdue debts
         $overdueDebts = Debt::where('user_id', $user->id)
             ->where('is_paid', false)
-            ->where('due_date', '<', Carbon::now())
+            ->where('due_date', '<', Carbon::now($userTimezone))
             ->count();
 
         // Expense by category (respect report filters)
@@ -250,7 +256,7 @@ class DashboardController extends Controller
         $maxCashFlow = 1;
         
         // Use selected month/year for cash flow calculations
-        $selectedDate = $monthYear ? Carbon::parse($monthYear . '-01') : Carbon::now();
+        $selectedDate = $monthYear ? Carbon::parse($monthYear . '-01', $userTimezone) : Carbon::now($userTimezone);
         
         switch ($periodType) {
             case 'daily':
@@ -432,6 +438,8 @@ class DashboardController extends Controller
             'selectedMonth',
             'selectedYear',
             'monthYear',
+            'user',
+            'userTimezone',
         ));
     }
 
@@ -449,11 +457,12 @@ class DashboardController extends Controller
                 // Check if budget exceeds 80%
                 if ($usagePercent >= 80) {
                     // Check if notification already exists for this budget this month
+                    $now = Carbon::now($user->timezone ?? config('app.timezone', 'Asia/Jakarta'));
                     $existingNotification = Notification::where('user_id', $user->id)
                         ->where('type', 'budget')
                         ->whereJsonContains('data->budget_id', $budget->id)
-                        ->whereMonth('created_at', Carbon::now()->month)
-                        ->whereYear('created_at', Carbon::now()->year)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year)
                         ->first();
                     
                     if (!$existingNotification) {

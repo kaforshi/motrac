@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'photo',
         'bio',
         'currency',
+        'timezone',
         'notify_security',
         'notify_budget',
         'notify_weekly_report',

@@ -133,6 +133,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::post('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    Route::post('/profile/timezone', [ProfileController::class, 'updateTimezone'])->name('profile.timezone');
     Route::post('/profile/notifications', [ProfileController::class, 'updateNotificationPreferences'])->name('profile.notifications');
     Route::post('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
     Route::post('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');

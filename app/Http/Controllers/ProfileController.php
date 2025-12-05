@@ -91,6 +91,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'currency' => 'nullable|string|max:3',
             'dark_mode' => 'boolean',
+            'timezone' => 'nullable|string|max:50',
         ]);
 
         if (isset($validated['currency'])) {
@@ -99,6 +100,10 @@ class ProfileController extends Controller
         
         if (isset($validated['dark_mode'])) {
             $user->dark_mode = $validated['dark_mode'];
+        }
+        
+        if (isset($validated['timezone'])) {
+            $user->timezone = $validated['timezone'];
         }
         
         $user->save();
@@ -112,6 +117,24 @@ class ProfileController extends Controller
         }
 
         return back()->with('success', 'Preferensi berhasil diperbarui!');
+    }
+    
+    public function updateTimezone(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'timezone' => 'required|string|max:50',
+        ]);
+
+        $user->timezone = $validated['timezone'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Timezone berhasil diperbarui!',
+            'timezone' => $user->timezone
+        ]);
     }
 
     public function updateNotificationPreferences(Request $request)
