@@ -7,30 +7,60 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>{{ __('Account Settings') }} - Motrac</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS with error handling -->
+    <script src="https://cdn.tailwindcss.com" onerror="console.warn('Tailwind CDN blocked, using fallback')"></script>
+    <script>
+        // Fallback if Tailwind CDN is blocked
+        if (typeof tailwind === 'undefined') {
+            console.warn('Tailwind CDN not loaded, using inline styles');
+            // Add basic utility classes as fallback
+            document.addEventListener('DOMContentLoaded', function() {
+                const style = document.createElement('style');
+                style.textContent = `
+                    .flex { display: flex; }
+                    .flex-col { flex-direction: column; }
+                    .items-center { align-items: center; }
+                    .justify-between { justify-content: space-between; }
+                    .w-full { width: 100%; }
+                    .h-screen { height: 100vh; }
+                    .hidden { display: none; }
+                    @media (min-width: 768px) { .md\\:flex { display: flex; } }
+                `;
+                document.head.appendChild(style);
+            });
+        }
+    </script>
     
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Font Awesome with error handling -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" onerror="console.warn('Font Awesome CDN blocked')">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts with error handling -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" onerror="console.warn('Google Fonts CDN blocked')">
+    <style>
+        /* Fallback font if Google Fonts is blocked */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
 
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#10B981', // Emerald 500
-                        secondary: '#3B82F6', // Blue 500
-                        dark: '#1E293B',
+        // Only configure Tailwind if it's loaded
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                        },
+                        colors: {
+                            primary: '#10B981', // Emerald 500
+                            secondary: '#3B82F6', // Blue 500
+                            dark: '#1E293B',
+                        }
                     }
                 }
             }
+        } else {
+            console.warn('Tailwind not available, skipping config');
         }
     </script>
     <style>
@@ -435,6 +465,23 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // Suppress non-critical console errors from browser extensions
+        (function() {
+            const originalError = console.error;
+            console.error = function(...args) {
+                // Filter out errors from browser extensions (autofill, etc.)
+                const errorStr = args.join(' ');
+                if (errorStr.includes('autofill') || 
+                    errorStr.includes('ERR_BLOCKED_BY_CLIENT') ||
+                    errorStr.includes('extension') ||
+                    errorStr.includes('Missing typeId or itemId')) {
+                    // Suppress these errors - they're from browser extensions, not our app
+                    return;
+                }
+                originalError.apply(console, args);
+            };
+        })();
+        
         // Function to toggle mobile sidebar
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
