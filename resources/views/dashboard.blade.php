@@ -1180,22 +1180,6 @@
 
     <!-- JavaScript Interactions -->
     <script>
-        // Suppress non-critical console errors from browser extensions
-        (function() {
-            const originalError = console.error;
-            console.error = function(...args) {
-                // Filter out errors from browser extensions (autofill, etc.)
-                const errorStr = args.join(' ');
-                if (errorStr.includes('autofill') || 
-                    errorStr.includes('ERR_BLOCKED_BY_CLIENT') ||
-                    errorStr.includes('extension') ||
-                    errorStr.includes('Missing typeId or itemId')) {
-                    // Suppress these errors - they're from browser extensions, not our app
-                    return;
-                }
-                originalError.apply(console, args);
-            };
-        })();
         
         // Format number with dot as thousands separator (Indonesian format)
         function formatNumber(number, decimals = 0) {
@@ -1279,7 +1263,6 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            console.log('Timezone saved/updated:', userTimezone);
                             // Reload page to apply new timezone
                             setTimeout(() => {
                                 window.location.reload();
@@ -1287,13 +1270,10 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Error saving timezone:', error);
                     });
                 } else if (userTimezone && userTimezone === savedTimezone) {
-                    console.log('Timezone already set:', userTimezone);
                 }
             } catch (error) {
-                console.error('Error detecting timezone:', error);
             }
         }
 
@@ -1841,7 +1821,6 @@
                     loadNotifications();
                 }
             } catch (error) {
-                console.error('Error:', error);
             }
         }
 
@@ -1886,10 +1865,8 @@
                     // Reload notifications to get fresh data
                     loadNotifications();
                 } else {
-                    console.error('Error:', data.message || translations.errorMarkNotifications);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorMarkNotifications);
             }
         }
@@ -1958,7 +1935,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Error loading notifications:', error);
             }
         }
 
@@ -2021,7 +1997,6 @@
                     const data = await response.json();
 
                     if (!response.ok || !data.success) {
-                        console.error('Failed loading form data:', data);
                         alert(data.message || translations.errorLoadData);
                         return;
                     }
@@ -2030,7 +2005,6 @@
                     categoriesData = Array.isArray(data.categories) ? data.categories : [];
                     populateFormSelects();
                 } catch (error) {
-                    console.error('Error loading form data:', error);
                     alert(translations.errorLoadData);
                 }
             } else {
@@ -2059,7 +2033,6 @@
             const form = document.getElementById('markPaidForm');
             
             if (!modal || !form) {
-                console.error('Mark paid modal elements not found');
                 return;
             }
             
@@ -2072,7 +2045,6 @@
             try {
                 const receivableDataStr = buttonElement.dataset.receivable || buttonElement.getAttribute('data-receivable');
                 if (!receivableDataStr) {
-                    console.error('Receivable data not found in button element');
                     alert(translations.errorLoadReceivables);
                     return;
                 }
@@ -2083,7 +2055,6 @@
                 const decodedStr = tempDiv.textContent || tempDiv.innerText || receivableDataStr;
                 receivableData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
             } catch (e) {
-                console.error('Error parsing receivable data:', e);
                 alert(translations.errorLoadReceivables);
                 return;
             }
@@ -2139,7 +2110,7 @@
                 try {
                     data = await response.json();
                 } catch (e) {
-                    console.error('Error parsing response:', e);
+
                     alert(translations.errorProcessing);
                     return;
                 }
@@ -2172,7 +2143,6 @@
                     submitBtn.innerHTML = originalText;
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -2387,7 +2357,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -2548,7 +2517,6 @@
                     alert(data.message || 'Gagal menyimpan dompet');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -2894,8 +2862,6 @@
             const icon = iconField ? iconField.value : '';
             const color = colorField ? colorField.value : '#F97316';
             
-            // Debug: Log values to console
-            console.log('Form values:', { name, type, parentId, icon, color });
             
             // Validate required fields
             if (!name || !name.trim()) {
@@ -2928,11 +2894,6 @@
                 formData.append('color', color);
             }
             
-            // Debug: Log FormData contents
-            console.log('FormData contents:');
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
 
             // Add method spoofing for PUT
             if (method === 'PUT') {
@@ -2980,7 +2941,6 @@
                     alert(data.message || 'Gagal menyimpan kategori');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -3141,7 +3101,6 @@
                     content.innerHTML = '<div class="text-center py-8 text-red-500 dark:text-red-400">Gagal memuat detail transaksi</div>';
                 }
             } catch (error) {
-                console.error('Error:', error);
                 content.innerHTML = '<div class="text-center py-8 text-red-500 dark:text-red-400">' + translations.errorLoadTransactionDetails + '</div>';
             }
         }
@@ -3220,7 +3179,6 @@
                     alert(data.message || translations.failedToDeleteTransaction);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -3326,7 +3284,6 @@
                     alert(data.message || translations.failedToDeleteAccount);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -3409,7 +3366,6 @@
                     alert(data.message || translations.failedToDeleteBudget);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -3492,7 +3448,6 @@
                     alert(data.message || translations.failedToDeleteCategory);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -3507,7 +3462,6 @@
             const content = document.getElementById('categoryDetailContent');
             
             if (!modal || !content) {
-                console.error('Category detail modal elements not found');
                 return;
             }
             
@@ -3609,7 +3563,6 @@
                     content.innerHTML = '<div class="text-center py-8 text-red-500">' + (data.message || translations.errorLoadData) + '</div>';
                 }
             } catch (error) {
-                console.error('Error:', error);
                 content.innerHTML = '<div class="text-center py-8 text-red-500">' + translations.errorLoadData + '</div>';
             }
         }
@@ -3625,28 +3578,17 @@
         // Function to open debt detail modal
         window.openDebtDetailModal = async function openDebtDetailModal(debtId) {
             try {
-                console.log('=== openDebtDetailModal START ===');
-                console.log('Called with ID:', debtId);
-                
                 const modal = document.getElementById('debtDetailModal');
                 const content = document.getElementById('debtDetailContent');
                 
-                console.log('Modal element:', modal);
-                console.log('Content element:', content);
-                
                 if (!modal || !content) {
-                    console.error('ERROR: Debt detail modal elements not found!');
-                    console.error('Modal:', modal);
-                    console.error('Content:', content);
                     alert('Modal elements not found. Please refresh the page.');
                     return;
                 }
                 
-                console.log('Modal and content found, showing modal...');
                 modal.classList.remove('hidden');
                 content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
                 
-                console.log('Fetching debt detail for ID:', debtId);
                 const response = await fetch(`/debts/${debtId}/detail`, {
                     headers: {
                         'Accept': 'application/json',
@@ -3654,25 +3596,16 @@
                     },
                 });
                 
-                console.log('Response status:', response.status);
-                
                 if (!response.ok) {
-                    console.error('Response not OK:', response.status, response.statusText);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Response data:', data);
                 
                 if (response.ok && data.success) {
                     const d = data.debt;
                     const isReceivable = d.type === 'receivable';
                     const typeLabel = isReceivable ? '{{ __('Receivable') }}' : '{{ __('Payable') }}';
-                    
-                    // Debug: Log debt data
-                    console.log('Debt data:', d);
-                    console.log('is_paid:', d.is_paid, 'type:', typeof d.is_paid);
-                    console.log('isReceivable:', isReceivable);
                     
                     const html = `
                         <div class="space-y-4">
@@ -3821,44 +3754,15 @@
                         </div>
                     `;
                     
-                    // Debug: Log generated HTML
-                    console.log('Generated HTML length:', html.length);
-                    console.log('HTML contains buttons:', html.includes('openReminderModal'));
-                    console.log('HTML contains remind button:', html.includes('fa-bell'));
-                    console.log('HTML contains edit button:', html.includes('fa-edit'));
-                    console.log('HTML contains delete button:', html.includes('fa-trash'));
-                    
                     // Set HTML content
                     content.innerHTML = html;
                     
                     // Force reflow to ensure DOM is updated
                     content.offsetHeight;
-                    
-                    // Debug: Verify buttons are in DOM
-                    setTimeout(() => {
-                        const buttons = content.querySelectorAll('button');
-                        console.log('Buttons found in DOM:', buttons.length);
-                        if (buttons.length === 0) {
-                            console.error('NO BUTTONS FOUND IN DOM!');
-                            console.log('Content HTML length:', content.innerHTML.length);
-                            console.log('Content HTML (first 1000 chars):', content.innerHTML.substring(0, 1000));
-                            console.log('Full HTML length:', html.length);
-                            console.log('Full HTML (last 500 chars):', html.substring(html.length - 500));
-                        } else {
-                            buttons.forEach((btn, idx) => {
-                                console.log(`Button ${idx}:`, btn.textContent.trim(), btn.onclick ? 'has onclick' : 'no onclick', btn.className);
-                            });
-                        }
-                    }, 100);
                 } else {
-                    console.error('Response not OK or data.success is false');
-                    console.error('Response status:', response.status);
-                    console.error('Response data:', data);
                     content.innerHTML = '<div class="text-center py-8 text-red-500">' + (data.message || translations.errorLoadData) + '</div>';
                 }
             } catch (error) {
-                console.error('Error loading debt detail:', error);
-                console.error('Error stack:', error.stack);
                 content.innerHTML = '<div class="text-center py-8 text-red-500">' + translations.errorLoadData + '</div>';
             }
         }
@@ -3900,7 +3804,7 @@
             const modalTitle = document.getElementById('categoryModalTitle');
             
             if (!modal || !form || !modalTitle) {
-                console.error('Category modal elements not found');
+
                 return;
             }
             
@@ -3936,17 +3840,6 @@
             if (colorField) {
                 colorField.value = color || '#F97316';
             }
-            
-            // Debug: Log values to ensure they are set
-            console.log('Category edit modal values:', {
-                categoryName,
-                categoryType,
-                parentId,
-                icon,
-                color,
-                nameFieldValue: nameField ? nameField.value : 'field not found',
-                typeFieldValue: typeField ? typeField.value : 'field not found'
-            });
             
             // Populate parent select based on type
             const parentSelect = document.getElementById('category_parent_id');
@@ -3997,12 +3890,6 @@
             // Show modal after a small delay to ensure fields are populated
             setTimeout(() => {
                 modal.classList.remove('hidden');
-                
-                // Double-check values after modal is shown
-                console.log('After modal shown - values:', {
-                    name: nameField ? nameField.value : 'N/A',
-                    type: typeField ? typeField.value : 'N/A'
-                });
             }, 50);
         }
 
@@ -4080,7 +3967,6 @@
                     alert(data.message || translations.failedToDeleteDebt);
                 }
             } catch (error) {
-                console.error('Error:', error);
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -4096,7 +3982,7 @@
             const modalTitle = document.getElementById('debtModalTitle');
             
             if (!modal || !form || !modalTitle) {
-                console.error('Debt modal elements not found');
+
                 return;
             }
             
@@ -4109,7 +3995,7 @@
             try {
                 let debtDataStr = buttonElement.dataset.debtEdit || buttonElement.getAttribute('data-debt-edit');
                 if (!debtDataStr) {
-                    console.error('Debt data not found in button element');
+
                     alert(translations.errorLoadDebts);
                     return;
                 }
@@ -4124,7 +4010,7 @@
                 
                 debtData = JSON.parse(debtDataStr);
             } catch (e) {
-                console.error('Error parsing debt data:', e);
+
                 alert(translations.errorLoadDebts);
                 return;
             }
@@ -4183,7 +4069,7 @@
             const title = document.getElementById('transactionModalTitle');
             
             if (!modal || !form) {
-                console.error('Transaction modal elements not found');
+
                 return;
             }
             
@@ -4314,7 +4200,7 @@
                     alert('Gagal memuat data transaksi');
                 }
             } catch (error) {
-                console.error('Error loading transaction:', error);
+
                 alert('Gagal memuat data transaksi');
             }
         }
@@ -4349,7 +4235,7 @@
             const modalTitle = document.getElementById('budgetModalTitle');
             
             if (!modal || !form || !modalTitle) {
-                console.error('Modal elements not found');
+
                 return;
             }
             
@@ -4363,7 +4249,7 @@
                 // Try dataset first, then getAttribute as fallback
                 let budgetDataStr = buttonElement.dataset.budget || buttonElement.getAttribute('data-budget');
                 if (!budgetDataStr) {
-                    console.error('Budget data not found in button element');
+
                     alert(translations.errorLoadBudget);
                     return;
                 }
@@ -4378,8 +4264,8 @@
                 
                 budgetData = JSON.parse(budgetDataStr);
             } catch (e) {
-                console.error('Error parsing budget data:', e);
-                console.error('Data string:', buttonElement.getAttribute('data-budget'));
+
+
                 alert(translations.errorLoadBudget);
                 return;
             }
@@ -4463,7 +4349,7 @@
             const modalTitle = document.getElementById('paymentModalTitle');
             
             if (!modal || !form || !modalTitle) {
-                console.error('Payment modal elements not found');
+
                 return;
             }
             
@@ -4476,7 +4362,7 @@
             try {
                 const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
                 if (!debtDataStr) {
-                    console.error('Debt data not found in button element');
+
                     alert(translations.errorLoadDebts);
                     return;
                 }
@@ -4487,8 +4373,8 @@
                 const decodedStr = tempDiv.textContent || tempDiv.innerText || debtDataStr;
                 debtData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
             } catch (e) {
-                console.error('Error parsing debt data:', e);
-                console.error('Data string:', buttonElement.getAttribute('data-debt'));
+
+
                 alert(translations.errorLoadDebts);
                 return;
             }
@@ -4583,7 +4469,7 @@
                 try {
                     data = await response.json();
                 } catch (e) {
-                    console.error('Error parsing response:', e);
+
                     alert(translations.errorProcessing);
                     return;
                 }
@@ -4614,7 +4500,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -4656,8 +4541,6 @@
             const dueDate = dueDateField ? dueDateField.value : '';
             const description = descriptionField ? descriptionField.value : '';
             
-            // Debug: Log values to console
-            console.log('Debt form values:', { contactName, contactPhone, contactEmail, type, accountId, initialAmount, dueDate, description });
             
             // Validate required fields
             if (!contactName || !contactName.trim()) {
@@ -4719,11 +4602,6 @@
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                // Debug: Log FormData contents
-                console.log('FormData contents:');
-                for (let pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
                 
                 const response = await fetch(url, {
                     method: actualMethod,
@@ -4761,7 +4639,6 @@
                     alert(data.message || 'Gagal menyimpan data');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -4828,7 +4705,6 @@
                     alert(data.message || 'Gagal menyimpan budget');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;
@@ -4842,7 +4718,7 @@
             const form = document.getElementById('reminderForm');
             
             if (!modal || !form) {
-                console.error('Reminder modal elements not found');
+
                 return;
             }
             
@@ -4855,7 +4731,7 @@
             try {
                 const debtDataStr = buttonElement.dataset.debt || buttonElement.getAttribute('data-debt');
                 if (!debtDataStr) {
-                    console.error('Debt data not found in button element');
+
                     alert(translations.errorLoadReceivables);
                     return;
                 }
@@ -4866,8 +4742,8 @@
                 const decodedStr = tempDiv.textContent || tempDiv.innerText || debtDataStr;
                 debtData = JSON.parse(decodedStr.trim().replace(/\s+/g, ' '));
             } catch (e) {
-                console.error('Error parsing debt data:', e);
-                console.error('Data string:', buttonElement.getAttribute('data-debt'));
+
+
                 alert(translations.errorLoadReceivables);
                 return;
             }
@@ -4942,7 +4818,7 @@
                 try {
                     data = await response.json();
                 } catch (e) {
-                    console.error('Error parsing response:', e);
+
                     alert(translations.errorProcessing);
                     return;
                 }
@@ -4973,7 +4849,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Error:', error);
                 alert(translations.errorGeneral);
             } finally {
                 submitBtn.disabled = false;

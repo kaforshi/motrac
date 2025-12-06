@@ -358,22 +358,6 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Suppress non-critical console errors from browser extensions
-        (function() {
-            const originalError = console.error;
-            console.error = function(...args) {
-                // Filter out errors from browser extensions (autofill, etc.)
-                const errorStr = args.join(' ');
-                if (errorStr.includes('autofill') || 
-                    errorStr.includes('ERR_BLOCKED_BY_CLIENT') ||
-                    errorStr.includes('extension') ||
-                    errorStr.includes('Missing typeId or itemId')) {
-                    // Suppress these errors - they're from browser extensions, not our app
-                    return;
-                }
-                originalError.apply(console, args);
-            };
-        })();
         
         // Function to toggle mobile sidebar
         function toggleMobileSidebar() {
@@ -591,7 +575,6 @@
                     photoImg.src = originalSrc;
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan saat mengupload foto');
                 photoImg.src = originalSrc;
             } finally {
@@ -646,7 +629,6 @@
                     showToast(data.message || 'Gagal memperbarui profil');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan. Silakan coba lagi.');
             } finally {
                 submitBtn.disabled = false;
@@ -689,7 +671,6 @@
                     showToast(data.message || 'Gagal memperbarui preferensi');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan. Silakan coba lagi.');
             }
         }
@@ -723,7 +704,6 @@
                     showToast(data.message || 'Gagal memperbarui preferensi notifikasi');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan. Silakan coba lagi.');
             }
         }
@@ -765,7 +745,6 @@
                     showToast(data.message || 'Gagal mengubah password');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan. Silakan coba lagi.');
             } finally {
                 submitBtn.disabled = false;
@@ -822,7 +801,6 @@
                     showToast(data.message || 'Gagal menghapus akun');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showToast('Terjadi kesalahan. Silakan coba lagi.');
             } finally {
                 submitBtn.disabled = false;
