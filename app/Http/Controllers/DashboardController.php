@@ -475,6 +475,24 @@ class DashboardController extends Controller
         
         $unreadCount = $unreadNotifications->count();
         
+        // Determine default view based on route
+        $defaultView = 'dashboard'; // default
+        $routeName = $request->route()->getName();
+        
+        if ($routeName === 'transactions.index') {
+            $defaultView = 'transactions';
+        } elseif ($routeName === 'wallets.index') {
+            $defaultView = 'wallets';
+        } elseif ($routeName === 'categories.index') {
+            $defaultView = 'categories';
+        } elseif ($routeName === 'reports.index') {
+            $defaultView = 'reports';
+        } elseif ($routeName === 'budget.index') {
+            $defaultView = 'budget';
+        } elseif ($routeName === 'debts.index') {
+            $defaultView = 'debts';
+        }
+        
         return view('dashboard', compact(
             'totalBalance',
             'monthlyIncome',
@@ -514,6 +532,7 @@ class DashboardController extends Controller
             'monthYear',
             'user',
             'userTimezone',
+            'defaultView',
         ));
     }
 

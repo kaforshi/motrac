@@ -30,36 +30,36 @@
         <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Menu Utama</p>
             
-            <button id="nav-dashboard" onclick="if(window.switchView) window.switchView('dashboard', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
+            <a id="nav-dashboard" href="{{ route('dashboard') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('dashboard') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition text-left">
                 <i class="fa-solid fa-house w-5 text-center"></i> {{ __('Dashboard') }}
-            </button>
+            </a>
             
-            <button id="nav-transactions" onclick="if(window.switchView) window.switchView('transactions', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a id="nav-transactions" href="{{ route('transactions.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('transactions.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-list-ul w-5 text-center group-hover:text-primary"></i> {{ __('Transactions') }}
-            </button>
+            </a>
             
-            <button onclick="if(window.switchView) window.switchView('wallets', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a href="{{ route('wallets.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('wallets.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-wallet w-5 text-center group-hover:text-primary"></i> {{ __('Wallets') }}
-            </button>
+            </a>
 
             <!-- Menu Kategori Baru -->
-            <button onclick="if(window.switchView) window.switchView('categories', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a href="{{ route('categories.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('categories.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-layer-group w-5 text-center group-hover:text-primary"></i> {{ __('Categories') }}
-            </button>
+            </a>
             
-            <button id="nav-reports" onclick="if(window.switchView) window.switchView('reports', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a id="nav-reports" href="{{ route('reports.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('reports.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary"></i> {{ __('Reports') }}
-            </button>
+            </a>
 
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-6 mb-2">Planning</p>
             
-            <button onclick="if(window.switchView) window.switchView('budget', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a href="{{ route('budget.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('budget.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-bullseye w-5 text-center group-hover:text-primary"></i> {{ __('Budget') }}
-            </button>
+            </a>
             
-            <button onclick="if(window.switchView) window.switchView('debts', this); else console.error('switchView not defined');" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            <a href="{{ route('debts.index') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('debts.index') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-hand-holding-dollar w-5 text-center group-hover:text-primary"></i> {{ __('Debts & Receivables') }}
-            </button>
+            </a>
         </div>
 
         <!-- User Footer -->
@@ -3515,7 +3515,7 @@
             content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
             
             try {
-                const response = await fetch(`/categories/${categoryId}`, {
+                const response = await fetch(`/categories/${categoryId}/detail`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
@@ -5230,52 +5230,43 @@
                 });
             }
 
-            // Set initial view based on URL params
+            // Set initial view based on URL path
+            const pathname = window.location.pathname;
             const params = new URLSearchParams(window.location.search);
             const hasTransactionFilter = params.has('transaction_search') || params.has('transaction_category_id');
             const hasReportFilter = params.has('report_from') || params.has('report_to') || params.has('report_type');
-            const viewParam = params.get('view');
-
-            if (hasTransactionFilter) {
-                const transactionsBtn = document.getElementById('nav-transactions');
-                if (transactionsBtn) {
-                    window.switchView('transactions', transactionsBtn);
-                }
-            } else if (hasReportFilter || viewParam === 'reports') {
-                const reportsBtn = document.getElementById('nav-reports');
-                if (reportsBtn) {
-                    window.switchView('reports', reportsBtn);
-                }
-            } else if (viewParam === 'budget') {
-                // Find budget button by looking for the one that contains "Budget" text
-                const navItems = document.querySelectorAll('.nav-item');
-                let budgetBtn = null;
-                navItems.forEach(btn => {
-                    if (btn.textContent.trim().includes('Budget')) {
-                        budgetBtn = btn;
-                    }
-                });
-                if (budgetBtn) {
-                    window.switchView('budget', budgetBtn);
-                }
-            } else if (viewParam === 'debts') {
-                // Find debts button by looking for the one that contains "Utang" text
-                const navItems = document.querySelectorAll('.nav-item');
-                let debtsBtn = null;
-                navItems.forEach(btn => {
-                    if (btn.textContent.trim().includes('Utang')) {
-                        debtsBtn = btn;
-                    }
-                });
-                if (debtsBtn) {
-                    window.switchView('debts', debtsBtn);
-                }
+            
+            let defaultView = 'dashboard';
+            let navButton = null;
+            
+            // Determine view based on pathname
+            if (pathname.includes('/transactions') || pathname === '/transactions') {
+                defaultView = 'transactions';
+                navButton = document.getElementById('nav-transactions');
+            } else if (pathname.includes('/wallets') || pathname === '/wallets') {
+                defaultView = 'wallets';
+                navButton = document.querySelector('a[href*="wallets"]');
+            } else if (pathname.includes('/categories') || pathname === '/categories') {
+                defaultView = 'categories';
+                navButton = document.querySelector('a[href*="categories"]');
+            } else if (pathname.includes('/reports') || pathname === '/reports') {
+                defaultView = 'reports';
+                navButton = document.getElementById('nav-reports');
+            } else if (pathname.includes('/budget') || pathname === '/budget') {
+                defaultView = 'budget';
+                navButton = document.querySelector('a[href*="budget"]');
+            } else if (pathname.includes('/debts') || pathname === '/debts') {
+                defaultView = 'debts';
+                navButton = document.querySelector('a[href*="debts"]');
             } else {
                 // Default view is Dashboard
-                const dashboardBtn = document.getElementById('nav-dashboard');
-                if (dashboardBtn && window.switchView) {
-                    window.switchView('dashboard', dashboardBtn);
-                }
+                defaultView = 'dashboard';
+                navButton = document.getElementById('nav-dashboard');
+            }
+            
+            // Switch to the appropriate view
+            if (navButton && window.switchView) {
+                window.switchView(defaultView, navButton);
             }
             
             // Wrap switchView to apply dark mode after view switch

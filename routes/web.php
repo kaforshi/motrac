@@ -90,37 +90,52 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
+    // Dashboard routes with different URLs - must be defined before resource routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/transactions', [DashboardController::class, 'index'])->name('transactions.index');
+    Route::get('/wallets', [DashboardController::class, 'index'])->name('wallets.index');
+    Route::get('/categories', [DashboardController::class, 'index'])->name('categories.index');
+    Route::get('/reports', [DashboardController::class, 'index'])->name('reports.index');
+    Route::get('/budget', [DashboardController::class, 'index'])->name('budget.index');
+    Route::get('/debts', [DashboardController::class, 'index'])->name('debts.index');
     
-    // Transactions
+    // Transactions - resource routes (index is already defined above)
     Route::get('/transactions/form-data', [TransactionController::class, 'getFormData'])->name('transactions.formData');
-    Route::resource('transactions', TransactionController::class);
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+    Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::put('/transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
+    Route::patch('/transactions/{transaction}', [TransactionController::class, 'update']);
+    Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+    Route::get('/transactions/{transaction}/edit', [TransactionController::class, 'edit'])->name('transactions.edit');
     
     // Accounts
     Route::resource('accounts', AccountController::class);
     Route::post('/accounts/{id}/reconcile', [AccountController::class, 'reconcile'])->name('accounts.reconcile');
     
-    // Categories
-    Route::resource('categories', CategoryController::class)->except(['edit']);
+    // Categories - Note: categories.index route is defined above for dashboard view
     Route::get('/categories/{id}/detail', [CategoryController::class, 'show'])->name('categories.show');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::post('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update'); // Support method spoofing
     Route::put('/categories/{id}', [CategoryController::class, 'update']); // Also support direct PUT
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
     // Budgets
     Route::resource('budgets', BudgetController::class)->except(['show', 'edit']);
     Route::post('/budgets/rollover', [BudgetController::class, 'processRollover'])->name('budgets.rollover');
     
-    // Debts
+    // Debts - index is already defined above for dashboard view
     Route::get('/debts/{id}/detail', [DebtController::class, 'show'])->name('debts.show');
-    Route::resource('debts', DebtController::class)->except(['show', 'edit']);
+    Route::post('/debts', [DebtController::class, 'store'])->name('debts.store');
+    Route::get('/debts/create', [DebtController::class, 'create'])->name('debts.create');
     Route::post('/debts/{id}', [DebtController::class, 'update'])->name('debts.update'); // Support method spoofing
     Route::put('/debts/{id}', [DebtController::class, 'update']); // Also support direct PUT
+    Route::delete('/debts/{debt}', [DebtController::class, 'destroy'])->name('debts.destroy');
     Route::post('/debts/{id}/payment', [DebtController::class, 'addPayment'])->name('debts.payment');
     Route::post('/debts/{id}/reminder', [DebtController::class, 'createReminder'])->name('debts.reminder');
     Route::post('/debts/{id}/mark-paid', [DebtController::class, 'markAsPaid'])->name('debts.markPaid');
     
-    // Reports
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    // Reports - index is already defined above for dashboard view
     Route::get('/reports/trends', [ReportController::class, 'trends'])->name('reports.trends');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.exportPdf');
