@@ -397,6 +397,21 @@
     "All transactions associated with this wallet will also be affected.": "Semua transaksi yang terkait dengan dompet ini juga akan terpengaruh.",
     "Wallet deleted successfully": "Dompet berhasil dihapus",
     "Budget deleted successfully": "Budget berhasil dihapus",
+    "Category deleted successfully": "Kategori berhasil dihapus",
+    "Debt deleted successfully": "Utang/Piutang berhasil dihapus",
     "Failed to delete wallet": "Gagal menghapus dompet",
-    "Failed to delete budget": "Gagal menghapus budget"
+    "Failed to delete budget": "Gagal menghapus budget",
+    "Failed to delete category": "Gagal menghapus kategori",
+    "Failed to delete debt": "Gagal menghapus utang/piutang",
+    "Delete Category": "Hapus Kategori",
+    "Delete Debt": "Hapus Utang/Piutang",
+    "Are you sure you want to delete this category?": "Apakah Anda yakin ingin menghapus kategori ini?",
+    "Are you sure you want to delete this debt?": "Apakah Anda yakin ingin menghapus utang/piutang ini?",
+    "Edit Category": "Edit Kategori",
+    "Edit Receivable": "Edit Piutang",
+    "Edit Payable": "Edit Utang",
+    "Category Detail": "Detail Kategori",
+    "Debt Detail": "Detail Utang/Piutang",
+    "Receivable": "Piutang",
+    "Payable": "Utang"
 }

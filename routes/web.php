@@ -101,8 +101,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/accounts/{id}/reconcile', [AccountController::class, 'reconcile'])->name('accounts.reconcile');
     
     // Categories
-    Route::resource('categories', CategoryController::class)->except(['show', 'edit', 'update']);
-    Route::post('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::resource('categories', CategoryController::class)->except(['edit']);
+    Route::get('/categories/{id}/detail', [CategoryController::class, 'show'])->name('categories.show');
+    Route::post('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update'); // Support method spoofing
+    Route::put('/categories/{id}', [CategoryController::class, 'update']); // Also support direct PUT
     
     // Budgets
     Route::resource('budgets', BudgetController::class)->except(['show', 'edit']);
@@ -110,7 +112,9 @@ Route::middleware('auth')->group(function () {
     
     // Debts
     Route::get('/debts/{id}/detail', [DebtController::class, 'show'])->name('debts.show');
-    Route::resource('debts', DebtController::class)->except(['show', 'edit', 'update']);
+    Route::resource('debts', DebtController::class)->except(['show', 'edit']);
+    Route::post('/debts/{id}', [DebtController::class, 'update'])->name('debts.update'); // Support method spoofing
+    Route::put('/debts/{id}', [DebtController::class, 'update']); // Also support direct PUT
     Route::post('/debts/{id}/payment', [DebtController::class, 'addPayment'])->name('debts.payment');
     Route::post('/debts/{id}/reminder', [DebtController::class, 'createReminder'])->name('debts.reminder');
     Route::post('/debts/{id}/mark-paid', [DebtController::class, 'markAsPaid'])->name('debts.markPaid');

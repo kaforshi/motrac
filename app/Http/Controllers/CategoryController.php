@@ -27,6 +27,18 @@ class CategoryController extends Controller
         return view('categories.index', compact('categories', 'parentCategories'));
     }
 
+    public function show($id)
+    {
+        $category = Category::where('user_id', auth()->id())
+            ->with(['parent', 'children'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'category' => $category
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -49,9 +61,10 @@ class CategoryController extends Controller
         }
 
         // Validate that parent category has the same type
-        if (!empty($validated['parent_id'])) {
+        $parentId = $validated['parent_id'] ?? null;
+        if (!empty($parentId)) {
             $parent = Category::where('user_id', auth()->id())
-                ->where('id', $validated['parent_id'])
+                ->where('id', $parentId)
                 ->where('type', $validated['type'])
                 ->first();
             
@@ -76,7 +89,7 @@ class CategoryController extends Controller
             'user_id' => auth()->id(),
             'name' => $validated['name'],
             'type' => $validated['type'],
-            'parent_id' => $validated['parent_id'] ?? null,
+            'parent_id' => $parentId,
             'icon' => $validated['icon'] ?? null,
             'color' => $validated['color'] ?? null,
         ]);
@@ -96,44 +109,91 @@ class CategoryController extends Controller
     {
         $category = Category::where('user_id', auth()->id())->findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:income,expense,transfer',
-            'parent_id' => 'nullable|exists:categories,id',
-            'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:7',
-            'is_active' => 'boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:income,expense,transfer',
+                'parent_id' => 'nullable|exists:categories,id',
+                'icon' => 'nullable|string|max:50',
+                'color' => 'nullable|string|max:7',
+                'is_active' => 'boolean',
+            ]);
 
-        // Validate that parent category has the same type and is not the category itself
-        if ($validated['parent_id']) {
-            if ($validated['parent_id'] == $id) {
-                return redirect()->route('categories.index')
-                    ->withErrors(['parent_id' => 'Category cannot be its own parent.'])
-                    ->withInput();
+            // Validate that parent category has the same type and is not the category itself
+            $parentId = $validated['parent_id'] ?? null;
+            if ($parentId) {
+                if ($parentId == $id) {
+                    $error = ['parent_id' => ['Category cannot be its own parent.']];
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Validation failed',
+                            'errors' => $error,
+                        ], 422);
+                    }
+                    return redirect()->route('categories.index')
+                        ->withErrors($error)
+                        ->withInput();
+                }
+                
+                $parent = Category::where('user_id', auth()->id())
+                    ->where('id', $parentId)
+                    ->where('type', $validated['type'])
+                    ->first();
+                
+                if (!$parent) {
+                    $error = ['parent_id' => ['Parent category must be of the same type.']];
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Validation failed',
+                            'errors' => $error,
+                        ], 422);
+                    }
+                    return redirect()->route('categories.index')
+                        ->withErrors($error)
+                        ->withInput();
+                }
             }
+
+            // Ensure parent_id is set to null if not provided
+            $updateData = $validated;
+            $updateData['parent_id'] = $parentId;
             
-            $parent = Category::where('user_id', auth()->id())
-                ->where('id', $validated['parent_id'])
-                ->where('type', $validated['type'])
-                ->first();
-            
-            if (!$parent) {
-                return redirect()->route('categories.index')
-                    ->withErrors(['parent_id' => 'Parent category must be of the same type.'])
-                    ->withInput();
+            $category->update($updateData);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Category updated successfully.',
+                    'category' => $category,
+                ]);
             }
+
+            return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
         }
-
-        $category->update($validated);
-
-        return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $category = Category::where('user_id', auth()->id())->findOrFail($id);
         $category->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category deleted successfully.',
+            ]);
+        }
 
         return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
     }

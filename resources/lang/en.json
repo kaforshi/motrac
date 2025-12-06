@@ -404,6 +404,21 @@
     "All transactions associated with this wallet will also be affected.": "All transactions associated with this wallet will also be affected.",
     "Wallet deleted successfully": "Wallet deleted successfully",
     "Budget deleted successfully": "Budget deleted successfully",
+    "Category deleted successfully": "Category deleted successfully",
+    "Debt deleted successfully": "Debt deleted successfully",
     "Failed to delete wallet": "Failed to delete wallet",
-    "Failed to delete budget": "Failed to delete budget"
+    "Failed to delete budget": "Failed to delete budget",
+    "Failed to delete category": "Failed to delete category",
+    "Failed to delete debt": "Failed to delete debt",
+    "Delete Category": "Delete Category",
+    "Delete Debt": "Delete Debt",
+    "Are you sure you want to delete this category?": "Are you sure you want to delete this category?",
+    "Are you sure you want to delete this debt?": "Are you sure you want to delete this debt?",
+    "Edit Category": "Edit Category",
+    "Edit Receivable": "Edit Receivable",
+    "Edit Payable": "Edit Payable",
+    "Category Detail": "Category Detail",
+    "Debt Detail": "Debt Detail",
+    "Receivable": "Receivable",
+    "Payable": "Payable"
 }

@@ -325,10 +325,97 @@ class DebtController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function update(Request $request, $id)
+    {
+        try {
+            $debt = Debt::where('user_id', auth()->id())->findOrFail($id);
+
+            $validated = $request->validate([
+                'type' => 'required|in:payable,receivable',
+                'account_id' => [
+                    'nullable',
+                    'exists:accounts,id',
+                    function ($attribute, $value, $fail) {
+                        if ($value) {
+                            $account = Account::find($value);
+                            if ($account && $account->user_id !== auth()->id()) {
+                                $fail('The selected account is invalid.');
+                            }
+                        }
+                    },
+                ],
+                'contact_name' => 'required|string|max:255',
+                'contact_phone' => 'nullable|string|max:20',
+                'contact_email' => 'nullable|email|max:255',
+                'initial_amount' => 'required|numeric|min:0.01',
+                'due_date' => 'nullable|date',
+                'description' => 'nullable|string',
+            ]);
+
+            // Update current_amount if initial_amount changed
+            if ($validated['initial_amount'] != $debt->initial_amount) {
+                $difference = $validated['initial_amount'] - $debt->initial_amount;
+                $debt->current_amount += $difference;
+                // Ensure current_amount doesn't go negative
+                if ($debt->current_amount < 0) {
+                    $debt->current_amount = 0;
+                }
+            }
+
+            $debt->update([
+                'type' => $validated['type'],
+                'account_id' => $validated['account_id'] ?? null,
+                'contact_name' => $validated['contact_name'],
+                'contact_phone' => $validated['contact_phone'] ?? null,
+                'contact_email' => $validated['contact_email'] ?? null,
+                'initial_amount' => $validated['initial_amount'],
+                'current_amount' => $debt->current_amount,
+                'due_date' => $validated['due_date'] ?? null,
+                'description' => $validated['description'] ?? null,
+            ]);
+
+            $debt->load('account');
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $validated['type'] === 'receivable' ? 'Piutang berhasil diperbarui.' : 'Utang berhasil diperbarui.',
+                    'debt' => $debt
+                ]);
+            }
+
+            return redirect()->route('debts.index')->with('success', 'Debt updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui data: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['error' => 'Failed to update debt: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function destroy(Request $request, $id)
     {
         $debt = Debt::where('user_id', auth()->id())->findOrFail($id);
         $debt->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Debt deleted successfully.',
+            ]);
+        }
 
         return redirect()->route('debts.index')->with('success', 'Debt deleted successfully.');
     }

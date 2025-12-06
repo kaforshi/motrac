@@ -554,8 +554,8 @@
                                     </div>
                                 </div>
                                 <div class="relative">
-                                    <button
-                                        type="button"
+                                <button
+                                    type="button"
                                         class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-500 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg p-2 transition"
                                         onclick="toggleAccountMenu({{ $account->id }})"
                                     >
@@ -565,13 +565,13 @@
                                         <button
                                             type="button"
                                             class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                                            data-id="{{ $account->id }}"
-                                            data-name="{{ e($account->name) }}"
-                                            data-type="{{ $account->type }}"
-                                            data-currency="{{ $account->currency }}"
-                                            data-notes="{{ e($account->notes) }}"
-                                            data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
-                                            data-is-active="{{ $account->is_active ? 1 : 0 }}"
+                                    data-id="{{ $account->id }}"
+                                    data-name="{{ e($account->name) }}"
+                                    data-type="{{ $account->type }}"
+                                    data-currency="{{ $account->currency }}"
+                                    data-notes="{{ e($account->notes) }}"
+                                    data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
+                                    data-is-active="{{ $account->is_active ? 1 : 0 }}"
                                             data-balance="{{ $account->balance }}"
                                             data-initial-balance="{{ $account->initial_balance }}"
                                             onclick="window.openAccountEditFromButton(this); toggleAccountMenu({{ $account->id }})"
@@ -584,7 +584,7 @@
                                             onclick="deleteAccount({{ $account->id }}, '{{ e($account->name) }}'); toggleAccountMenu({{ $account->id }})"
                                         >
                                             <i class="fa-solid fa-trash"></i> {{ __('Delete') }}
-                                        </button>
+                                </button>
                                     </div>
                                 </div>
                             </div>
@@ -626,7 +626,7 @@
                                     $colorMap = ['orange', 'blue', 'purple', 'teal', 'yellow', 'gray'];
                                     $color = $category->color ?? $colorMap[($loop->index % count($colorMap))];
                                 @endphp
-                                <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-rose-200 dark:hover:border-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition group">
+                                <div onclick="openCategoryDetailModal({{ $category->id }})" class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-rose-200 dark:hover:border-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition group relative cursor-pointer">
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition" style="background-color: {{ $category->color ?? '#F97316' }}20; color: {{ $category->color ?? '#F97316' }};">
                                         <i class="fa-solid fa-{{ $category->icon ?? 'tag' }}"></i>
                                     </div>
@@ -646,7 +646,7 @@
                         </div>
                         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                             @forelse($incomeCategories as $category)
-                                <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer transition group">
+                                <div onclick="openCategoryDetailModal({{ $category->id }})" class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition group relative cursor-pointer">
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition" style="background-color: {{ $category->color ?? '#10B981' }}20; color: {{ $category->color ?? '#10B981' }};">
                                         <i class="fa-solid fa-{{ $category->icon ?? 'tag' }}"></i>
                                     </div>
@@ -954,21 +954,21 @@
                                         ];
                                     @endphp
                                     <div class="flex items-center gap-2">
-                                        <button 
-                                            type="button" 
+                                    <button 
+                                        type="button" 
                                             onclick="window.openBudgetEditModal({{ $budget->id }}, this)"
-                                            data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
-                                            class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-2"
+                                        data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
+                                        class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-2"
                                             title="{{ __('Edit Budget') }}">
-                                            <i class="fa-solid fa-edit"></i>
-                                        </button>
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
                                         <button 
                                             type="button" 
                                             onclick="deleteBudget({{ $budget->id }}, '{{ e($budget->category->name ?? 'N/A') }}')"
                                             class="text-rose-400 dark:text-rose-500 hover:text-rose-600 dark:hover:text-rose-300 transition p-2"
                                             title="{{ __('Delete Budget') }}">
                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                    </button>
                                     </div>
                                 </div>
                             </div>
@@ -1002,7 +1002,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @forelse($receivables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <div onclick="window.openDebtDetailModal({{ $debt->id }})" class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition">
                                     <div>
                                         <p class="font-bold text-dark dark:text-white">{{ $debt->contact_name }}</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
@@ -1014,45 +1014,6 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-emerald-600 dark:text-emerald-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, ',', '.') : number_format($debt->current_amount, 0, ',', '.') }}</p>
-                                        <div class="flex gap-2 items-center justify-end">
-                                            @if(!$debt->is_paid)
-                                                <button 
-                                                    type="button"
-                                                    onclick="window.openMarkPaidModal({{ $debt->id }}, this)"
-                                                    @php
-                                                        $receivablePaidData = [
-                                                            'contact_name' => $debt->contact_name,
-                                                            'initial_amount' => $debt->initial_amount,
-                                                            'account_id' => $debt->account_id,
-                                                            'description' => $debt->description
-                                                        ];
-                                                    @endphp
-                                                    data-receivable="{{ htmlspecialchars(json_encode($receivablePaidData), ENT_QUOTES, 'UTF-8') }}"
-                                                    class="text-[10px] text-emerald-600 hover:underline font-bold"
-                                                    title="{{ __('Mark as Paid') }}">
-                                                    <i class="fa-solid fa-check-circle"></i> {{ __('Mark as Paid') }}
-                                                </button>
-                                            @else
-                                                <span class="text-[10px] text-emerald-600 font-bold">
-                                                    <i class="fa-solid fa-check-circle"></i> Lunas
-                                                </span>
-                                            @endif
-                                            <button 
-                                                type="button"
-                                                onclick="window.openReminderModal({{ $debt->id }}, this)"
-                                                @php
-                                                    $debtReminderData = [
-                                                        'contact_name' => $debt->contact_name,
-                                                        'current_amount' => $debt->current_amount,
-                                                        'due_date' => $debt->due_date ? $debt->due_date->format('Y-m-d') : null,
-                                                        'description' => $debt->description
-                                                    ];
-                                                @endphp
-                                                data-debt="{{ htmlspecialchars(json_encode($debtReminderData), ENT_QUOTES, 'UTF-8') }}"
-                                                class="text-[10px] {{ $debt->due_date && $debt->due_date->isPast() ? 'text-red-500' : 'text-blue-500' }} hover:underline font-bold">
-                                                {{ $debt->due_date && $debt->due_date->isPast() ? __('Remind') . '!' : __('Remind') }}
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             @empty
@@ -1074,7 +1035,7 @@
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @forelse($payables as $debt)
-                                <div class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <div onclick="window.openDebtDetailModal({{ $debt->id }})" class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition">
                                     <div>
                                         <p class="font-bold text-dark dark:text-white">{{ $debt->contact_name }}</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
@@ -1086,18 +1047,6 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-rose-600 dark:text-rose-400 sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($debt->current_amount, 2, ',', '.') : number_format($debt->current_amount, 0, ',', '.') }}</p>
-                                        <button 
-                                            type="button" 
-                                            onclick="window.openPaymentModal({{ $debt->id }}, this)"
-                                            @php
-                                                $debtData = [
-                                                    'contact_name' => $debt->contact_name,
-                                                    'current_amount' => $debt->current_amount,
-                                                    'type' => $debt->type
-                                                ];
-                                            @endphp
-                                            data-debt="{{ htmlspecialchars(json_encode($debtData), ENT_QUOTES, 'UTF-8') }}"
-                                            class="bg-primary text-white text-[10px] px-2 py-1 rounded transition">{{ __('Pay Installment') }}</button>
                                     </div>
                                 </div>
                             @empty
@@ -1371,7 +1320,7 @@
                 }
             });
         });
-
+        
         // Translation strings for JavaScript
         const translations = {
             addReceivable: @json(__('Add Receivable')),
@@ -1405,8 +1354,17 @@
             deleteTransaction: @json(__('Delete Transaction')),
             accountDeletedSuccessfully: @json(__('Wallet deleted successfully')),
             budgetDeletedSuccessfully: @json(__('Budget deleted successfully')),
+            categoryDeletedSuccessfully: @json(__('Category deleted successfully')),
+            debtDeletedSuccessfully: @json(__('Debt deleted successfully')),
             failedToDeleteAccount: @json(__('Failed to delete wallet')),
             failedToDeleteBudget: @json(__('Failed to delete budget')),
+            failedToDeleteCategory: @json(__('Failed to delete category')),
+            failedToDeleteDebt: @json(__('Failed to delete debt')),
+            editCategory: @json(__('Edit Category')),
+            editReceivable: @json(__('Edit Receivable')),
+            editPayable: @json(__('Edit Payable')),
+            markAsPaid: @json(__('Mark as Paid')),
+            remind: @json(__('Remind')),
             income: @json(__('Income')),
             expense: @json(__('Expense')),
             transfer: @json(__('Transfer')),
@@ -1501,6 +1459,9 @@
         // Close sidebar when clicking on menu items (mobile only)
         document.addEventListener('DOMContentLoaded', function() {
             ensureDesktopLayout();
+            
+            // Store original parent select options on page load
+            storeParentSelectOptions();
             
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileSidebarOverlay');
@@ -2761,9 +2722,31 @@
         window.openCategoryModal = function openCategoryModal() {
             const modal = document.getElementById('categoryModal');
             const form = document.getElementById('categoryForm');
+            const modalTitle = document.getElementById('categoryModalTitle');
             modal.classList.remove('hidden');
             form.reset();
             clearErrors();
+            
+            // Reset modal title
+            if (modalTitle) {
+                modalTitle.textContent = translations.newCategory || '{{ __('New Category') }}';
+            }
+            
+            // Remove editing mode
+            form.removeAttribute('data-editing');
+            form.removeAttribute('data-category-id');
+            form.action = '{{ route("categories.store") }}';
+            form.method = 'POST';
+            
+            // Remove method spoofing if exists
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) {
+                methodInput.remove();
+            }
+            
+            // Restore parent select options
+            restoreParentSelectOptions();
+            
             document.getElementById('category_type').value = 'expense';
             
             // Reset icon preview
@@ -2791,8 +2774,33 @@
 
         window.closeCategoryModal = function closeCategoryModal() {
             const modal = document.getElementById('categoryModal');
+            const form = document.getElementById('categoryForm');
+            const modalTitle = document.getElementById('categoryModalTitle');
             modal.classList.add('hidden');
             clearErrors();
+            
+            // Reset form
+            if (form) {
+                form.reset();
+                form.removeAttribute('data-editing');
+                form.removeAttribute('data-category-id');
+                form.action = '{{ route("categories.store") }}';
+                form.method = 'POST';
+                
+                // Remove method spoofing if exists
+                const methodInput = form.querySelector('input[name="_method"]');
+                if (methodInput) {
+                    methodInput.remove();
+                }
+            }
+            
+            // Restore parent select options
+            restoreParentSelectOptions();
+            
+            // Reset modal title
+            if (modalTitle) {
+                modalTitle.textContent = translations.newCategory || '{{ __('New Category') }}';
+            }
             
             // Close icon picker if open
             const iconPicker = document.getElementById('iconPickerModal');
@@ -2812,20 +2820,89 @@
             clearErrors();
 
             const form = e.target;
-            const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
+
+            // Check if editing
+            const isEditing = form.getAttribute('data-editing') === 'true';
+            const categoryId = form.getAttribute('data-category-id');
+            const url = isEditing ? `/categories/${categoryId}` : '{{ route("categories.store") }}';
+            const method = isEditing ? 'PUT' : 'POST';
+
+            // Get form values manually to ensure they are captured
+            const formData = new FormData();
+            const nameField = document.getElementById('category_name');
+            const typeField = document.getElementById('category_type');
+            const parentIdField = document.getElementById('category_parent_id');
+            const iconField = document.getElementById('category_icon');
+            const colorField = document.getElementById('category_color');
+            
+            const name = nameField ? nameField.value : '';
+            const type = typeField ? typeField.value : '';
+            const parentId = parentIdField ? parentIdField.value : '';
+            const icon = iconField ? iconField.value : '';
+            const color = colorField ? colorField.value : '#F97316';
+            
+            // Debug: Log values to console
+            console.log('Form values:', { name, type, parentId, icon, color });
+            
+            // Validate required fields
+            if (!name || !name.trim()) {
+                showError('name', 'The name field is required.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            if (!type) {
+                showError('type', 'The type field is required.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            // Append form data
+            formData.append('name', name.trim());
+            formData.append('type', type);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            
+            // Only append parent_id if it has a value (not empty string)
+            if (parentId && parentId.trim() !== '') {
+                formData.append('parent_id', parentId);
+            }
+            if (icon && icon.trim() !== '') {
+                formData.append('icon', icon);
+            }
+            if (color && color.trim() !== '') {
+                formData.append('color', color);
+            }
+            
+            // Debug: Log FormData contents
+            console.log('FormData contents:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            // Add method spoofing for PUT
+            if (method === 'PUT') {
+                formData.append('_method', 'PUT');
+            }
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                const response = await fetch('{{ route("categories.store") }}', {
-                    method: 'POST',
+                // For PUT requests with FormData, Laravel requires POST method with _method=PUT
+                // This is because browsers don't support PUT with FormData properly
+                const actualMethod = method === 'PUT' ? 'POST' : method;
+                
+                const response = await fetch(url, {
+                    method: actualMethod,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
+                        // Don't set Content-Type - let browser set it with boundary for FormData
                     },
                     body: formData,
                 });
@@ -2835,7 +2912,7 @@
                 if (response.ok && data.success) {
                     const notification = document.createElement('div');
                     notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> Kategori berhasil ditambahkan!';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + (isEditing ? 'Kategori berhasil diperbarui!' : 'Kategori berhasil ditambahkan!');
                     document.body.appendChild(notification);
 
                     setTimeout(() => {
@@ -3003,7 +3080,7 @@
                                 >
                                     <i class="fa-solid fa-trash"></i> ${translations.delete}
                                 </button>
-                            </div>
+                                </div>
                             ` : ''}
                         </div>
                     `;
@@ -3290,6 +3367,760 @@
             }
         }
 
+        // Function to delete category
+        window.deleteCategory = function deleteCategory(categoryId, categoryName) {
+            window.deletingCategoryId = categoryId;
+            window.deletingCategoryName = categoryName;
+            const modal = document.getElementById('deleteCategoryModal');
+            const nameSpan = document.getElementById('deleteCategoryName');
+            if (modal) {
+                if (nameSpan) {
+                    nameSpan.textContent = categoryName;
+                }
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close delete category modal
+        window.closeDeleteCategoryModal = function closeDeleteCategoryModal() {
+            const modal = document.getElementById('deleteCategoryModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.deletingCategoryId = null;
+            window.deletingCategoryName = null;
+        }
+
+        // Function to confirm and delete category
+        window.confirmDeleteCategory = async function confirmDeleteCategory() {
+            if (!window.deletingCategoryId) {
+                return;
+            }
+
+            const categoryId = window.deletingCategoryId;
+            const submitBtn = document.getElementById('confirmDeleteCategoryBtn');
+            const originalText = submitBtn ? submitBtn.innerHTML : '';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + translations.deleting;
+            }
+
+            try {
+                const response = await fetch(`/categories/${categoryId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + translations.categoryDeletedSuccessfully;
+                    document.body.appendChild(notification);
+                    
+                    // Close modal
+                    closeDeleteCategoryModal();
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        // Reload page to show updated category list
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    alert(data.message || translations.failedToDeleteCategory);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                alert(translations.errorGeneral);
+            }
+        }
+
+        // Function to open category detail modal
+        window.openCategoryDetailModal = async function openCategoryDetailModal(categoryId) {
+            const modal = document.getElementById('categoryDetailModal');
+            const content = document.getElementById('categoryDetailContent');
+            
+            if (!modal || !content) {
+                console.error('Category detail modal elements not found');
+                return;
+            }
+            
+            modal.classList.remove('hidden');
+            content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
+            
+            try {
+                const response = await fetch(`/categories/${categoryId}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const c = data.category;
+                    const typeLabels = {
+                        'income': translations.income || '{{ __('Income') }}',
+                        'expense': translations.expense || '{{ __('Expense') }}',
+                        'transfer': translations.transfer || '{{ __('Transfer') }}'
+                    };
+                    
+                    const html = `
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl" style="background-color: ${c.color || '#3B82F6'}20; color: ${c.color || '#3B82F6'};">
+                                    <i class="fa-solid fa-${c.icon || 'tag'}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-dark dark:text-white">${c.name}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 capitalize">${typeLabels[c.type] || c.type}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">${translations.categoryName || '{{ __('Category Name') }}'}</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white">${c.name}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">${translations.type || '{{ __('Type') }}'}</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white capitalize">${typeLabels[c.type] || c.type}</p>
+                                </div>
+                                
+                                ${c.parent ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">${translations.parent || '{{ __('Parent') }}'}</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white">${c.parent.name}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${c.icon ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">${translations.icon || '{{ __('Icon') }}'}</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white"><i class="fa-solid fa-${c.icon}"></i> ${c.icon}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${c.color ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">${translations.color || '{{ __('Color') }}'}</label>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-600" style="background-color: ${c.color};"></div>
+                                        <p class="text-sm font-medium text-dark dark:text-white">${c.color}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Status</label>
+                                    <p class="text-sm font-medium ${c.is_active ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}">
+                                        ${c.is_active ? 'Aktif' : 'Tidak Aktif'}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                                <button 
+                                    onclick="closeCategoryDetailModal(); setTimeout(() => openCategoryEditModal(${c.id}, '${c.name.replace(/'/g, "\\'")}', '${c.type}', ${c.parent_id || 'null'}, '${(c.icon || '').replace(/'/g, "\\'")}', '${c.color || '#3B82F6'}'), 100);" 
+                                    class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center gap-2"
+                                >
+                                    <i class="fa-solid fa-edit"></i> ${translations.edit}
+                                </button>
+                                <button 
+                                    onclick="closeCategoryDetailModal(); deleteCategory(${c.id}, '${c.name.replace(/'/g, "\\'")}');" 
+                                    class="px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition flex items-center gap-2"
+                                >
+                                    <i class="fa-solid fa-trash"></i> ${translations.delete}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div class="text-center py-8 text-red-500">' + (data.message || translations.errorLoadData) + '</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = '<div class="text-center py-8 text-red-500">' + translations.errorLoadData + '</div>';
+            }
+        }
+
+        // Function to close category detail modal
+        window.closeCategoryDetailModal = function closeCategoryDetailModal() {
+            const modal = document.getElementById('categoryDetailModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Function to open debt detail modal
+        window.openDebtDetailModal = async function openDebtDetailModal(debtId) {
+            try {
+                console.log('=== openDebtDetailModal START ===');
+                console.log('Called with ID:', debtId);
+                
+                const modal = document.getElementById('debtDetailModal');
+                const content = document.getElementById('debtDetailContent');
+                
+                console.log('Modal element:', modal);
+                console.log('Content element:', content);
+                
+                if (!modal || !content) {
+                    console.error('ERROR: Debt detail modal elements not found!');
+                    console.error('Modal:', modal);
+                    console.error('Content:', content);
+                    alert('Modal elements not found. Please refresh the page.');
+                    return;
+                }
+                
+                console.log('Modal and content found, showing modal...');
+                modal.classList.remove('hidden');
+                content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
+                
+                console.log('Fetching debt detail for ID:', debtId);
+                const response = await fetch(`/debts/${debtId}/detail`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    console.error('Response not OK:', response.status, response.statusText);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok && data.success) {
+                    const d = data.debt;
+                    const isReceivable = d.type === 'receivable';
+                    const typeLabel = isReceivable ? '{{ __('Receivable') }}' : '{{ __('Payable') }}';
+                    
+                    // Debug: Log debt data
+                    console.log('Debt data:', d);
+                    console.log('is_paid:', d.is_paid, 'type:', typeof d.is_paid);
+                    console.log('isReceivable:', isReceivable);
+                    
+                    const html = `
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl ${isReceivable ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'}">
+                                    <i class="fa-solid fa-${isReceivable ? 'hand-holding-usd' : 'credit-card'}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-dark dark:text-white">${d.contact_name}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${typeLabel}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Kontak</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white">${d.contact_name}</p>
+                                    ${d.contact_phone ? `<p class="text-xs text-gray-500 dark:text-gray-400">${d.contact_phone}</p>` : ''}
+                                    ${d.contact_email ? `<p class="text-xs text-gray-500 dark:text-gray-400">${d.contact_email}</p>` : ''}
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Jumlah Awal</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white sensitive-data">${formatCurrencyJS(d.initial_amount)}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Sisa Utang</label>
+                                    <p class="text-sm font-medium ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} sensitive-data">${formatCurrencyJS(d.current_amount)}</p>
+                                </div>
+                                
+                                ${d.due_date ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Jatuh Tempo</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white">${new Date(d.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${d.description ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Deskripsi</label>
+                                    <p class="text-sm text-dark dark:text-white">${d.description}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${d.account ? `
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Dompet</label>
+                                    <p class="text-sm font-medium text-dark dark:text-white">${d.account.name}</p>
+                                </div>
+                                ` : ''}
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1 block">Status</label>
+                                    <p class="text-sm font-medium ${d.is_paid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                                        ${d.is_paid ? 'Lunas' : 'Belum Lunas'}
+                                    </p>
+                                </div>
+                                
+                                ${d.payments && d.payments.length > 0 ? `
+                                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-3 block">Riwayat Pembayaran</label>
+                                    <div class="space-y-2">
+                                        ${d.payments.map(payment => `
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                <div>
+                                                    <p class="text-sm font-medium text-dark dark:text-white">${new Date(payment.payment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                    ${payment.notes ? `<p class="text-xs text-gray-500 dark:text-gray-400">${payment.notes}</p>` : ''}
+                                                </div>
+                                                <p class="text-sm font-bold text-dark dark:text-white sensitive-data">${formatCurrencyJS(payment.amount)}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${!d.is_paid ? `
+                            <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                                ${isReceivable ? `
+                                <button 
+                                    onclick="closeDebtDetailModal(); window.openMarkPaidModal(${d.id}, this);" 
+                                    data-receivable='${JSON.stringify({
+                                        contact_name: d.contact_name,
+                                        initial_amount: d.initial_amount,
+                                        account_id: d.account_id || null,
+                                        description: d.description || ''
+                                    })}'
+                                    class="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition flex items-center justify-center gap-2"
+                                >
+                                    <i class="fa-solid fa-check-circle"></i> ${translations.markAsPaid || '{{ __('Mark as Paid') }}'}
+                                </button>
+                                ` : `
+                                <button 
+                                    onclick="closeDebtDetailModal(); window.openPaymentModal(${d.id}, this);" 
+                                    data-debt='${JSON.stringify({
+                                        contact_name: d.contact_name,
+                                        current_amount: d.current_amount,
+                                        type: d.type
+                                    })}'
+                                    class="w-full px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center justify-center gap-2"
+                                >
+                                    <i class="fa-solid fa-money-bill-wave"></i> ${translations.payInstallment || '{{ __('Pay Installment') }}'}
+                                </button>
+                                `}
+                                
+                                <button 
+                                    onclick="closeDebtDetailModal(); window.openReminderModal(${d.id}, this);" 
+                                    data-debt='${JSON.stringify({
+                                        contact_name: d.contact_name,
+                                        current_amount: d.current_amount,
+                                        due_date: d.due_date ? new Date(d.due_date).toISOString().split('T')[0] : null,
+                                        description: d.description || ''
+                                    })}'
+                                    class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition flex items-center justify-center gap-2"
+                                >
+                                    <i class="fa-solid fa-bell"></i> ${translations.remind || '{{ __('Remind') }}'}
+                                </button>
+                                
+                                <div class="flex gap-3">
+                                    <button 
+                                        onclick="closeDebtDetailModal(); openDebtEditModal(${d.id}, this);" 
+                                        data-debt-edit='${JSON.stringify({
+                                            type: d.type,
+                                            contact_name: d.contact_name,
+                                            contact_phone: d.contact_phone || '',
+                                            contact_email: d.contact_email || '',
+                                            account_id: d.account_id || null,
+                                            initial_amount: d.initial_amount,
+                                            due_date: d.due_date ? new Date(d.due_date).toISOString().split('T')[0] : null,
+                                            description: d.description || ''
+                                        })}'
+                                        class="flex-1 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition flex items-center justify-center gap-2"
+                                    >
+                                        <i class="fa-solid fa-edit"></i> ${translations.edit}
+                                    </button>
+                                    <button 
+                                        onclick="closeDebtDetailModal(); deleteDebt(${d.id}, '${d.contact_name.replace(/'/g, "\\'")}');" 
+                                        class="flex-1 px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition flex items-center justify-center gap-2"
+                                    >
+                                        <i class="fa-solid fa-trash"></i> ${translations.delete}
+                                    </button>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    // Debug: Log generated HTML
+                    console.log('Generated HTML length:', html.length);
+                    console.log('HTML contains buttons:', html.includes('openReminderModal'));
+                    console.log('HTML contains remind button:', html.includes('fa-bell'));
+                    console.log('HTML contains edit button:', html.includes('fa-edit'));
+                    console.log('HTML contains delete button:', html.includes('fa-trash'));
+                    
+                    // Set HTML content
+                    content.innerHTML = html;
+                    
+                    // Force reflow to ensure DOM is updated
+                    content.offsetHeight;
+                    
+                    // Debug: Verify buttons are in DOM
+                    setTimeout(() => {
+                        const buttons = content.querySelectorAll('button');
+                        console.log('Buttons found in DOM:', buttons.length);
+                        if (buttons.length === 0) {
+                            console.error('NO BUTTONS FOUND IN DOM!');
+                            console.log('Content HTML length:', content.innerHTML.length);
+                            console.log('Content HTML (first 1000 chars):', content.innerHTML.substring(0, 1000));
+                            console.log('Full HTML length:', html.length);
+                            console.log('Full HTML (last 500 chars):', html.substring(html.length - 500));
+                        } else {
+                            buttons.forEach((btn, idx) => {
+                                console.log(`Button ${idx}:`, btn.textContent.trim(), btn.onclick ? 'has onclick' : 'no onclick', btn.className);
+                            });
+                        }
+                    }, 100);
+                } else {
+                    console.error('Response not OK or data.success is false');
+                    console.error('Response status:', response.status);
+                    console.error('Response data:', data);
+                    content.innerHTML = '<div class="text-center py-8 text-red-500">' + (data.message || translations.errorLoadData) + '</div>';
+                }
+            } catch (error) {
+                console.error('Error loading debt detail:', error);
+                console.error('Error stack:', error.stack);
+                content.innerHTML = '<div class="text-center py-8 text-red-500">' + translations.errorLoadData + '</div>';
+            }
+        }
+
+        // Function to close debt detail modal
+        window.closeDebtDetailModal = function closeDebtDetailModal() {
+            const modal = document.getElementById('debtDetailModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Store original parent select options
+        let originalParentOptions = null;
+        
+        // Function to store original parent select options
+        window.storeParentSelectOptions = function storeParentSelectOptions() {
+            const parentSelect = document.getElementById('category_parent_id');
+            if (parentSelect && !originalParentOptions) {
+                originalParentOptions = Array.from(parentSelect.options).map(opt => opt.cloneNode(true));
+            }
+        };
+        
+        // Function to restore original parent select options
+        window.restoreParentSelectOptions = function restoreParentSelectOptions() {
+            const parentSelect = document.getElementById('category_parent_id');
+            if (parentSelect && originalParentOptions) {
+                parentSelect.innerHTML = '';
+                originalParentOptions.forEach(option => {
+                    parentSelect.appendChild(option.cloneNode(true));
+                });
+            }
+        };
+        
+        // Function to open category edit modal
+        window.openCategoryEditModal = function openCategoryEditModal(categoryId, categoryName, categoryType, parentId, icon, color) {
+            const modal = document.getElementById('categoryModal');
+            const form = document.getElementById('categoryForm');
+            const modalTitle = document.getElementById('categoryModalTitle');
+            
+            if (!modal || !form || !modalTitle) {
+                console.error('Category modal elements not found');
+                return;
+            }
+            
+            // Store original options if not already stored
+            storeParentSelectOptions();
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Set editing mode
+            form.setAttribute('data-editing', 'true');
+            form.setAttribute('data-category-id', categoryId);
+            
+            // Set modal title
+            modalTitle.textContent = translations.editCategory || '{{ __('Edit Category') }}';
+            
+            // Populate form fields
+            const nameField = document.getElementById('category_name');
+            const typeField = document.getElementById('category_type');
+            const iconField = document.getElementById('category_icon');
+            const colorField = document.getElementById('category_color');
+            
+            if (nameField) {
+                nameField.value = categoryName || '';
+            }
+            if (typeField) {
+                typeField.value = categoryType || 'expense';
+            }
+            if (iconField) {
+                iconField.value = icon || '';
+            }
+            if (colorField) {
+                colorField.value = color || '#F97316';
+            }
+            
+            // Debug: Log values to ensure they are set
+            console.log('Category edit modal values:', {
+                categoryName,
+                categoryType,
+                parentId,
+                icon,
+                color,
+                nameFieldValue: nameField ? nameField.value : 'field not found',
+                typeFieldValue: typeField ? typeField.value : 'field not found'
+            });
+            
+            // Populate parent select based on type
+            const parentSelect = document.getElementById('category_parent_id');
+            if (parentSelect && originalParentOptions) {
+                // Clear existing options
+                parentSelect.innerHTML = '<option value="">{{ __('No parent') }}</option>';
+                
+                // Filter and add only options that match the category type
+                originalParentOptions.forEach(option => {
+                    if (option.value) {
+                        // Check if this option matches the category type
+                        // Since options are in format "Name (type)", we need to check the type
+                        const optionText = option.textContent;
+                        if (optionText.includes(`(${categoryType})`)) {
+                            const newOption = document.createElement('option');
+                            newOption.value = option.value;
+                            newOption.textContent = option.textContent.replace(` (${categoryType})`, '');
+                            parentSelect.appendChild(newOption);
+                            
+                            // Set selected if matches parentId
+                            if (parentId && parentId !== 'null' && option.value == parentId) {
+                                newOption.selected = true;
+                            }
+                        }
+                    }
+                });
+                
+                // If parentId is set but not found, try to set it directly
+                if (parentId && parentId !== 'null' && !parentSelect.value) {
+                    parentSelect.value = parentId;
+                }
+            }
+            
+            // Set form action
+            form.action = `/categories/${categoryId}`;
+            form.method = 'POST';
+            
+            // Add method spoofing for PUT
+            let methodInput = form.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                form.appendChild(methodInput);
+            }
+            methodInput.value = 'PUT';
+            
+            // Show modal after a small delay to ensure fields are populated
+            setTimeout(() => {
+                modal.classList.remove('hidden');
+                
+                // Double-check values after modal is shown
+                console.log('After modal shown - values:', {
+                    name: nameField ? nameField.value : 'N/A',
+                    type: typeField ? typeField.value : 'N/A'
+                });
+            }, 50);
+        }
+
+        // Function to delete debt
+        window.deleteDebt = function deleteDebt(debtId, debtName) {
+            window.deletingDebtId = debtId;
+            window.deletingDebtName = debtName;
+            const modal = document.getElementById('deleteDebtModal');
+            const nameSpan = document.getElementById('deleteDebtName');
+            if (modal) {
+                if (nameSpan) {
+                    nameSpan.textContent = debtName;
+                }
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close delete debt modal
+        window.closeDeleteDebtModal = function closeDeleteDebtModal() {
+            const modal = document.getElementById('deleteDebtModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.deletingDebtId = null;
+            window.deletingDebtName = null;
+        }
+
+        // Function to confirm and delete debt
+        window.confirmDeleteDebt = async function confirmDeleteDebt() {
+            if (!window.deletingDebtId) {
+                return;
+            }
+
+            const debtId = window.deletingDebtId;
+            const submitBtn = document.getElementById('confirmDeleteDebtBtn');
+            const originalText = submitBtn ? submitBtn.innerHTML : '';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + translations.deleting;
+            }
+
+            try {
+                const response = await fetch(`/debts/${debtId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + translations.debtDeletedSuccessfully;
+                    document.body.appendChild(notification);
+                    
+                    // Close modal
+                    closeDeleteDebtModal();
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        // Reload page to show updated debt list
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    alert(data.message || translations.failedToDeleteDebt);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                alert(translations.errorGeneral);
+            }
+        }
+
+        // Function to open debt edit modal
+        window.openDebtEditModal = function openDebtEditModal(debtId, buttonElement) {
+            const modal = document.getElementById('debtModal');
+            const form = document.getElementById('debtForm');
+            const modalTitle = document.getElementById('debtModalTitle');
+            
+            if (!modal || !form || !modalTitle) {
+                console.error('Debt modal elements not found');
+                return;
+            }
+            
+            // Reset form first
+            form.reset();
+            clearErrors();
+            
+            // Parse debt data from data attribute
+            let debtData;
+            try {
+                let debtDataStr = buttonElement.dataset.debtEdit || buttonElement.getAttribute('data-debt-edit');
+                if (!debtDataStr) {
+                    console.error('Debt data not found in button element');
+                    alert(translations.errorLoadDebts);
+                    return;
+                }
+                
+                // Decode HTML entities if present
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = debtDataStr;
+                debtDataStr = tempDiv.textContent || tempDiv.innerText || debtDataStr;
+                
+                // Remove any whitespace and line breaks
+                debtDataStr = debtDataStr.trim().replace(/\s+/g, ' ');
+                
+                debtData = JSON.parse(debtDataStr);
+            } catch (e) {
+                console.error('Error parsing debt data:', e);
+                alert(translations.errorLoadDebts);
+                return;
+            }
+            
+            // Set editing mode
+            form.setAttribute('data-editing', 'true');
+            form.setAttribute('data-debt-id', debtId);
+            
+            // Set modal title
+            if (debtData.type === 'receivable') {
+                modalTitle.textContent = translations.editReceivable || '{{ __('Edit Receivable') }}';
+            } else {
+                modalTitle.textContent = translations.editPayable || '{{ __('Edit Payable') }}';
+            }
+            
+            // Populate form fields
+            document.getElementById('debt_type').value = debtData.type;
+            document.getElementById('debt_contact_name').value = debtData.contact_name || '';
+            document.getElementById('debt_contact_phone').value = debtData.contact_phone || '';
+            document.getElementById('debt_contact_email').value = debtData.contact_email || '';
+            if (debtData.account_id) {
+                document.getElementById('debt_account_id').value = debtData.account_id;
+            }
+            document.getElementById('debt_initial_amount').value = debtData.initial_amount || '';
+            if (debtData.due_date) {
+                document.getElementById('debt_due_date').value = debtData.due_date;
+            }
+            document.getElementById('debt_description').value = debtData.description || '';
+            
+            // Set form action
+            form.action = `/debts/${debtId}`;
+            form.method = 'POST';
+            
+            // Add method spoofing for PUT
+            let methodInput = form.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                form.appendChild(methodInput);
+            }
+            methodInput.value = 'PUT';
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+
         // Function to open transaction edit modal
         window.openTransactionEditModal = async function openTransactionEditModal(transactionId) {
             // Close detail modal first
@@ -3437,159 +4268,7 @@
             }
         }
 
-        // 7.5. Debt Detail Modal Functions
-        window.openDebtDetailModal = async function openDebtDetailModal(debtId) {
-            const modal = document.getElementById('debtDetailModal');
-            const content = document.getElementById('debtDetailContent');
-            
-            modal.classList.remove('hidden');
-            content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
-
-            try {
-                const response = await fetch(`/debts/${debtId}/detail`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    const debt = data.debt;
-                    const isReceivable = debt.type === 'receivable';
-                    const typeLabel = isReceivable ? 'Piutang' : 'Utang';
-                    const typeColor = isReceivable ? 'emerald' : 'rose';
-                    
-                    let html = `
-                        <div class="space-y-6">
-                            <!-- Header Info -->
-                            <div class="bg-${typeColor}-50 dark:bg-${typeColor === 'emerald' ? 'emerald-900/30' : 'rose-900/30'} p-4 rounded-lg border border-${typeColor}-100 dark:border-${typeColor}-800">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h4 class="font-bold text-${typeColor}-800 dark:text-${typeColor}-400 text-lg">${typeLabel}</h4>
-                                    <span class="bg-${typeColor}-100 dark:bg-${typeColor}-900/30 text-${typeColor}-700 dark:text-${typeColor}-400 text-xs px-3 py-1 rounded font-bold">
-                                        <i class="fa-solid fa-check-circle"></i> ${debt.is_paid ? 'Lunas' : 'Belum Lunas'}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">Kontak: <span class="font-bold text-dark dark:text-white">${debt.contact_name || 'N/A'}</span></p>
-                            </div>
-
-                            <!-- Amount Info -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Jumlah Awal</p>
-                                    <p class="font-bold text-lg text-dark dark:text-white sensitive-data">${formatCurrencyJS(debt.initial_amount || 0)}</p>
-                                </div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Sisa ${typeLabel}</p>
-                                    <p class="font-bold text-lg text-${typeColor}-600 dark:text-${typeColor}-400 sensitive-data">${formatCurrencyJS(debt.current_amount || 0)}</p>
-                                </div>
-                            </div>
-
-                            <!-- Contact Info -->
-                            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                <h5 class="font-bold text-dark dark:text-white mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-user text-gray-400 dark:text-gray-500"></i> Informasi Kontak
-                                </h5>
-                                <div class="space-y-2 text-sm">
-                                    <p><span class="text-gray-500 dark:text-gray-400">Nama:</span> <span class="font-semibold text-dark dark:text-white">${debt.contact_name || 'N/A'}</span></p>
-                                    ${debt.contact_phone ? `<p><span class="text-gray-500 dark:text-gray-400">Telepon:</span> <span class="font-semibold text-dark dark:text-white">${debt.contact_phone}</span></p>` : ''}
-                                    ${debt.contact_email ? `<p><span class="text-gray-500 dark:text-gray-400">Email:</span> <span class="font-semibold text-dark dark:text-white">${debt.contact_email}</span></p>` : ''}
-                                </div>
-                            </div>
-
-                            <!-- Dates Info -->
-                            <div class="grid grid-cols-2 gap-4">
-                                ${debt.due_date ? `
-                                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Jatuh Tempo</p>
-                                    <p class="font-semibold text-dark dark:text-white">${new Date(debt.due_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                </div>
-                                ` : ''}
-                                ${debt.paid_at ? `
-                                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Tanggal Lunas</p>
-                                    <p class="font-semibold text-emerald-600 dark:text-emerald-400">${new Date(debt.paid_at).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                </div>
-                                ` : ''}
-                            </div>
-
-                            <!-- Account Info -->
-                            ${debt.account ? `
-                            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                <h5 class="font-bold text-dark dark:text-white mb-2 flex items-center gap-2">
-                                    <i class="fa-solid fa-wallet text-gray-400 dark:text-gray-500"></i> Akun Terkait
-                                </h5>
-                                <p class="text-sm text-dark dark:text-white">${debt.account.name}</p>
-                            </div>
-                            ` : ''}
-
-                            <!-- Description -->
-                            ${debt.description ? `
-                            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                <h5 class="font-bold text-dark dark:text-white mb-2 flex items-center gap-2">
-                                    <i class="fa-solid fa-file-lines text-gray-400 dark:text-gray-500"></i> Deskripsi
-                                </h5>
-                                <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">${debt.description}</p>
-                            </div>
-                            ` : ''}
-
-                            <!-- Payment History -->
-                            ${debt.payments && debt.payments.length > 0 ? `
-                            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                                <h5 class="font-bold text-dark dark:text-white mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-receipt text-gray-400 dark:text-gray-500"></i> Riwayat Pembayaran (${debt.payments.length})
-                                </h5>
-                                <div class="space-y-3">
-                                    ${debt.payments.map((payment, index) => `
-                                        <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg border border-gray-100 dark:border-gray-500">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <p class="font-semibold text-dark dark:text-white">Pembayaran #${index + 1}</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">${new Date(payment.payment_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                                </div>
-                                                <p class="font-bold text-${typeColor}-600 dark:text-${typeColor}-400 sensitive-data">${formatCurrencyJS(payment.amount || 0)}</p>
-                                            </div>
-                                            ${payment.notes ? `<p class="text-xs text-gray-600 dark:text-gray-300 mt-2 italic">${payment.notes}</p>` : ''}
-                                            ${payment.transaction ? `
-                                                <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-2">
-                                                    <i class="fa-solid fa-check-circle"></i> Transaksi terkait: ${payment.transaction.description || 'N/A'}
-                                                </p>
-                                            ` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    
-                    content.innerHTML = html;
-                } else {
-                    content.innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fa-solid fa-exclamation-circle text-red-500 dark:text-red-400 text-3xl mb-3"></i>
-                            <p class="text-gray-600 dark:text-gray-300">Gagal memuat detail utang/piutang</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${data.message || translations.errorOccurred}</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                content.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fa-solid fa-exclamation-circle text-red-500 dark:text-red-400 text-3xl mb-3"></i>
-                        <p class="text-gray-600 dark:text-gray-300">${translations.errorLoadData}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${translations.pleaseTryAgain}</p>
-                    </div>
-                `;
-            }
-        }
-
-        window.closeDebtDetailModal = function closeDebtDetailModal() {
-            const modal = document.getElementById('debtDetailModal');
-            modal.classList.add('hidden');
-        }
+        // 7.5. Debt Detail Modal Functions - REMOVED (using the one defined earlier with buttons)
 
         // 8. Budget Modal Functions
         window.openBudgetModal = function openBudgetModal() {
@@ -3698,6 +4377,18 @@
             modal.classList.remove('hidden');
             form.reset();
             clearErrors();
+            
+            // Reset editing mode
+            form.removeAttribute('data-editing');
+            form.removeAttribute('data-debt-id');
+            form.action = '{{ route("debts.store") }}';
+            form.method = 'POST';
+            
+            // Remove method spoofing if exists
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) {
+                methodInput.remove();
+            }
             
             // Set type and title based on type
             typeInput.value = type;
@@ -3885,20 +4576,111 @@
             clearErrors();
 
             const form = e.target;
-            const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
+
+            // Check if editing
+            const isEditing = form.getAttribute('data-editing') === 'true';
+            const debtId = form.getAttribute('data-debt-id');
+            const url = isEditing ? `/debts/${debtId}` : '{{ route("debts.store") }}';
+            const method = isEditing ? 'PUT' : 'POST';
+
+            // Get form values manually to ensure they are captured
+            const formData = new FormData();
+            const contactNameField = document.getElementById('debt_contact_name');
+            const contactPhoneField = document.getElementById('debt_contact_phone');
+            const contactEmailField = document.getElementById('debt_contact_email');
+            const typeField = document.getElementById('debt_type');
+            const accountIdField = document.getElementById('debt_account_id');
+            const initialAmountField = document.getElementById('debt_initial_amount');
+            const dueDateField = document.getElementById('debt_due_date');
+            const descriptionField = document.getElementById('debt_description');
+            
+            const contactName = contactNameField ? contactNameField.value : '';
+            const contactPhone = contactPhoneField ? contactPhoneField.value : '';
+            const contactEmail = contactEmailField ? contactEmailField.value : '';
+            const type = typeField ? typeField.value : '';
+            const accountId = accountIdField ? accountIdField.value : '';
+            const initialAmount = initialAmountField ? initialAmountField.value : '';
+            const dueDate = dueDateField ? dueDateField.value : '';
+            const description = descriptionField ? descriptionField.value : '';
+            
+            // Debug: Log values to console
+            console.log('Debt form values:', { contactName, contactPhone, contactEmail, type, accountId, initialAmount, dueDate, description });
+            
+            // Validate required fields
+            if (!contactName || !contactName.trim()) {
+                showError('contact_name', 'The contact name field is required.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            if (!initialAmount || !initialAmount.trim()) {
+                showError('initial_amount', 'The initial amount field is required.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            if (!type) {
+                showError('type', 'The type field is required.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            // Append form data
+            formData.append('contact_name', contactName.trim());
+            formData.append('type', type);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            
+            if (contactPhone && contactPhone.trim() !== '') {
+                formData.append('contact_phone', contactPhone.trim());
+            }
+            if (contactEmail && contactEmail.trim() !== '') {
+                formData.append('contact_email', contactEmail.trim());
+            }
+            if (accountId && accountId.trim() !== '') {
+                formData.append('account_id', accountId);
+            }
+            
+            // Format amount (remove dots, replace comma with dot)
+            const formattedAmount = initialAmount.replace(/\./g, '').replace(',', '.');
+            formData.append('initial_amount', formattedAmount);
+            
+            if (dueDate && dueDate.trim() !== '') {
+                formData.append('due_date', dueDate);
+            }
+            if (description && description.trim() !== '') {
+                formData.append('description', description.trim());
+            }
+
+            // Add method spoofing for PUT
+            if (method === 'PUT') {
+                formData.append('_method', 'PUT');
+            }
+            
+            // For PUT requests with FormData, Laravel requires POST method with _method=PUT
+            const actualMethod = method === 'PUT' ? 'POST' : method;
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
             try {
-                const response = await fetch('{{ route("debts.store") }}', {
-                    method: 'POST',
+                // Debug: Log FormData contents
+                console.log('FormData contents:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                
+                const response = await fetch(url, {
+                    method: actualMethod,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
+                        // Don't set Content-Type - let browser set it with boundary for FormData
                     },
                     body: formData,
                 });
@@ -3908,7 +4690,7 @@
                 if (response.ok && data.success) {
                     const notification = document.createElement('div');
                     notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-                    notification.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + (data.message || (isEditing ? 'Data berhasil diperbarui!' : 'Data berhasil ditambahkan!'));
                     document.body.appendChild(notification);
 
                     setTimeout(() => {
@@ -4598,7 +5380,7 @@
                         value="0"
                         inputmode="numeric"
                         pattern="[0-9.,]*"
-                        class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                     >
                 </div>
 
@@ -4666,7 +5448,7 @@
     <div id="categoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-dark dark:text-white">{{ __('New Category') }}</h3>
+                <h3 id="categoryModalTitle" class="text-xl font-bold text-dark dark:text-white">{{ __('New Category') }}</h3>
                 <button onclick="window.closeCategoryModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
@@ -4708,11 +5490,11 @@
                             <i class="fa-solid fa-tag text-gray-400 text-xl"></i>
                         </div>
                         <div class="flex-1">
-                            <input
-                                type="text"
-                                name="icon"
-                                id="category_icon"
-                                class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                    <input
+                        type="text"
+                        name="icon"
+                        id="category_icon"
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
                                 placeholder="{{ __('Select icon or type icon name') }}"
                             >
                         </div>
@@ -4760,13 +5542,13 @@
                             <i class="fa-solid fa-check text-white text-sm opacity-0" id="color_check_icon"></i>
                         </div>
                         <div class="flex-1">
-                            <input
-                                type="text"
-                                name="color"
-                                id="category_color"
-                                class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
-                                placeholder="#F97316"
-                            >
+                    <input
+                        type="text"
+                        name="color"
+                        id="category_color"
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="#F97316"
+                    >
                         </div>
                         <button type="button" onclick="toggleColorPicker()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
                             <i class="fa-solid fa-palette mr-1"></i> Pilih
@@ -5318,6 +6100,99 @@
                         <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Category Modal -->
+    <div id="deleteCategoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md">
+            <div class="p-4 sm:p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-500 dark:text-rose-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark dark:text-white">{{ __('Delete Category') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('This action cannot be undone') }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+                    {{ __('Are you sure you want to delete this category?') }} <span id="deleteCategoryName" class="font-semibold"></span>?
+                </p>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="window.closeDeleteCategoryModal()" 
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    >
+                        {{ __('Cancel') }}
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteCategoryBtn"
+                        onclick="window.confirmDeleteCategory()" 
+                        class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
+                    >
+                        <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Debt Modal -->
+    <div id="deleteDebtModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md">
+            <div class="p-4 sm:p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-500 dark:text-rose-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark dark:text-white">{{ __('Delete Debt') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('This action cannot be undone') }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+                    {{ __('Are you sure you want to delete this debt?') }} <span id="deleteDebtName" class="font-semibold"></span>?
+                </p>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="window.closeDeleteDebtModal()" 
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    >
+                        {{ __('Cancel') }}
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteDebtBtn"
+                        onclick="window.confirmDeleteDebt()" 
+                        class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
+                    >
+                        <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Detail Modal -->
+    <div id="categoryDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+                <h3 class="text-lg sm:text-xl font-bold text-dark dark:text-white">{{ __('Category Detail') }}</h3>
+                <button onclick="window.closeCategoryDetailModal()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition">
+                    <i class="fa-solid fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+            <div id="categoryDetailContent" class="p-4 sm:p-6">
+                <!-- Content will be loaded via AJAX -->
             </div>
         </div>
     </div>
