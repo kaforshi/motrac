@@ -603,7 +603,7 @@
                             <span class="text-xs bg-white dark:bg-gray-800 text-rose-500 dark:text-rose-400 px-2 py-1 rounded font-bold">{{ $expenseCategories->count() }} {{ __('categories') }}</span>
                         </div>
                         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            @forelse($expenseCategories->take(6) as $category)
+                            @forelse($expenseCategories as $category)
                                 @php
                                     $colorMap = ['orange', 'blue', 'purple', 'teal', 'yellow', 'gray'];
                                     $color = $category->color ?? $colorMap[($loop->index % count($colorMap))];
@@ -627,7 +627,7 @@
                             <span class="text-xs bg-white dark:bg-gray-800 text-emerald-500 dark:text-emerald-400 px-2 py-1 rounded font-bold">{{ $incomeCategories->count() }} {{ __('categories') }}</span>
                         </div>
                         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            @forelse($incomeCategories->take(6) as $category)
+                            @forelse($incomeCategories as $category)
                                 <div class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer transition group">
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition" style="background-color: {{ $category->color ?? '#10B981' }}20; color: {{ $category->color ?? '#10B981' }};">
                                         <i class="fa-solid fa-{{ $category->icon ?? 'tag' }}"></i>
