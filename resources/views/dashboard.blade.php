@@ -553,22 +553,40 @@
                                         <p class="text-xs text-gray-400 dark:text-gray-500">{{ ucfirst($account->type) }}</p>
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-500 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg p-2 transition"
-                                    data-id="{{ $account->id }}"
-                                    data-name="{{ e($account->name) }}"
-                                    data-type="{{ $account->type }}"
-                                    data-currency="{{ $account->currency }}"
-                                    data-notes="{{ e($account->notes) }}"
-                                    data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
-                                    data-is-active="{{ $account->is_active ? 1 : 0 }}"
-                                    data-balance="{{ $account->balance }}"
-                                    data-initial-balance="{{ $account->initial_balance }}"
-                                    onclick="window.openAccountEditFromButton(this)"
-                                >
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
+                                <div class="relative">
+                                    <button
+                                        type="button"
+                                        class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-500 hover:text-dark dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg p-2 transition"
+                                        onclick="toggleAccountMenu({{ $account->id }})"
+                                    >
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <div id="accountMenu{{ $account->id }}" class="hidden absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-[120px]">
+                                        <button
+                                            type="button"
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                            data-id="{{ $account->id }}"
+                                            data-name="{{ e($account->name) }}"
+                                            data-type="{{ $account->type }}"
+                                            data-currency="{{ $account->currency }}"
+                                            data-notes="{{ e($account->notes) }}"
+                                            data-is-hidden="{{ $account->is_hidden ? 1 : 0 }}"
+                                            data-is-active="{{ $account->is_active ? 1 : 0 }}"
+                                            data-balance="{{ $account->balance }}"
+                                            data-initial-balance="{{ $account->initial_balance }}"
+                                            onclick="window.openAccountEditFromButton(this); toggleAccountMenu({{ $account->id }})"
+                                        >
+                                            <i class="fa-solid fa-edit"></i> {{ __('Edit') }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="w-full text-left px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                            onclick="deleteAccount({{ $account->id }}, '{{ e($account->name) }}'); toggleAccountMenu({{ $account->id }})"
+                                        >
+                                            <i class="fa-solid fa-trash"></i> {{ __('Delete') }}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="pl-2">
                                 <p class="text-2xl font-bold text-dark dark:text-white sensitive-data">{{ $currencySymbol }} {{ $userCurrency === 'USD' ? number_format($account->balance, 2, ',', '.') : number_format($account->balance, 0, ',', '.') }}</p>
@@ -935,14 +953,23 @@
                                             'rollover_enabled' => (bool)$budget->rollover_enabled
                                         ];
                                     @endphp
-                                    <button 
-                                        type="button" 
-                                        onclick="window.openBudgetEditModal({{ $budget->id }}, this)"
-                                        data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
-                                        class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-2"
-                                        title="Edit Budget">
-                                        <i class="fa-solid fa-edit"></i>
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button 
+                                            type="button" 
+                                            onclick="window.openBudgetEditModal({{ $budget->id }}, this)"
+                                            data-budget="{{ htmlspecialchars(json_encode($budgetData), ENT_QUOTES, 'UTF-8') }}"
+                                            class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-2"
+                                            title="{{ __('Edit Budget') }}">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onclick="deleteBudget({{ $budget->id }}, '{{ e($budget->category->name ?? 'N/A') }}')"
+                                            class="text-rose-400 dark:text-rose-500 hover:text-rose-600 dark:hover:text-rose-300 transition p-2"
+                                            title="{{ __('Delete Budget') }}">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 mt-2 relative z-10">
@@ -1376,6 +1403,10 @@
             balance: @json(__('Balance')),
             transactionDetail: @json(__('Transaction Detail')),
             deleteTransaction: @json(__('Delete Transaction')),
+            accountDeletedSuccessfully: @json(__('Wallet deleted successfully')),
+            budgetDeletedSuccessfully: @json(__('Budget deleted successfully')),
+            failedToDeleteAccount: @json(__('Failed to delete wallet')),
+            failedToDeleteBudget: @json(__('Failed to delete budget')),
             income: @json(__('Income')),
             expense: @json(__('Expense')),
             transfer: @json(__('Transfer')),
@@ -3059,6 +3090,195 @@
                         submitBtn.innerHTML = originalText;
                     }
                     alert(data.message || translations.failedToDeleteTransaction);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                alert(translations.errorGeneral);
+            }
+        }
+
+        // Function to toggle account menu
+        function toggleAccountMenu(accountId) {
+            const menu = document.getElementById('accountMenu' + accountId);
+            if (menu) {
+                // Close all other menus
+                document.querySelectorAll('[id^="accountMenu"]').forEach(m => {
+                    if (m.id !== 'accountMenu' + accountId) {
+                        m.classList.add('hidden');
+                    }
+                });
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        // Close account menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('[id^="accountMenu"]') && !event.target.closest('button[onclick*="toggleAccountMenu"]')) {
+                document.querySelectorAll('[id^="accountMenu"]').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
+        // Function to delete account
+        window.deleteAccount = function deleteAccount(accountId, accountName) {
+            window.deletingAccountId = accountId;
+            window.deletingAccountName = accountName;
+            const modal = document.getElementById('deleteAccountModal');
+            const nameSpan = document.getElementById('deleteAccountName');
+            if (modal) {
+                if (nameSpan) {
+                    nameSpan.textContent = accountName;
+                }
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close delete account modal
+        window.closeDeleteAccountModal = function closeDeleteAccountModal() {
+            const modal = document.getElementById('deleteAccountModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.deletingAccountId = null;
+            window.deletingAccountName = null;
+        }
+
+        // Function to confirm and delete account
+        window.confirmDeleteAccount = async function confirmDeleteAccount() {
+            if (!window.deletingAccountId) {
+                return;
+            }
+
+            const accountId = window.deletingAccountId;
+            const submitBtn = document.getElementById('confirmDeleteAccountBtn');
+            const originalText = submitBtn ? submitBtn.innerHTML : '';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + translations.deleting;
+            }
+
+            try {
+                const response = await fetch(`/accounts/${accountId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + translations.accountDeletedSuccessfully;
+                    document.body.appendChild(notification);
+                    
+                    // Close modal
+                    closeDeleteAccountModal();
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        // Reload page to show updated account list
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    alert(data.message || translations.failedToDeleteAccount);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                alert(translations.errorGeneral);
+            }
+        }
+
+        // Function to delete budget
+        window.deleteBudget = function deleteBudget(budgetId, budgetName) {
+            window.deletingBudgetId = budgetId;
+            window.deletingBudgetName = budgetName;
+            const modal = document.getElementById('deleteBudgetModal');
+            const nameSpan = document.getElementById('deleteBudgetName');
+            if (modal) {
+                if (nameSpan) {
+                    nameSpan.textContent = budgetName;
+                }
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close delete budget modal
+        window.closeDeleteBudgetModal = function closeDeleteBudgetModal() {
+            const modal = document.getElementById('deleteBudgetModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.deletingBudgetId = null;
+            window.deletingBudgetName = null;
+        }
+
+        // Function to confirm and delete budget
+        window.confirmDeleteBudget = async function confirmDeleteBudget() {
+            if (!window.deletingBudgetId) {
+                return;
+            }
+
+            const budgetId = window.deletingBudgetId;
+            const submitBtn = document.getElementById('confirmDeleteBudgetBtn');
+            const originalText = submitBtn ? submitBtn.innerHTML : '';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + translations.deleting;
+            }
+
+            try {
+                const response = await fetch(`/budgets/${budgetId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success - show notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                    notification.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + translations.budgetDeletedSuccessfully;
+                    document.body.appendChild(notification);
+                    
+                    // Close modal
+                    closeDeleteBudgetModal();
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                        // Reload page to show updated budget list
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    alert(data.message || translations.failedToDeleteBudget);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -5015,6 +5235,84 @@
                         type="button" 
                         id="confirmDeleteBtn"
                         onclick="window.confirmDeleteTransaction()" 
+                        class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
+                    >
+                        <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md">
+            <div class="p-4 sm:p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-500 dark:text-rose-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark dark:text-white">{{ __('Delete Wallet') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('This action cannot be undone') }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+                    {{ __('Are you sure you want to delete this wallet?') }} <span id="deleteAccountName" class="font-semibold"></span>? {{ __('All transactions associated with this wallet will also be affected.') }}
+                </p>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="window.closeDeleteAccountModal()" 
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    >
+                        {{ __('Cancel') }}
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteAccountBtn"
+                        onclick="window.confirmDeleteAccount()" 
+                        class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
+                    >
+                        <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Budget Modal -->
+    <div id="deleteBudgetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md">
+            <div class="p-4 sm:p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-500 dark:text-rose-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark dark:text-white">{{ __('Delete Budget') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('This action cannot be undone') }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+                    {{ __('Are you sure you want to delete this budget?') }} <span id="deleteBudgetName" class="font-semibold"></span>?
+                </p>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="window.closeDeleteBudgetModal()" 
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    >
+                        {{ __('Cancel') }}
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteBudgetBtn"
+                        onclick="window.confirmDeleteBudget()" 
                         class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition"
                     >
                         <i class="fa-solid fa-trash mr-2"></i> {{ __('Delete') }}

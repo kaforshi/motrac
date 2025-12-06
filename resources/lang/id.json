@@ -389,5 +389,14 @@
     "Balance": "Saldo",
     "Currency": "Mata Uang",
     "Active wallet": "Dompet aktif",
-    "Save Wallet": "Simpan Dompet"
+    "Save Wallet": "Simpan Dompet",
+    "Delete Wallet": "Hapus Dompet",
+    "Delete Budget": "Hapus Budget",
+    "Are you sure you want to delete this wallet?": "Apakah Anda yakin ingin menghapus dompet ini?",
+    "Are you sure you want to delete this budget?": "Apakah Anda yakin ingin menghapus budget ini?",
+    "All transactions associated with this wallet will also be affected.": "Semua transaksi yang terkait dengan dompet ini juga akan terpengaruh.",
+    "Wallet deleted successfully": "Dompet berhasil dihapus",
+    "Budget deleted successfully": "Budget berhasil dihapus",
+    "Failed to delete wallet": "Gagal menghapus dompet",
+    "Failed to delete budget": "Gagal menghapus budget"
 }

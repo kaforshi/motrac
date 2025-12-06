@@ -160,10 +160,17 @@ class BudgetController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $budget = Budget::where('user_id', auth()->id())->findOrFail($id);
         $budget->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Budget deleted successfully.',
+            ]);
+        }
 
         return redirect()->route('budgets.index')->with('success', 'Budget deleted successfully.');
     }

@@ -129,10 +129,17 @@ class AccountController extends Controller
         return redirect()->route('accounts.index')->with('success', 'Account updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $account = Account::where('user_id', auth()->id())->findOrFail($id);
         $account->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted successfully.',
+            ]);
+        }
 
         return redirect()->route('accounts.index')->with('success', 'Account deleted successfully.');
     }

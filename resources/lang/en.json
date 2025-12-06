@@ -396,5 +396,14 @@
     "Balance": "Balance",
     "Currency": "Currency",
     "Active wallet": "Active wallet",
-    "Save Wallet": "Save Wallet"
+    "Save Wallet": "Save Wallet",
+    "Delete Wallet": "Delete Wallet",
+    "Delete Budget": "Delete Budget",
+    "Are you sure you want to delete this wallet?": "Are you sure you want to delete this wallet?",
+    "Are you sure you want to delete this budget?": "Are you sure you want to delete this budget?",
+    "All transactions associated with this wallet will also be affected.": "All transactions associated with this wallet will also be affected.",
+    "Wallet deleted successfully": "Wallet deleted successfully",
+    "Budget deleted successfully": "Budget deleted successfully",
+    "Failed to delete wallet": "Failed to delete wallet",
+    "Failed to delete budget": "Failed to delete budget"
 }
