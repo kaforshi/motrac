@@ -12,7 +12,7 @@ use App\Models\Account;
 
 class ProfileController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
@@ -20,7 +20,17 @@ class ProfileController extends Controller
         $transactionCount = Transaction::where('user_id', $user->id)->count();
         $accountCount = Account::where('user_id', $user->id)->count();
         
-        return view('profile', compact('user', 'transactionCount', 'accountCount'));
+        // Determine default view based on route
+        $defaultView = 'profile'; // default
+        $routeName = $request->route()->getName();
+        
+        if ($routeName === 'profile.security') {
+            $defaultView = 'security';
+        } elseif ($routeName === 'profile.notifications') {
+            $defaultView = 'notifications';
+        }
+        
+        return view('profile', compact('user', 'transactionCount', 'accountCount', 'defaultView'));
     }
 
     public function updateProfile(Request $request)

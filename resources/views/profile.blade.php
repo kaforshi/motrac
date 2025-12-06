@@ -36,15 +36,15 @@
 
             <p class="px-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">{{ __('Settings') }}</p>
             
-            <button onclick="switchSettings('profile', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg font-medium transition text-left">
+            <a id="nav-profile" href="{{ route('profile') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('profile') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition text-left">
                 <i class="fa-regular fa-user w-5 text-center"></i> {{ __('My Profile') }}
-            </button>
-            <button onclick="switchSettings('security', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            </a>
+            <a id="nav-security" href="{{ route('profile.security') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('profile.security') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-solid fa-shield-halved w-5 text-center group-hover:text-primary"></i> {{ __('Security') }}
-            </button>
-            <button onclick="switchSettings('notifications', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white rounded-lg font-medium transition group text-left">
+            </a>
+            <a id="nav-notifications" href="{{ route('profile.notifications') }}" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 {{ request()->routeIs('profile.notifications') ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-dark dark:hover:text-white' }} rounded-lg font-medium transition group text-left">
                 <i class="fa-regular fa-bell w-5 text-center group-hover:text-primary"></i> {{ __('Notifications') }}
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -478,7 +478,7 @@
             }
         }
 
-        // Switch Settings View
+        // Switch Settings View (kept for compatibility, but now using links)
         function switchSettings(viewId, btnElement) {
             // 1. Hide all content sections
             document.querySelectorAll('.content-section').forEach(el => {
@@ -507,6 +507,31 @@
             };
             document.getElementById('page-title').innerText = titles[viewId] || 'Pengaturan';
         }
+
+        // Set initial view based on URL path
+        document.addEventListener('DOMContentLoaded', function() {
+            const pathname = window.location.pathname;
+            let defaultView = 'profile';
+            let navButton = null;
+            
+            // Determine view based on pathname
+            if (pathname.includes('/profile/security') || pathname === '/profile/security') {
+                defaultView = 'security';
+                navButton = document.getElementById('nav-security');
+            } else if (pathname.includes('/profile/notifications') || pathname === '/profile/notifications') {
+                defaultView = 'notifications';
+                navButton = document.getElementById('nav-notifications');
+            } else {
+                // Default view is Profile
+                defaultView = 'profile';
+                navButton = document.getElementById('nav-profile');
+            }
+            
+            // Switch to the appropriate view
+            if (navButton && typeof switchSettings === 'function') {
+                switchSettings(defaultView, navButton);
+            }
+        });
 
         // Dark mode settings
         const isDarkMode = {{ $user->dark_mode ? 'true' : 'false' }};
@@ -680,7 +705,7 @@
             formData.append('notify_weekly_report', document.getElementById('notify_weekly_report').checked ? '1' : '0');
 
             try {
-                const response = await fetch('{{ route("profile.notifications") }}', {
+                const response = await fetch('{{ route("profile.notifications.update") }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
