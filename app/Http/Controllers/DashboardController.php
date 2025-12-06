@@ -37,10 +37,20 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
+        // Summary filters (account and category)
+        $summaryAccountId = $request->get('summary_account_id');
+        $summaryCategoryId = $request->get('summary_category_id');
+        
         // Total balance (excluding hidden accounts)
-        $totalBalance = Account::where('user_id', $user->id)
-            ->where('is_hidden', false)
-            ->sum('balance');
+        // If account filter is set, only show balance for that account
+        $totalBalanceQuery = Account::where('user_id', $user->id)
+            ->where('is_hidden', false);
+        
+        if ($summaryAccountId) {
+            $totalBalanceQuery->where('id', $summaryAccountId);
+        }
+        
+        $totalBalance = $totalBalanceQuery->sum('balance');
 
         // Get user timezone with validation
         $userTimezone = $this->getUserTimezone($user);
@@ -77,19 +87,41 @@ class DashboardController extends Controller
         if ($reportType !== 'all' && $reportType !== Transaction::TYPE_INCOME) {
             $monthlyIncome = 0;
         } else {
-            $monthlyIncome = Transaction::where('user_id', $user->id)
+            $incomeQuery = Transaction::where('user_id', $user->id)
                 ->where('type', Transaction::TYPE_INCOME)
-                ->whereBetween('date', [$fromDate, $toDate])
-                ->sum('amount');
+                ->whereBetween('date', [$fromDate, $toDate]);
+            
+            // Apply account filter if set
+            if ($summaryAccountId) {
+                $incomeQuery->where('account_id', $summaryAccountId);
+            }
+            
+            // Apply category filter if set
+            if ($summaryCategoryId) {
+                $incomeQuery->where('category_id', $summaryCategoryId);
+            }
+            
+            $monthlyIncome = $incomeQuery->sum('amount');
         }
 
         if ($reportType !== 'all' && $reportType !== Transaction::TYPE_EXPENSE) {
             $monthlyExpense = 0;
         } else {
-            $monthlyExpense = Transaction::where('user_id', $user->id)
+            $expenseQuery = Transaction::where('user_id', $user->id)
                 ->where('type', Transaction::TYPE_EXPENSE)
-                ->whereBetween('date', [$fromDate, $toDate])
-                ->sum('amount');
+                ->whereBetween('date', [$fromDate, $toDate]);
+            
+            // Apply account filter if set
+            if ($summaryAccountId) {
+                $expenseQuery->where('account_id', $summaryAccountId);
+            }
+            
+            // Apply category filter if set
+            if ($summaryCategoryId) {
+                $expenseQuery->where('category_id', $summaryCategoryId);
+            }
+            
+            $monthlyExpense = $expenseQuery->sum('amount');
         }
 
         // Recent transactions - filter by selected month/year

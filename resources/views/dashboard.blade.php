@@ -168,6 +168,28 @@
 
             <!-- VIEW 1: DASHBOARD (Default) -->
             <div id="view-dashboard" class="content-section animate-fade-in">
+                <!-- Summary Filters -->
+                <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <label for="summary-account-filter" class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{{ __('Filter by Wallet') }}</label>
+                        <select id="summary-account-filter" onchange="window.applySummaryFilters()" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 min-w-[150px] sm:min-w-[180px]">
+                            <option value="">{{ __('All Wallets') }}</option>
+                            @foreach($accounts as $account)
+                                <option value="{{ $account->id }}" {{ request('summary_account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <label for="summary-category-filter" class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{{ __('Filter by Category') }}</label>
+                        <select id="summary-category-filter" onchange="window.applySummaryFilters()" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-dark dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 min-w-[150px] sm:min-w-[180px]">
+                            <option value="">{{ __('All Categories') }}</option>
+                            @foreach($filterCategories as $category)
+                                <option value="{{ $category->id }}" {{ request('summary_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     <div class="bg-white dark:bg-gray-700 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600 relative overflow-hidden group">
@@ -1598,7 +1620,36 @@
             }
         }
 
-        // 3. Change Period for Cash Flow Chart
+        // 3. Apply Summary Filters (Account and Category)
+        window.applySummaryFilters = function applySummaryFilters() {
+            const accountId = document.getElementById('summary-account-filter')?.value || '';
+            const categoryId = document.getElementById('summary-category-filter')?.value || '';
+            
+            // Reload page with filter parameters
+            const url = new URL(window.location.href);
+            
+            if (accountId) {
+                url.searchParams.set('summary_account_id', accountId);
+            } else {
+                url.searchParams.delete('summary_account_id');
+            }
+            
+            if (categoryId) {
+                url.searchParams.set('summary_category_id', categoryId);
+            } else {
+                url.searchParams.delete('summary_category_id');
+            }
+            
+            // Preserve other important parameters
+            const period = url.searchParams.get('period');
+            if (period) {
+                url.searchParams.set('period', period);
+            }
+            
+            window.location.href = url.toString();
+        }
+
+        // 4. Change Period for Cash Flow Chart
         window.changePeriod = function changePeriod(period) {
             const titles = {
                 'daily': 'Arus Kas Harian',
