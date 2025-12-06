@@ -280,120 +280,142 @@ class DashboardController extends Controller
         
         switch ($periodType) {
             case 'daily':
-                // All days in selected month
-                $daysInMonth = $selectedDate->daysInMonth;
-                for ($i = 1; $i <= $daysInMonth; $i++) {
-                    $date = $selectedDate->copy()->day($i);
-                    $dayStart = $date->copy()->startOfDay();
-                    $dayEnd = $date->copy()->endOfDay();
+                // For daily period, show only today's data
+                // If month/year filter is set and it's not the current month, use the last day of that month
+                // Otherwise, use today
+                $today = Carbon::now($userTimezone);
+                if ($monthYear) {
+                    $selectedMonthYear = $selectedDate->format('Y-m');
+                    $currentMonthYear = $today->format('Y-m');
                     
-                    $dayIncome = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_INCOME)
-                        ->whereBetween('date', [$dayStart, $dayEnd])
-                        ->sum('amount');
-                    
-                    $dayExpense = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_EXPENSE)
-                        ->whereBetween('date', [$dayStart, $dayEnd])
-                        ->sum('amount');
-                    
-                    $dayNet = $dayIncome - $dayExpense;
-                    $cashFlowData[] = [
-                        'date' => $date,
-                        'label' => $date->format('d M'),
-                        'income' => $dayIncome,
-                        'expense' => $dayExpense,
-                        'net' => $dayNet,
-                    ];
+                    if ($selectedMonthYear === $currentMonthYear) {
+                        // Selected month is current month, use today
+                        $date = $today;
+                    } else {
+                        // Selected month is different, use the last day of that month
+                        $date = $selectedDate->copy()->endOfMonth();
+                    }
+                } else {
+                    // No month/year filter, use today
+                    $date = $today;
                 }
+                
+                $dayStart = $date->copy()->startOfDay();
+                $dayEnd = $date->copy()->endOfDay();
+                
+                $dayIncome = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_INCOME)
+                    ->whereBetween('date', [$dayStart, $dayEnd])
+                    ->sum('amount');
+                
+                $dayExpense = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_EXPENSE)
+                    ->whereBetween('date', [$dayStart, $dayEnd])
+                    ->sum('amount');
+                
+                $dayNet = $dayIncome - $dayExpense;
+                $cashFlowData[] = [
+                    'date' => $date,
+                    'label' => $date->format('d M Y'),
+                    'income' => $dayIncome,
+                    'expense' => $dayExpense,
+                    'net' => $dayNet,
+                ];
                 break;
                 
             case 'weekly':
-                // All weeks in selected month
-                $startOfMonth = $selectedDate->copy()->startOfMonth();
-                $endOfMonth = $selectedDate->copy()->endOfMonth();
-                $currentWeek = $startOfMonth->copy()->startOfWeek();
-                
-                while ($currentWeek->lte($endOfMonth)) {
-                    $weekStart = $currentWeek->copy();
-                    $weekEnd = min($currentWeek->copy()->endOfWeek(), $endOfMonth);
+                // For weekly period, show only current week's data
+                $today = Carbon::now($userTimezone);
+                if ($monthYear) {
+                    // If month/year is selected, use the current week that contains today
+                    // But ensure it's within the selected month
+                    $weekStart = $today->copy()->startOfWeek();
+                    $weekEnd = $today->copy()->endOfWeek();
+                    $selectedMonthStart = $selectedDate->copy()->startOfMonth();
+                    $selectedMonthEnd = $selectedDate->copy()->endOfMonth();
                     
-                    $weekIncome = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_INCOME)
-                        ->whereBetween('date', [$weekStart, $weekEnd])
-                        ->sum('amount');
-                    
-                    $weekExpense = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_EXPENSE)
-                        ->whereBetween('date', [$weekStart, $weekEnd])
-                        ->sum('amount');
-                    
-                    $weekNet = $weekIncome - $weekExpense;
-                    $cashFlowData[] = [
-                        'date' => $weekStart,
-                        'label' => 'Minggu ' . $weekStart->format('d M'),
-                        'income' => $weekIncome,
-                        'expense' => $weekExpense,
-                        'net' => $weekNet,
-                    ];
-                    
-                    $currentWeek->addWeek();
+                    // Adjust week boundaries to be within selected month
+                    if ($weekStart->lt($selectedMonthStart)) {
+                        $weekStart = $selectedMonthStart->copy();
+                    }
+                    if ($weekEnd->gt($selectedMonthEnd)) {
+                        $weekEnd = $selectedMonthEnd->copy();
+                    }
+                } else {
+                    // No month/year filter, use current week
+                    $weekStart = $today->copy()->startOfWeek();
+                    $weekEnd = $today->copy()->endOfWeek();
                 }
+                
+                $weekIncome = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_INCOME)
+                    ->whereBetween('date', [$weekStart, $weekEnd])
+                    ->sum('amount');
+                
+                $weekExpense = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_EXPENSE)
+                    ->whereBetween('date', [$weekStart, $weekEnd])
+                    ->sum('amount');
+                
+                $weekNet = $weekIncome - $weekExpense;
+                $cashFlowData[] = [
+                    'date' => $weekStart,
+                    'label' => $weekStart->format('d M') . ' - ' . $weekEnd->format('d M Y'),
+                    'income' => $weekIncome,
+                    'expense' => $weekExpense,
+                    'net' => $weekNet,
+                ];
                 break;
                 
             case 'monthly':
-                // Show selected month and 6 months before
-                for ($i = 6; $i >= 0; $i--) {
-                    $monthStart = $selectedDate->copy()->subMonths($i)->startOfMonth();
-                    $monthEnd = $selectedDate->copy()->subMonths($i)->endOfMonth();
-                    
-                    $monthIncome = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_INCOME)
-                        ->whereBetween('date', [$monthStart, $monthEnd])
-                        ->sum('amount');
-                    
-                    $monthExpense = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_EXPENSE)
-                        ->whereBetween('date', [$monthStart, $monthEnd])
-                        ->sum('amount');
-                    
-                    $monthNet = $monthIncome - $monthExpense;
-                    $cashFlowData[] = [
-                        'date' => $monthStart,
-                        'label' => $monthStart->format('M Y'),
-                        'income' => $monthIncome,
-                        'expense' => $monthExpense,
-                        'net' => $monthNet,
-                    ];
-                }
+                // For monthly period, show only selected month's data (or current month if no filter)
+                $monthStart = $selectedDate->copy()->startOfMonth();
+                $monthEnd = $selectedDate->copy()->endOfMonth();
+                
+                $monthIncome = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_INCOME)
+                    ->whereBetween('date', [$monthStart, $monthEnd])
+                    ->sum('amount');
+                
+                $monthExpense = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_EXPENSE)
+                    ->whereBetween('date', [$monthStart, $monthEnd])
+                    ->sum('amount');
+                
+                $monthNet = $monthIncome - $monthExpense;
+                $cashFlowData[] = [
+                    'date' => $monthStart,
+                    'label' => $monthStart->format('M Y'),
+                    'income' => $monthIncome,
+                    'expense' => $monthExpense,
+                    'net' => $monthNet,
+                ];
                 break;
                 
             case 'yearly':
-                // Show selected year and 6 years before
+                // For yearly period, show only selected year's data (or current year if no filter)
                 $selectedYear = $selectedDate->year;
-                for ($i = 6; $i >= 0; $i--) {
-                    $yearStart = Carbon::create($selectedYear - $i, 1, 1)->startOfYear();
-                    $yearEnd = Carbon::create($selectedYear - $i, 12, 31)->endOfYear();
-                    
-                    $yearIncome = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_INCOME)
-                        ->whereBetween('date', [$yearStart, $yearEnd])
-                        ->sum('amount');
-                    
-                    $yearExpense = Transaction::where('user_id', $user->id)
-                        ->where('type', Transaction::TYPE_EXPENSE)
-                        ->whereBetween('date', [$yearStart, $yearEnd])
-                        ->sum('amount');
-                    
-                    $yearNet = $yearIncome - $yearExpense;
-                    $cashFlowData[] = [
-                        'date' => $yearStart,
-                        'label' => $yearStart->format('Y'),
-                        'income' => $yearIncome,
-                        'expense' => $yearExpense,
-                        'net' => $yearNet,
-                    ];
-                }
+                $yearStart = Carbon::create($selectedYear, 1, 1)->startOfYear()->setTimezone($userTimezone);
+                $yearEnd = Carbon::create($selectedYear, 12, 31)->endOfYear()->setTimezone($userTimezone);
+                
+                $yearIncome = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_INCOME)
+                    ->whereBetween('date', [$yearStart, $yearEnd])
+                    ->sum('amount');
+                
+                $yearExpense = Transaction::where('user_id', $user->id)
+                    ->where('type', Transaction::TYPE_EXPENSE)
+                    ->whereBetween('date', [$yearStart, $yearEnd])
+                    ->sum('amount');
+                
+                $yearNet = $yearIncome - $yearExpense;
+                $cashFlowData[] = [
+                    'date' => $yearStart,
+                    'label' => $yearStart->format('Y'),
+                    'income' => $yearIncome,
+                    'expense' => $yearExpense,
+                    'net' => $yearNet,
+                ];
                 break;
         }
         
